@@ -162,6 +162,8 @@ void MainWindow::setupUi()
 
     sel->addWidget(win);
     sel->addWidget(btn);
+    sel->hide(win);
+    sel->setCurrent(btn);
 
 }
 

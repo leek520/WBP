@@ -69,8 +69,8 @@ void WidgetHandle::setWidget(QWidget *w)
 void WidgetHandle::paintEvent(QPaintEvent *)
 {
     QPainter p(this);
-    p.setPen(m_current? Qt::blue : Qt::black);
-    p.setBrush(QBrush(QColor(m_current? Qt::darkBlue : Qt::black)));
+    p.setPen(m_current? Qt::blue : Qt::red);
+    p.setBrush(QBrush(QColor(m_current? Qt::darkBlue : Qt::red)));
     p.drawRect(0, 0, width() - 1, height() - 1);
 }
 
