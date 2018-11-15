@@ -1,4 +1,4 @@
-﻿#include "widgethandle.h"
+﻿#include "widgetselection.h"
 
 
 #include <QPainter>
@@ -69,9 +69,12 @@ void WidgetHandle::setWidget(QWidget *w)
 void WidgetHandle::paintEvent(QPaintEvent *)
 {
     QPainter p(this);
-    p.setPen(m_current? Qt::blue : Qt::red);
-    p.setBrush(QBrush(QColor(m_current? Qt::darkBlue : Qt::red)));
-    p.drawRect(0, 0, width() - 1, height() - 1);
+    if (m_current){
+        p.setPen(m_current? Qt::blue : Qt::red);
+        p.setBrush(QBrush(QColor(m_current? Qt::darkBlue : Qt::red)));
+        p.drawRect(0, 0, width() - 1, height() - 1);
+    }
+
 }
 
 void WidgetHandle::mousePressEvent(QMouseEvent *e)

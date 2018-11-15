@@ -16,15 +16,17 @@ SOURCES += main.cpp\
         mainwindow.cpp \
     widget.cpp \
     leftwidget.cpp \
-    ewindow.cpp \
-    widgethandle.cpp
+    widgetselection.cpp \
+    formwindow.cpp \
+    basewidget.cpp
 
 HEADERS  += mainwindow.h \
     widget.h \
     common.h \
     leftwidget.h \
-    ewindow.h \
-    widgethandle.h
+    widgetselection.h \
+    formwindow.h \
+    basewidget.h
 
 RESOURCES += \
     application.qrc

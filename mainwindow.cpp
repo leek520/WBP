@@ -152,18 +152,17 @@ void MainWindow::setupUi()
     this->addDockWidget(Qt::LeftDockWidgetArea, m_dockW);//初始位置
 
 
-    QWidget *backW = new QWidget(m_mdiArea);
-    backW->resize(1000,800);
-    Selection *sel = new Selection(backW);
-
-    EWindow *win = new EWindow(backW);
-    QPushButton *btn = new QPushButton(win);
+    FormWindow *win = new FormWindow(m_mdiArea);
+    connect(win, SIGNAL(currentChanged(QWidget*)),
+            m_leftW, SLOT(currentChanged(QWidget*)));
+    EPushButton *btn = new EPushButton(win);
     btn->resize(100,200);
+    win->addWidget(btn);
 
-    sel->addWidget(win);
-    sel->addWidget(btn);
-    sel->hide(win);
-    sel->setCurrent(btn);
+    ELabel *lbl = new ELabel(win);
+    lbl->resize(100,100);
+    win->addWidget(lbl);
+
 
 }
 
@@ -174,17 +173,17 @@ void MainWindow::newFile()
 
 bool MainWindow::open()
 {
-
+    return true;
 }
 
 bool MainWindow::save()
 {
-
+    return true;
 }
 
 bool MainWindow::saveAs()
 {
-
+    return true;
 }
 
 void MainWindow::about()

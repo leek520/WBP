@@ -2,8 +2,9 @@
 #define MAINWINDOW_H
 #include "widget.h"
 #include "leftwidget.h"
-#include "ewindow.h"
-#include "widgethandle.h"
+#include "formwindow.h"
+#include "basewidget.h"
+#include "widgetselection.h"
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
