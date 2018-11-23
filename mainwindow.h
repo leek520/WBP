@@ -5,6 +5,7 @@
 #include "formwindow.h"
 #include "basewidget.h"
 #include "widgetselection.h"
+#include "comobject.h"
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -18,6 +19,11 @@ private:
     void createToolBars();
     void createStatusBar();
     void setupUi();
+
+    void QStringToMultBytes(QString str, char *array);
+    BaseInfo* set_base_info(BaseInfo *base, QWidget *w);
+    void for_each_app(const struct list_head *head);
+    void destroy_app_list(struct list_head *head);
 private slots:
     void newFile();
     bool open();
@@ -31,6 +37,12 @@ private slots:
     void paste();
     void cut();
     void remove();
+
+    void readText();
+    void build();
+    void download();
+signals:
+    void DownLoad_sig(const int cmd, const int addr, const QByteArray data);
 private:
     QStatusBar *stateBar;
     QMenu *fileMenu;
@@ -71,8 +83,20 @@ private:
 
     QAction *aboutAct;
 
+    QAction *buildAct;
+    QAction *downAct;
+
     QMdiArea *m_mdiArea;
     LeftWidget *m_leftW;
+
+private:
+    ComDriver *com;
+    QString m_charList;
+    struct SendBuf{
+       int len;
+       char buf[10240];
+    }sendBuf;
+
 };
 
 #endif // MAINWINDOW_H

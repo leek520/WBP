@@ -1,20 +1,16 @@
-#include "formwindow.h"
-
+﻿#include "formwindow.h"
+QWidgetList FormWindow::winList;
 FormWindow::FormWindow(QWidget *parent) :
     QFrame(parent),
-    sel(new Selection(parent)),
-    prop({{10,10,800,480,"Window",0x00ffff},})
+    sel(new Selection(parent))
 {
+    winList.append(this);
     addWidget(this);
 
     setMouseTracking(true); //开启鼠标追踪
     setFocusPolicy(Qt::StrongFocus);
-    setGeometry(prop.baseProp.xPos,
-                prop.baseProp.yPos,
-                prop.baseProp.xSize,
-                prop.baseProp.ySize);
-    setObjectName("FormWindow");
-    setStyleSheet("QFrame#FormWindow{background-color: #ffffff;border: 1px solid red;}");
+    setObjectName("Window");
+    setStyleSheet("QFrame#Window{background-color: #ffffff;border: 1px solid red;}");
 
     connect(qApp, SIGNAL(focusChanged(QWidget *, QWidget *)),
             this, SLOT(focusChanged(QWidget *, QWidget *)));
@@ -41,6 +37,16 @@ void FormWindow::setCurrent(QWidget *w)
     sel->show(w);
 }
 
+QWidgetList FormWindow::childWidgets() const
+{
+    return sel->selectedWidgets();
+}
+
+QWidgetList FormWindow::windowList()
+{
+    return winList;
+}
+
 void FormWindow::mouseMoveEvent(QMouseEvent *event)
 {
     if (this->focusWidget() != this) return;
@@ -59,16 +65,6 @@ void FormWindow::mousePressEvent(QMouseEvent *event)
     }
 }
 
-void FormWindow::propteryChanged()
-{
-    QRect rect = frameGeometry();
-    prop.baseProp.xPos = rect.left();
-    prop.baseProp.yPos = rect.top();
-    prop.baseProp.xSize = rect.width();
-    prop.baseProp.ySize = rect.height();
-
-
-}
 
 void FormWindow::focusChanged(QWidget *old, QWidget *now)
 {
@@ -78,8 +74,6 @@ void FormWindow::focusChanged(QWidget *old, QWidget *now)
 
     if (sel->isWidgetSelected(now)){
         setCurrent(now);
-        //now->setStyleSheet("border: 1px solid blue;");
-        propteryChanged();
     }
 }
 

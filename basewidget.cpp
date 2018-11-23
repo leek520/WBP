@@ -1,9 +1,9 @@
-#include "basewidget.h"
+﻿#include "basewidget.h"
 
 
 EPushButton::EPushButton(QWidget *parent) : QPushButton(parent)
 {
-    setObjectName("EPushButton");
+    setObjectName("Button");
     setMouseTracking(true); //开启鼠标追踪
     setFocusPolicy(Qt::StrongFocus);
 }
@@ -27,9 +27,10 @@ void EPushButton::mousePressEvent(QMouseEvent *event)
 }
 ELabel::ELabel(QWidget *parent) : QLabel(parent)
 {
-    setObjectName("ELabel");
+    setObjectName("Text");
     setMouseTracking(true); //开启鼠标追踪
     setFocusPolicy(Qt::StrongFocus);
+    setStyleSheet("border: 1px solid black;");
 }
 
 void ELabel::mouseMoveEvent(QMouseEvent *event)

@@ -35,22 +35,4 @@ void LeftWidget::setPropertyTable(int row, QString prop, QString value)
 void LeftWidget::currentChanged(QWidget *now)
 {
 
-    QString name = now->objectName();
-    if (name == "FormWindow"){
-        FormWindow *curWidget = (FormWindow *)now;
-        WindowPorp prop = curWidget->prop;
-        m_propertyTable->clearContents();
-        m_propertyTable->setRowCount(5);
-
-        setPropertyTable(0, PropName(prop.baseProp.xPos), PropValue(prop.baseProp.xPos));
-        setPropertyTable(1, PropName(prop.baseProp.yPos), PropValue(prop.baseProp.yPos));
-        setPropertyTable(2, PropName(prop.baseProp.xSize), PropValue(prop.baseProp.xSize));
-        setPropertyTable(3, PropName(prop.baseProp.ySize), PropValue(prop.baseProp.ySize));
-        setPropertyTable(4, PropName(prop.baseProp.backColor), PropValue(prop.baseProp.backColor));
-
-    }else if (name == "EPushButton"){
-        EPushButton *curWidget = (EPushButton *)now;
-    }else if (name == "ELabel"){
-        ELabel *curWidget = (ELabel *)now;
-    }
 }

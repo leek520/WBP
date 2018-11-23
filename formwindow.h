@@ -1,4 +1,4 @@
-#ifndef FORMWINDOW_H
+﻿#ifndef FORMWINDOW_H
 #define FORMWINDOW_H
 
 #include "common.h"
@@ -12,6 +12,8 @@ public:
     ~FormWindow();
     void addWidget(QWidget *w);
     void setCurrent(QWidget *w);
+    QWidgetList childWidgets() const;
+    static QWidgetList windowList();
 protected:
     void mouseMoveEvent(QMouseEvent *event);
     void mousePressEvent(QMouseEvent *event);
@@ -24,11 +26,10 @@ public slots:
 private:
     Selection *sel;
     QPoint dragPosition;   //鼠标拖动的位置
+    static QWidgetList winList;
 public:
 
-    WindowPorp prop;
-    typedef QHash<QString, QString> PropteryHash;
-    PropteryHash m_prop;
+
 };
 
 #endif // FORMWINDOW_H

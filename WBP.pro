@@ -5,6 +5,7 @@
 #-------------------------------------------------
 
 QT       += core gui
+QT       += serialport
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -18,7 +19,8 @@ SOURCES += main.cpp\
     leftwidget.cpp \
     widgetselection.cpp \
     formwindow.cpp \
-    basewidget.cpp
+    basewidget.cpp \
+    comobject.cpp
 
 HEADERS  += mainwindow.h \
     widget.h \
@@ -26,7 +28,8 @@ HEADERS  += mainwindow.h \
     leftwidget.h \
     widgetselection.h \
     formwindow.h \
-    basewidget.h
+    basewidget.h \
+    comobject.h
 
 RESOURCES += \
     application.qrc
