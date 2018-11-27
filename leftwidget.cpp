@@ -12,7 +12,8 @@ LeftWidget::LeftWidget(QWidget *parent) :
 
     createPropertyTree();
     splitter->addWidget(propertyEditor);
-
+    splitter->setStretchFactor(0, 1);
+    splitter->setStretchFactor(1, 3);
     initUi();
 }
 
@@ -126,6 +127,8 @@ void LeftWidget::valueChanged(QtProperty *property, const QVariant &value)
         }else if (currentItem->objectName() == "Edit"){
             ((EEdit *)currentItem)->setAlignment(align);
         }
+    }else if (id == QLatin1String("maxLen")){
+        ((EEdit *)currentItem)->maxLen = value.toInt();
     }
 }
 
@@ -183,6 +186,12 @@ void LeftWidget::currentItemChanged(QWidget *w)
         addProperty(property, QLatin1String("backColor"));
     }
 
+    if (propertyList.contains("maxLen")){
+        property = variantManager->addProperty(QVariant::Int, tr("maxLen"));
+        property->setAttribute(QLatin1String("minimum"), 0);
+        property->setValue(((EEdit *)w)->maxLen);
+        addProperty(property, QLatin1String("maxLen"));
+    }
     if (propertyList.contains("text")){
         property = variantManager->addProperty(QVariant::String, tr("text"));
         property->setValue(text);

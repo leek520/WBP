@@ -35,6 +35,7 @@
 #include <QTreeWidget>
 #include <QSplitter>
 #include <QPushButton>
+#include <QMessageBox>
 #include <QDebug>
 
 

@@ -94,7 +94,7 @@ private:
     LeftWidget *m_leftW;
 
 private:
-    EWindow *curentWin;
+    EWindow *curWin;
     ComDriver *com;
     QString m_charList;
     struct SendBuf{

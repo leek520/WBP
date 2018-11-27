@@ -1,7 +1,8 @@
 ﻿#include "mainwindow.h"
 
 MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent)
+    : QMainWindow(parent),
+    curWin(NULL)
 {
     setWindowTitle(tr("WBP"));//设置窗口标题
     setWindowIcon(QIcon(":/mamtool.ico"));
@@ -226,42 +227,49 @@ void MainWindow::addWidget()
 {
 
     int index = m_graphActList.indexOf((QAction *)sender());
-    if (index < 0) return;
+    if (index < 0){
+        return;
+    }else if (index != 0){
+        if (!curWin){
+            QMessageBox::warning(NULL, "警告", "请先建父窗体！", QMessageBox::Yes, QMessageBox::Yes);
+            return;
+        }
+    }
     switch (index) {
     case 0:
     {
-        curentWin = new EWindow(m_mdiArea);
-        curentWin->resize(800,480);
-        connect(curentWin, SIGNAL(currentItemChanged(QWidget*)),
+        curWin = new EWindow(m_mdiArea);
+        curWin->resize(800,480);
+        connect(curWin, SIGNAL(currentItemChanged(QWidget*)),
                 m_leftW, SLOT(currentItemChanged(QWidget*)));
-        curentWin->propertyChanged(curentWin);
-        m_leftW->addWidget(curentWin);
+        curWin->propertyChanged(curWin);
+        m_leftW->addWidget(curWin);
         break;
     }
     case 1:
     {
-        EButton *btn = new EButton(curentWin);
+        EButton *btn = new EButton(curWin);
         btn->resize(80,50);
-        curentWin->addWidget(btn);
-        connect(btn, SIGNAL(currentItemChanged(QWidget*)), curentWin, SLOT(propertyChanged(QWidget*)));
+        curWin->addWidget(btn);
+        connect(btn, SIGNAL(currentItemChanged(QWidget*)), curWin, SLOT(propertyChanged(QWidget*)));
         m_leftW->addWidget(btn);
         break;
     }
     case 2:
     {
-        EText *text = new EText(curentWin);
+        EText *text = new EText(curWin);
         text->resize(100,50);
-        curentWin->addWidget(text);
-        connect(text, SIGNAL(currentItemChanged(QWidget*)), curentWin, SLOT(propertyChanged(QWidget*)));
+        curWin->addWidget(text);
+        connect(text, SIGNAL(currentItemChanged(QWidget*)), curWin, SLOT(propertyChanged(QWidget*)));
         m_leftW->addWidget(text);
         break;
     }
     case 3:
     {
-        EEdit *edit = new EEdit(curentWin);
+        EEdit *edit = new EEdit(curWin);
         edit->resize(100,50);
-        curentWin->addWidget(edit);
-        connect(edit, SIGNAL(currentItemChanged(QWidget*)), curentWin, SLOT(propertyChanged(QWidget*)));
+        curWin->addWidget(edit);
+        connect(edit, SIGNAL(currentItemChanged(QWidget*)), curWin, SLOT(propertyChanged(QWidget*)));
         m_leftW->addWidget(edit);
         break;
     }
@@ -372,7 +380,7 @@ void MainWindow::cut()
 
 void MainWindow::remove()
 {
-    curentWin->remove(focusWidget());
+    curWin->remove(focusWidget());
 }
 
 void MainWindow::readText()
@@ -388,6 +396,14 @@ void MainWindow::readText()
     }
     QTextStream input(&f1);
     m_charList = input.readAll();
+
+    //1、初始化串口线程
+    QThread *com_thread = new QThread;
+    com = new ComDriver("COM1", "9600", "Even", "1");
+    com->moveToThread(com_thread);
+    com_thread->start();
+    connect(this, SIGNAL(DownLoad_sig(int,int,QByteArray)),
+            com, SLOT(DownLoad_slt(int,int,QByteArray)));
 }
 
 void MainWindow::build()
@@ -433,7 +449,7 @@ void MainWindow::build()
                 editInfo = (EditInfo*)malloc(sizeof(EditInfo));
                 set_text_info(&editInfo->text, childList[j]);
                 set_color_info(editInfo->BkColor, childList[j]);
-                editInfo->maxLen = 10;
+                editInfo->maxLen = ((EEdit *)childList[j])->maxLen;
                 baseInfo = &editInfo->base;
             }
 
@@ -455,13 +471,7 @@ void MainWindow::build()
 
 void MainWindow::download()
 {
-    //1、初始化串口线程
-    QThread *com_thread = new QThread;
-    com = new ComDriver("COM1", "9600", "Even", "1");
-    com->moveToThread(com_thread);
-    com_thread->start();
-    connect(this, SIGNAL(DownLoad_sig(int,int,QByteArray)),
-            com, SLOT(DownLoad_slt(int,int,QByteArray)));
+
 
     //擦除20K，下载地址，下载数据包
     int erase = 0x5c;

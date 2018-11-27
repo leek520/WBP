@@ -54,12 +54,14 @@ void EText::mousePressEvent(QMouseEvent *event)
         dragPosition = event->globalPos() - frameGeometry().topLeft();  //获得鼠标按键位置相对窗口左上面的位置
     }
 }
-EEdit::EEdit(QWidget *parent) : QLineEdit(parent)
+EEdit::EEdit(QWidget *parent) :
+    QLineEdit(parent),
+    maxLen(10)
 {
     setObjectName("Edit");
     setMouseTracking(true); //开启鼠标追踪
     setFocusPolicy(Qt::StrongFocus);
-    m_propertyList<<"backColor"<<"text";
+    m_propertyList<<"backColor"<<"text"<<"maxLen";
 }
 
 void EEdit::mouseMoveEvent(QMouseEvent *event)

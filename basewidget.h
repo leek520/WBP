@@ -43,6 +43,7 @@ protected:
 signals:
     void currentItemChanged(QWidget *now);
 public:
+    int maxLen;
     QStringList m_propertyList;
 private:
     QPoint dragPosition;   //鼠标拖动的位置
