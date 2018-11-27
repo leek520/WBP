@@ -43,6 +43,7 @@
 #define START_ADDR_SDRAM  0xa0300000
 #define START_ADDR_FLASH  0x100000
 #define CHAR_START_UNICODE    0x4e00
+#define INVALID_COLOR 0x80000000
 /************双向循环链表*************/
 
 //计算member在type中的位置
@@ -125,7 +126,7 @@ typedef enum _eWidgetType
     Edit,
 }WidgetType;
 /*********»ù´¡ÐÅÏ¢½á¹¹************/
-typedef struct _tBaseInfo
+typedef struct _tBasePara
 {
     ushort x0;
     ushort y0;
@@ -134,31 +135,44 @@ typedef struct _tBaseInfo
     uchar type;
     char resv[3];
     struct list_head node_info;//链表节点
-}BaseInfo;
+}BasePara;
+/*********ÎÄ±¾ÐÅÏ¢½á¹¹************/
+typedef struct _tTextPara
+{
+    int alignment;
+    int color;
+    char string[128];
+}TextPara;
 /*********´°ÌåÐÅÏ¢½á¹¹************/
 typedef struct _tWindowInfo
 {
-    BaseInfo base;
-    BaseInfo *firstChild;
+    BasePara base;
+    int BkColor[1];
+    BasePara *firstChild;
 }WindowInfo;
 
 /*********°´Å¥ÐÅÏ¢½á¹¹************/
 typedef struct _tButtonInfo
 {
-    BaseInfo base;
-    char text[128];
+    BasePara base;
+    int BkColor[3];
+    TextPara text;
 }ButtonInfo;
 /*********ÎÄ±¾¿òÐÅÏ¢½á¹¹************/
 typedef struct _tTextInfo
 {
-    BaseInfo base;
-    char text[128];
+    BasePara base;
+    int BkColor[1];
+    TextPara text;
 }TextInfo;
 /*********ÊäÈë¿òÐÅÏ¢½á¹¹************/
 typedef struct _tEditInfo
 {
-    BaseInfo base;
-    char text[128];
+    BasePara base;
+    int BkColor[2];
+    uchar maxLen;
+    TextPara text;
 }EditInfo;
+
 
 #endif // COMMON_H

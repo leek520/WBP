@@ -23,9 +23,13 @@ private:
 
 
 
+    void set_text_info(TextPara *text, QWidget *w);
+
+    uint QColorToEColor(QColor color);
+    int set_color_info(int *color, QWidget *w);
 
     void QStringToMultBytes(QString str, char *array);
-    BaseInfo* set_base_info(BaseInfo *base, QWidget *w);
+    BasePara* set_base_info(BasePara *base, QWidget *w);
     void for_each_app(const struct list_head *head);
     void destroy_app_list(struct list_head *head);
 private slots:

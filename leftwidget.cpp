@@ -75,8 +75,27 @@ void LeftWidget::valueChanged(QtProperty *property, const QVariant &value)
         return;
 
     QString id = propertyToId[property];
+    QPalette palette(currentItem->palette());
     if (id == QLatin1String("geometry")) {
         currentItem->setGeometry(value.toRect());
+    }else if (id == QLatin1String("backColor")) {
+        if (currentItem->objectName() == "Window"){
+            palette.setColor(QPalette::Window, value.value<QColor>());
+            ((EWindow *)currentItem)->setPalette(palette);
+        }else if (currentItem->objectName() == "Button"){
+//            palette.setColor(QPalette::Active, QPalette::Button, value.value<QColor>());
+//            ((EButton *)currentItem)->setPalette(palette);
+            qDebug()<<QString::number(value.value<QColor>().rgba(), 16);
+            currentItem->setStyleSheet(QString("background-color: #%1;")
+                                       .arg(QString::number(value.value<QColor>().rgba(), 16)));
+        }else if (currentItem->objectName() == "Text"){
+            palette.setColor(QPalette::Window, value.value<QColor>());
+            ((EText *)currentItem)->setPalette(palette);
+        }else if (currentItem->objectName() == "Edit"){
+            palette.setColor(QPalette::Base, value.value<QColor>());
+            ((EEdit *)currentItem)->setPalette(palette);
+        }
+        currentItem->setAutoFillBackground(true);   //一定要有这句话，不然不更新窗口颜色
     }else if (id == QLatin1String("text")) {
         if (currentItem->objectName() == "Button"){
             ((EButton *)currentItem)->setText(value.toString());
@@ -84,6 +103,28 @@ void LeftWidget::valueChanged(QtProperty *property, const QVariant &value)
             ((EText *)currentItem)->setText(value.toString());
         }else if (currentItem->objectName() == "Edit"){
             ((EEdit *)currentItem)->setText(value.toString());
+        }
+    }else if (id == QLatin1String("textColor")) {
+        if (currentItem->objectName() == "Button"){
+            palette.setColor(QPalette::ButtonText, value.value<QColor>());
+            ((EButton *)currentItem)->setPalette(palette);
+        }else if (currentItem->objectName() == "Text"){
+            palette.setColor(QPalette::WindowText, value.value<QColor>());
+            ((EText *)currentItem)->setPalette(palette);
+        }else if (currentItem->objectName() == "Edit"){
+            palette.setColor(QPalette::Text, value.value<QColor>());
+            ((EEdit *)currentItem)->setPalette(palette);
+        }
+    }else if ((id == QLatin1String("Horizontal")) || (id == QLatin1String("Vertical"))) {
+
+        int hA = idToProperty[QLatin1String("Horizontal")]->value().toInt();
+        int vA = idToProperty[QLatin1String("Vertical")]->value().toInt();
+        Qt::Alignment align = Qt::Alignment((1<<hA) | (1<<(vA+5)));
+        qDebug()<<hA<<vA<<align;
+        if (currentItem->objectName() == "Text"){
+            ((EText *)currentItem)->setAlignment(align);
+        }else if (currentItem->objectName() == "Edit"){
+            ((EEdit *)currentItem)->setAlignment(align);
         }
     }
 }
@@ -108,18 +149,26 @@ void LeftWidget::currentItemChanged(QWidget *w)
 
     QStringList propertyList;
     QString text;
+    QColor color, textColor;
     //根据w类型获取对应需要显示的属性列表
     if (w->objectName() == "Window"){
         propertyList = ((EWindow *)w)->m_propertyList;
+        color = ((EWindow *)w)->palette().color(QPalette::Window);
     }else if (w->objectName() == "Button"){
         propertyList = ((EButton *)w)->m_propertyList;
         text = ((EButton *)w)->text();
+        color = ((EButton *)w)->palette().color(QPalette::Button);
+        textColor = ((EButton *)w)->palette().color(QPalette::ButtonText);
     }else if (w->objectName() == "Text"){
         propertyList = ((EText *)w)->m_propertyList;
         text = ((EText *)w)->text();
+        color = ((EText *)w)->palette().color(QPalette::Window);
+        textColor = ((EText *)w)->palette().color(QPalette::WindowText);
     }else if (w->objectName() == "Edit"){
         propertyList = ((EEdit *)w)->m_propertyList;
         text = ((EEdit *)w)->text();
+        color = ((EEdit *)w)->palette().color(QPalette::Base);
+        textColor = ((EEdit *)w)->palette().color(QPalette::Text);
     }
 
     QtVariantProperty *property;
@@ -128,10 +177,40 @@ void LeftWidget::currentItemChanged(QWidget *w)
     property->setValue(w->geometry());
     addProperty(property, QLatin1String("geometry"));
 
+    if (propertyList.contains("backColor")){
+        property = variantManager->addProperty(QVariant::Color, tr("backColor"));
+        property->setValue(color);
+        addProperty(property, QLatin1String("backColor"));
+    }
+
     if (propertyList.contains("text")){
         property = variantManager->addProperty(QVariant::String, tr("text"));
         property->setValue(text);
         addProperty(property, QLatin1String("text"));
+
+        property = variantManager->addProperty(QVariant::Color, tr("textColor"));
+        property->setValue(textColor);
+        addProperty(property, QLatin1String("textColor"));
+
+
+        QtVariantProperty *Gproperty = variantManager->addProperty(QtVariantPropertyManager::groupTypeId(), tr("alignment"));
+
+        property = variantManager->addProperty(QtVariantPropertyManager::enumTypeId(), tr("Horizontal"));
+        QStringList enumNames1;
+        enumNames1 << "AlignLeft"  << "AlignRight" << "AlignHCenter";
+        property->setAttribute(QLatin1String("enumNames"), enumNames1);
+        property->setValue(0);
+        addProperty(property, QLatin1String("Horizontal"));
+        Gproperty->addSubProperty(property);
+
+        property = variantManager->addProperty(QtVariantPropertyManager::enumTypeId(), tr("Vertical"));
+        QStringList enumNames2;
+        enumNames2 << "AlignTop" << "AlignBottom" << "AlignVCenter";
+        property->setAttribute(QLatin1String("enumNames"), enumNames2);
+        property->setValue(2);
+        addProperty(property, QLatin1String("Vertical"));
+        Gproperty->addSubProperty(property);
+
     }
 
 }

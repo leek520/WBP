@@ -6,7 +6,7 @@ EButton::EButton(QWidget *parent) : QPushButton(parent)
     setObjectName("Button");
     setMouseTracking(true); //开启鼠标追踪
     setFocusPolicy(Qt::StrongFocus);
-    m_propertyList<<"text";
+    m_propertyList<<"backColor"<<"text";
 }
 
 void EButton::mouseMoveEvent(QMouseEvent *event)
@@ -33,7 +33,7 @@ EText::EText(QWidget *parent) : QLabel(parent)
     setMouseTracking(true); //开启鼠标追踪
     setFocusPolicy(Qt::StrongFocus);
     setStyleSheet("border: 1px solid black;");
-    m_propertyList<<"text";
+    m_propertyList<<"backColor"<<"text";
 }
 
 void EText::mouseMoveEvent(QMouseEvent *event)
@@ -59,7 +59,7 @@ EEdit::EEdit(QWidget *parent) : QLineEdit(parent)
     setObjectName("Edit");
     setMouseTracking(true); //开启鼠标追踪
     setFocusPolicy(Qt::StrongFocus);
-    m_propertyList<<"text";
+    m_propertyList<<"backColor"<<"text";
 }
 
 void EEdit::mouseMoveEvent(QMouseEvent *event)

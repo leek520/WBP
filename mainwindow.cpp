@@ -220,6 +220,8 @@ void MainWindow::setupUi()
 
 }
 
+
+
 void MainWindow::addWidget()
 {
 
@@ -232,6 +234,7 @@ void MainWindow::addWidget()
         curentWin->resize(800,480);
         connect(curentWin, SIGNAL(currentItemChanged(QWidget*)),
                 m_leftW, SLOT(currentItemChanged(QWidget*)));
+        curentWin->propertyChanged(curentWin);
         m_leftW->addWidget(curentWin);
         break;
     }
@@ -411,22 +414,26 @@ void MainWindow::build()
             set_base_info(&winInfo->base, winList[i]);
             list_add_tail(&winInfo->base.node_info, head);
         }
-
+        set_color_info(winInfo->BkColor, winList[i]);
         QWidgetList childList = ((EWindow *)winList[i])->childWidgets();
 
-        BaseInfo *baseInfo;
+        BasePara *baseInfo;
         for(int j=0;j<childList.count();j++){
             if (childList[j]->objectName() == "Button"){
                 btnInfo = (ButtonInfo*)malloc(sizeof(ButtonInfo));
-                QStringToMultBytes(((QPushButton *)childList[j])->text(), btnInfo->text);
+                set_text_info(&btnInfo->text, childList[j]);
+                set_color_info(btnInfo->BkColor, childList[j]);
                 baseInfo = &btnInfo->base;
             }else if (childList[j]->objectName() == "Text"){
                 textInfo = (TextInfo*)malloc(sizeof(TextInfo));
-                QStringToMultBytes(((QLabel *)childList[j])->text(), textInfo->text);
+                set_text_info(&textInfo->text, childList[j]);
+                set_color_info(textInfo->BkColor, childList[j]);
                 baseInfo = &textInfo->base;
             }else if (childList[j]->objectName() == "Edit"){
                 editInfo = (EditInfo*)malloc(sizeof(EditInfo));
-                QStringToMultBytes(((QLineEdit *)childList[j])->text(), editInfo->text);
+                set_text_info(&editInfo->text, childList[j]);
+                set_color_info(editInfo->BkColor, childList[j]);
+                editInfo->maxLen = 10;
                 baseInfo = &editInfo->base;
             }
 
@@ -467,7 +474,7 @@ void MainWindow::download()
     emit DownLoad_sig(erase, address, byte);
 
 }
-BaseInfo* MainWindow::set_base_info(BaseInfo *base, QWidget *w)
+BasePara* MainWindow::set_base_info(BasePara *base, QWidget *w)
 {
     if (base == NULL)
     {
@@ -481,6 +488,7 @@ BaseInfo* MainWindow::set_base_info(BaseInfo *base, QWidget *w)
     base->resv[0] = 0;
     base->resv[1] = 0;
     base->resv[2] = 0;
+
     if (w->objectName() == "Window"){
         base->type = 0;
     }else if (w->objectName() == "Button"){
@@ -490,21 +498,82 @@ BaseInfo* MainWindow::set_base_info(BaseInfo *base, QWidget *w)
     }else if (w->objectName() == "Edit"){
         base->type = 3;
     }
-
     return base;
+}
+void MainWindow::set_text_info(TextPara *text, QWidget *w)
+{
+    QColor bc;
+    if (w->objectName() == "Button"){
+        bc = ((EButton *)w)->palette().color(QPalette::ButtonText);
+        text->color = QColorToEColor(bc);
+        text->alignment = (2<<0) | (3<<2);
+
+        QStringToMultBytes(((EButton *)w)->text(), text->string);
+    }else if (w->objectName() == "Text"){
+        bc = ((EText *)w)->palette().color(QPalette::WindowText);
+        text->color = QColorToEColor(bc);
+        text->alignment = (2<<0) | (3<<2);
+
+        QStringToMultBytes(((EText *)w)->text(), text->string);
+    }else if (w->objectName() == "Edit"){
+        bc = ((EEdit *)w)->palette().color(QPalette::Text);
+        text->color = QColorToEColor(bc);
+        text->alignment = (2<<0) | (3<<2);
+
+        QStringToMultBytes(((EEdit *)w)->text(), text->string);
+    }
+
+}
+uint MainWindow::QColorToEColor(QColor color)
+{
+    uint rgb = color.rgb();
+    qDebug()<<QString::number(rgb, 16);
+    //互换rb颜色
+    rgb = ((rgb & 0x000000ff) << 16) | (rgb & 0x0000ff00) | ((rgb & 0x00ff0000) >> 16);
+    qDebug()<<QString::number(rgb, 16);
+    return rgb;
+}
+
+int MainWindow::set_color_info(int *color, QWidget *w)
+{
+    QColor bc;
+    if (w->objectName() == "Window"){
+        bc = ((EWindow *)w)->palette().color(QPalette::Window);
+        color[0] = QColorToEColor(bc);
+    }else if (w->objectName() == "Button"){
+        bc = ((EButton *)w)->palette().color(QPalette::Disabled ,QPalette::Button);
+        color[0] = QColorToEColor(bc);
+        color[0] = INVALID_COLOR;
+        bc = ((EButton *)w)->palette().color(QPalette::Active ,QPalette::Button);
+        color[1] = QColorToEColor(bc);
+        color[1] = INVALID_COLOR;
+        bc = ((EButton *)w)->palette().color(QPalette::Inactive ,QPalette::Button);
+        color[2] = QColorToEColor(bc);
+    }else if (w->objectName() == "Text"){
+        bc = ((EText *)w)->palette().color(QPalette::Window);
+        color[0] = QColorToEColor(bc);
+    }else if (w->objectName() == "Edit"){
+        bc = ((EEdit *)w)->palette().color(QPalette::Disabled, QPalette::Base);
+        color[0] = QColorToEColor(bc);
+        color[0] = INVALID_COLOR;
+        bc = ((EEdit *)w)->palette().color(QPalette::Active, QPalette::Base);
+        color[1] = QColorToEColor(bc);
+    }
+
 }
 void MainWindow::for_each_app(const struct list_head *head)
 {
     struct list_head *pos;
-    BaseInfo *baseInfo;
+    BasePara *baseInfo;
     WindowInfo *winInfo, *dstWin;
     ButtonInfo *btnInfo, *dstBtn;
     TextInfo *textInfo, *dstText;
     EditInfo *editInfo, *dstEdit;
     //遍历链表
+    if (!head) return;
     list_for_each(pos, head)
     {
-        baseInfo = list_entry(pos, BaseInfo, node_info);
+        baseInfo = list_entry(pos, BasePara, node_info);
         qDebug()<<baseInfo->x0<<baseInfo->y0<<baseInfo->xsize<<baseInfo->ysize<<baseInfo->type;
         switch(baseInfo->type) {
         case Window:
@@ -513,8 +582,8 @@ void MainWindow::for_each_app(const struct list_head *head)
             dstWin = (WindowInfo *)(sendBuf.buf + sendBuf.len);
             memcpy(dstWin, winInfo, sizeof(WindowInfo));
             sendBuf.len += sizeof(WindowInfo);
-            dstWin->firstChild = (BaseInfo *)(sendBuf.len + START_ADDR_SDRAM);
-
+            dstWin->firstChild = (BasePara *)(sendBuf.len + START_ADDR_SDRAM);
+            if (!winInfo->firstChild) break;
             for_each_app(&winInfo->firstChild->node_info);
 
             dstWin->base.node_info.prev = NULL;
@@ -538,7 +607,7 @@ void MainWindow::for_each_app(const struct list_head *head)
             }else{
                 dstBtn->base.node_info.next = NULL;
             }
-            qDebug()<<QString(btnInfo->text);
+            qDebug()<<QString(btnInfo->text.string);
             break;
         case Text:
             textInfo = (TextInfo *)baseInfo;
@@ -553,7 +622,7 @@ void MainWindow::for_each_app(const struct list_head *head)
             }else{
                 dstText->base.node_info.next = NULL;
             }
-            qDebug()<<QString(textInfo->text);
+            qDebug()<<QString(textInfo->text.string);
             break;
         case Edit:
             editInfo = (EditInfo *)baseInfo;
@@ -568,7 +637,7 @@ void MainWindow::for_each_app(const struct list_head *head)
             }else{
                 dstEdit->base.node_info.next = NULL;
             }
-            qDebug()<<QString(editInfo->text);
+            qDebug()<<QString(editInfo->text.string);
             break;
         default:
             break;

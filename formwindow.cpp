@@ -4,13 +4,18 @@ EWindow::EWindow(QWidget *parent) :
     QFrame(parent),
     sel(new Selection(parent))
 {
+    m_propertyList<<"geometry"<<"backColor";
     winList.append(this);
     addWidget(this);
 
     setMouseTracking(true); //开启鼠标追踪
     setFocusPolicy(Qt::StrongFocus);
     setObjectName("Window");
-    setStyleSheet("QFrame#Window{background-color: #ffffff;border: 1px solid red;}");
+
+    QPalette palette(this->palette());
+    palette.setColor(QPalette::Background, QColor(0xDCDCDC));
+    this->setAutoFillBackground(true);
+    this->setPalette(palette);
 
     connect(qApp, SIGNAL(focusChanged(QWidget *, QWidget *)),
             this, SLOT(focusChanged(QWidget *, QWidget *)));
