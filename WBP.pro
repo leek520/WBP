@@ -13,6 +13,8 @@ TARGET = WBP
 TEMPLATE = app
 
 
+include(./qtpropertybrowser/src/qtpropertybrowser.pri)
+
 SOURCES += main.cpp\
         mainwindow.cpp \
     widget.cpp \

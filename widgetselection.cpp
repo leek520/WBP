@@ -556,7 +556,7 @@ void Selection::repaintSelection()
     }
 }
 
-bool Selection::isWidgetSelected(QWidget *w) const{
+bool Selection::isContainWidget(QWidget *w) const{
     return  m_usedSelections.contains(w);
 }
 

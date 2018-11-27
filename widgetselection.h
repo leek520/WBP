@@ -91,7 +91,7 @@ public:
     void repaintSelection(QWidget *w);
     void repaintSelection();
 
-    bool isWidgetSelected(QWidget *w) const;
+    bool isContainWidget(QWidget *w) const;
     QWidgetList selectedWidgets() const;
 
     WidgetSelection *addWidget(QWidget *w);

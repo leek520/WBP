@@ -6,6 +6,7 @@
 #include "basewidget.h"
 #include "widgetselection.h"
 #include "comobject.h"
+
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -19,6 +20,9 @@ private:
     void createToolBars();
     void createStatusBar();
     void setupUi();
+
+
+
 
     void QStringToMultBytes(QString str, char *array);
     BaseInfo* set_base_info(BaseInfo *base, QWidget *w);
@@ -41,6 +45,8 @@ private slots:
     void readText();
     void build();
     void download();
+
+    void addWidget();
 signals:
     void DownLoad_sig(const int cmd, const int addr, const QByteArray data);
 private:
@@ -73,23 +79,18 @@ private:
     QAction *pasteAct;
     QAction *removeAct;
 
-    QAction *zoomInAct;
-    QAction *zoomOutAct;
-    QAction *findAct;
-
-    QAction *wstackAct;
-    QAction *whsideAct;
-    QAction *wvsideAct;
-
     QAction *aboutAct;
 
     QAction *buildAct;
     QAction *downAct;
 
-    QMdiArea *m_mdiArea;
+    QList <QAction *>m_graphActList;
+
+    QScrollArea *m_mdiArea;
     LeftWidget *m_leftW;
 
 private:
+    EWindow *curentWin;
     ComDriver *com;
     QString m_charList;
     struct SendBuf{

@@ -100,17 +100,40 @@ void MainWindow::createActions()
     downAct = new QAction(QIcon(":/images/download.png"), tr("&Download"), this);
     downAct->setStatusTip(tr("Download"));
     connect(downAct, SIGNAL(triggered()), this, SLOT(download()));
+
+
+    /****widget****/
+    QAction *act = new QAction(QIcon(":/images/widget/window.PNG"), tr("Window"), this);
+    act->setStatusTip(tr("Window"));
+    act->setShortcut(Qt::Key_F3);
+    connect(act, SIGNAL(triggered()), this, SLOT(addWidget()));
+    m_graphActList.append(act);
+
+    act = new QAction(QIcon(":/images/widget/button.PNG"), tr("Button"), this);
+    act->setStatusTip(tr("Button"));
+    act->setShortcut(Qt::Key_F4);
+    connect(act, SIGNAL(triggered()), this, SLOT(addWidget()));
+    m_graphActList.append(act);
+
+    act = new QAction(QIcon(":/images/widget/text.PNG"), tr("Text"), this);
+    act->setStatusTip(tr("Text"));
+    act->setShortcut(Qt::Key_F5);
+    connect(act, SIGNAL(triggered()), this, SLOT(addWidget()));
+    m_graphActList.append(act);
+
+    act = new QAction(QIcon(":/images/widget/edit.PNG"), tr("Edit"), this);
+    act->setStatusTip(tr("Edit"));
+    act->setShortcut(Qt::Key_F6);
+    connect(act, SIGNAL(triggered()), this, SLOT(addWidget()));
+    m_graphActList.append(act);
 }
 
 void MainWindow::createMenus()
 {
     fileMenu = menuBar()->addMenu(tr("&File"));
     fileMenu->addAction(newAct);
-
     fileMenu->addAction(openAct);
-
     fileMenu->addAction(saveAct);
-
     fileMenu->addAction(saveAsAct);
     fileMenu->addSeparator();
     fileMenu->addAction(exitAct);
@@ -136,6 +159,32 @@ void MainWindow::createMenus()
 
 void MainWindow::createToolBars()
 {
+    fileToolBar = addToolBar(tr("File"));
+    fileToolBar->addAction(newAct);
+    fileToolBar->addAction(openAct);
+    fileToolBar->addAction(saveAct);
+
+    editToolBar = addToolBar(tr("Edit"));
+    editToolBar->addAction(undoAct);
+    editToolBar->addAction(redoAct);
+    editToolBar->addAction(cutAct);
+    editToolBar->addAction(copyAct);
+    editToolBar->addAction(pasteAct);
+    editToolBar->addAction(removeAct);
+
+
+    buildToolBar = addToolBar(tr("Build"));
+    buildToolBar->addAction(buildAct);
+    buildToolBar->addAction(downAct);
+
+    addToolBarBreak(Qt::TopToolBarArea);
+
+    graphToolBar = addToolBar(tr("Widget"));
+    for(int i=0;i<m_graphActList.count();i++){
+        graphToolBar->addAction(m_graphActList[i]);
+    }
+    graphToolBar->setIconSize(QSize(100,100));
+    graphToolBar->setFixedHeight(100);
 
 }
 
@@ -158,7 +207,8 @@ void MainWindow::createStatusBar()
 
 void MainWindow::setupUi()
 {
-    m_mdiArea = new QMdiArea(this);
+    resize(1200,800);
+    m_mdiArea = new QScrollArea(this);
     setCentralWidget(m_mdiArea);
 
     m_leftW = new LeftWidget();
@@ -168,22 +218,53 @@ void MainWindow::setupUi()
     m_dockW->setWidget(m_leftW);
     this->addDockWidget(Qt::LeftDockWidgetArea, m_dockW);//初始位置
 
+}
 
-    FormWindow *win = new FormWindow(m_mdiArea);
-    win->resize(800,480);
-    connect(win, SIGNAL(currentChanged(QWidget*)),
-            m_leftW, SLOT(currentChanged(QWidget*)));
-    EPushButton *btn = new EPushButton(win);
-    btn->resize(100,200);
-    btn->setText("菜单");
-    win->addWidget(btn);
+void MainWindow::addWidget()
+{
 
-    ELabel *lbl = new ELabel(win);
-    lbl->resize(100,100);
-    lbl->setText("abc1123");
-    win->addWidget(lbl);
-
-
+    int index = m_graphActList.indexOf((QAction *)sender());
+    if (index < 0) return;
+    switch (index) {
+    case 0:
+    {
+        curentWin = new EWindow(m_mdiArea);
+        curentWin->resize(800,480);
+        connect(curentWin, SIGNAL(currentItemChanged(QWidget*)),
+                m_leftW, SLOT(currentItemChanged(QWidget*)));
+        m_leftW->addWidget(curentWin);
+        break;
+    }
+    case 1:
+    {
+        EButton *btn = new EButton(curentWin);
+        btn->resize(80,50);
+        curentWin->addWidget(btn);
+        connect(btn, SIGNAL(currentItemChanged(QWidget*)), curentWin, SLOT(propertyChanged(QWidget*)));
+        m_leftW->addWidget(btn);
+        break;
+    }
+    case 2:
+    {
+        EText *text = new EText(curentWin);
+        text->resize(100,50);
+        curentWin->addWidget(text);
+        connect(text, SIGNAL(currentItemChanged(QWidget*)), curentWin, SLOT(propertyChanged(QWidget*)));
+        m_leftW->addWidget(text);
+        break;
+    }
+    case 3:
+    {
+        EEdit *edit = new EEdit(curentWin);
+        edit->resize(100,50);
+        curentWin->addWidget(edit);
+        connect(edit, SIGNAL(currentItemChanged(QWidget*)), curentWin, SLOT(propertyChanged(QWidget*)));
+        m_leftW->addWidget(edit);
+        break;
+    }
+    default:
+        break;
+    }
 }
 
 void MainWindow::QStringToMultBytes(QString str, char *array)
@@ -288,7 +369,7 @@ void MainWindow::cut()
 
 void MainWindow::remove()
 {
-
+    curentWin->remove(focusWidget());
 }
 
 void MainWindow::readText()
@@ -317,7 +398,7 @@ void MainWindow::build()
     TextInfo *textInfo;
     EditInfo *editInfo;
 
-    QWidgetList winList = FormWindow::windowList();
+    QWidgetList winList = EWindow::windowList();
     for(int i=0;i<winList.count();i++){
         winInfo = (WindowInfo*)malloc(sizeof(WindowInfo));
         winInfo->firstChild = NULL;
@@ -331,8 +412,7 @@ void MainWindow::build()
             list_add_tail(&winInfo->base.node_info, head);
         }
 
-        QWidgetList childList = ((FormWindow *)winList[i])->childWidgets();
-        childList.removeOne(winList[i]);
+        QWidgetList childList = ((EWindow *)winList[i])->childWidgets();
 
         BaseInfo *baseInfo;
         for(int j=0;j<childList.count();j++){

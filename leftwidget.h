@@ -5,9 +5,9 @@
 #include "basewidget.h"
 #include "formwindow.h"
 
+#include "qtvariantproperty.h"
+#include "qttreepropertybrowser.h"
 
-#define PropName(x)     (#x+14)
-#define PropValue(x)    QString("%1").arg(x)
 class LeftWidget : public QWidget
 {
     Q_OBJECT
@@ -17,15 +17,25 @@ public:
     QSize sizeHint() const {
         return QSize(250, 200);
     }
+    void addWidget(QWidget *w);
+    void removeWidget(QWidget *w);
 signals:
 private:
-    void setPropertyTable(int row, QString prop, QString value);
+    void createPropertyTree();
+    void updateExpandState();
+    void addProperty(QtVariantProperty *property, const QString &id);
 public slots:
-    void currentChanged(QWidget *now);
+    void valueChanged(QtProperty *property, const QVariant &value);
+    void currentItemChanged(QWidget *w);
 private:
-    QTreeWidget *m_objectTree;
-    QTableWidget *m_propertyTable;
+    QtTreePropertyBrowser *propertyEditor;
+    QtVariantPropertyManager *variantManager;
+    QMap<QtProperty *, QString> propertyToId;
+    QMap<QString, QtVariantProperty *> idToProperty;
+    QMap<QString, bool> idToExpanded;
+    QWidget *currentItem;
 
+    QTreeWidget *m_objectTree;
 };
 
 #endif // LEFTWIDGET_H

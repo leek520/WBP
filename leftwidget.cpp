@@ -8,31 +8,138 @@ LeftWidget::LeftWidget(QWidget *parent) :
     layout->addWidget(splitter);
     m_objectTree = new QTreeWidget(this);
     m_objectTree->setHeaderLabel("");
-    m_propertyTable = new QTableWidget(this);
     splitter->addWidget(m_objectTree);
-    splitter->addWidget(m_propertyTable);
+
+    createPropertyTree();
+    splitter->addWidget(propertyEditor);
 
     initUi();
 }
 
 void LeftWidget::initUi()
 {
-    m_propertyTable->setColumnCount(2); //设置列数
-    m_propertyTable->setHorizontalHeaderLabels((QStringList()<<tr("属性")<<tr("值"))); //设置头的标题
-    m_propertyTable->verticalHeader()->setVisible(false);
-    m_propertyTable->horizontalHeader()->setStretchLastSection(true);//关键
+
 }
 
-void LeftWidget::setPropertyTable(int row, QString prop, QString value)
+void LeftWidget::addWidget(QWidget *w)
 {
-    QTableWidgetItem *item;
-    item = new QTableWidgetItem(prop);
-    m_propertyTable->setItem(row, 0, item);
-    item = new QTableWidgetItem(value);
-    m_propertyTable->setItem(row, 1, item);
+    m_objectTree->clear();
+    QWidgetList winList = EWindow::windowList();
+    for(int i=0;i<winList.count();i++){
+        QTreeWidgetItem* pItem = new QTreeWidgetItem();
+        pItem->setText(0, winList[i]->objectName());
+        m_objectTree->addTopLevelItem(pItem);
+        QWidgetList childList = ((EWindow *)winList[i])->childWidgets();
+        for(int j=0;j<childList.count();j++){
+            QTreeWidgetItem* pChild = new QTreeWidgetItem();
+            pChild->setText(0, childList[j]->objectName());
+            pItem->addChild(pChild);
+        }
+    }
+    m_objectTree->expandAll();
 }
 
-void LeftWidget::currentChanged(QWidget *now)
+void LeftWidget::removeWidget(QWidget *w)
 {
 
+}
+
+void LeftWidget::createPropertyTree()
+{
+    variantManager = new QtVariantPropertyManager(this);
+
+    connect(variantManager, SIGNAL(valueChanged(QtProperty *, const QVariant &)),
+                this, SLOT(valueChanged(QtProperty *, const QVariant &)));
+    QtVariantEditorFactory *variantFactory = new QtVariantEditorFactory(this);
+    propertyEditor = new QtTreePropertyBrowser();
+    propertyEditor->setFactoryForManager(variantManager, variantFactory);
+}
+
+void LeftWidget::updateExpandState()
+{
+    QList<QtBrowserItem *> list = propertyEditor->topLevelItems();
+    QListIterator<QtBrowserItem *> it(list);
+    while (it.hasNext()) {
+        QtBrowserItem *item = it.next();
+        QtProperty *prop = item->property();
+        idToExpanded[propertyToId[prop]] = propertyEditor->isExpanded(item);
+    }
+}
+
+void LeftWidget::valueChanged(QtProperty *property, const QVariant &value)
+{
+    if (!propertyToId.contains(property))
+        return;
+
+    if (!currentItem)
+        return;
+
+    QString id = propertyToId[property];
+    if (id == QLatin1String("geometry")) {
+        currentItem->setGeometry(value.toRect());
+    }else if (id == QLatin1String("text")) {
+        if (currentItem->objectName() == "Button"){
+            ((EButton *)currentItem)->setText(value.toString());
+        }else if (currentItem->objectName() == "Text"){
+            ((EText *)currentItem)->setText(value.toString());
+        }else if (currentItem->objectName() == "Edit"){
+            ((EEdit *)currentItem)->setText(value.toString());
+        }
+    }
+}
+
+void LeftWidget::currentItemChanged(QWidget *w)
+{
+    qDebug()<<w;
+    updateExpandState();
+    //删除原有属性map
+    QMap<QtProperty *, QString>::ConstIterator itProp = propertyToId.constBegin();
+    while (itProp != propertyToId.constEnd()) {
+        delete itProp.key();
+        itProp++;
+    }
+    propertyToId.clear();
+    idToProperty.clear();
+
+    currentItem = w;
+    if (!currentItem) {
+        return;
+    }
+
+    QStringList propertyList;
+    QString text;
+    //根据w类型获取对应需要显示的属性列表
+    if (w->objectName() == "Window"){
+        propertyList = ((EWindow *)w)->m_propertyList;
+    }else if (w->objectName() == "Button"){
+        propertyList = ((EButton *)w)->m_propertyList;
+        text = ((EButton *)w)->text();
+    }else if (w->objectName() == "Text"){
+        propertyList = ((EText *)w)->m_propertyList;
+        text = ((EText *)w)->text();
+    }else if (w->objectName() == "Edit"){
+        propertyList = ((EEdit *)w)->m_propertyList;
+        text = ((EEdit *)w)->text();
+    }
+
+    QtVariantProperty *property;
+    //共有属性
+    property = variantManager->addProperty(QVariant::Rect, tr("geometry"));
+    property->setValue(w->geometry());
+    addProperty(property, QLatin1String("geometry"));
+
+    if (propertyList.contains("text")){
+        property = variantManager->addProperty(QVariant::String, tr("text"));
+        property->setValue(text);
+        addProperty(property, QLatin1String("text"));
+    }
+
+}
+void LeftWidget::addProperty(QtVariantProperty *property, const QString &id)
+{
+    propertyToId[property] = id;
+    idToProperty[id] = property;
+    QtBrowserItem *item = propertyEditor->addProperty(property);
+    if (idToExpanded.contains(id))
+        propertyEditor->setExpanded(item, idToExpanded[id]);
 }

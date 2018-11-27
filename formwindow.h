@@ -3,26 +3,30 @@
 
 #include "common.h"
 #include "widgetselection.h"
-
-class FormWindow : public QFrame
+#include "basewidget.h"
+class EWindow : public QFrame
 {
     Q_OBJECT
 public:
-    explicit FormWindow(QWidget *parent = 0);
-    ~FormWindow();
+    explicit EWindow(QWidget *parent = 0);
+    ~EWindow();
     void addWidget(QWidget *w);
     void setCurrent(QWidget *w);
+    void remove(QWidget *w);
     QWidgetList childWidgets() const;
     static QWidgetList windowList();
 protected:
     void mouseMoveEvent(QMouseEvent *event);
     void mousePressEvent(QMouseEvent *event);
 private:
-    void propteryChanged();
+    void getPropertyList();
 signals:
-    void currentChanged(QWidget *now);
+    void currentItemChanged(QWidget *now);
 public slots:
     void focusChanged(QWidget *old, QWidget *now);
+    void propertyChanged(QWidget *now);
+public:
+    QStringList m_propertyList;
 private:
     Selection *sel;
     QPoint dragPosition;   //鼠标拖动的位置

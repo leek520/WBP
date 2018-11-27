@@ -14,5 +14,9 @@
         <file>images/build.png</file>
         <file>images/download.png</file>
         <file>char3000.txt</file>
+        <file>images/widget/button.PNG</file>
+        <file>images/widget/edit.PNG</file>
+        <file>images/widget/text.PNG</file>
+        <file>images/widget/window.PNG</file>
     </qresource>
 </RCC>

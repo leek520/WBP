@@ -1,6 +1,6 @@
 ﻿#include "formwindow.h"
-QWidgetList FormWindow::winList;
-FormWindow::FormWindow(QWidget *parent) :
+QWidgetList EWindow::winList;
+EWindow::EWindow(QWidget *parent) :
     QFrame(parent),
     sel(new Selection(parent))
 {
@@ -14,20 +14,22 @@ FormWindow::FormWindow(QWidget *parent) :
 
     connect(qApp, SIGNAL(focusChanged(QWidget *, QWidget *)),
             this, SLOT(focusChanged(QWidget *, QWidget *)));
+    connect(sel, SIGNAL(sizeChanged(QWidget*,QRect,QRect)),
+            this, SLOT(propertyChanged(QWidget*)));
 }
 
-FormWindow::~FormWindow()
+EWindow::~EWindow()
 {
     delete sel;
 }
 
-void FormWindow::addWidget(QWidget *w)
+void EWindow::addWidget(QWidget *w)
 {
     sel->addWidget(w);
     setCurrent(w);
 }
 
-void FormWindow::setCurrent(QWidget *w)
+void EWindow::setCurrent(QWidget *w)
 {
     QWidget *curWidget = sel->current();
     if (curWidget){
@@ -35,28 +37,55 @@ void FormWindow::setCurrent(QWidget *w)
     }
     sel->setCurrent(w);
     sel->show(w);
+    w->show();
+    propertyChanged(w);
 }
 
-QWidgetList FormWindow::childWidgets() const
+void EWindow::remove(QWidget *w)
 {
-    return sel->selectedWidgets();
+    if (w->objectName() == "Window"){
+        delete ((EWindow *)w);
+    }else if (w->objectName() == "Button"){
+        ((EWindow *)w->parentWidget())->sel->removeWidget(w);
+        delete ((EButton *)w);
+    }else if (w->objectName() == "Text"){
+        ((EWindow *)w->parentWidget())->sel->removeWidget(w);
+        delete ((EText *)w);
+    }else if (w->objectName() == "Edit"){
+        ((EWindow *)w->parentWidget())->sel->removeWidget(w);
+        delete ((EEdit *)w);
+    }
+
 }
 
-QWidgetList FormWindow::windowList()
+QWidgetList EWindow::childWidgets() const
+{
+    QWidgetList childwidgets;
+    QWidgetList widgets = sel->selectedWidgets();
+    for(int i=0;i<widgets.count();i++){
+        if (widgets[i] != this){
+            childwidgets.append(widgets[i]);
+        }
+    }
+    return childwidgets;
+}
+
+QWidgetList EWindow::windowList()
 {
     return winList;
 }
 
-void FormWindow::mouseMoveEvent(QMouseEvent *event)
+void EWindow::mouseMoveEvent(QMouseEvent *event)
 {
     if (this->focusWidget() != this) return;
     event->ignore();
     if (event->buttons() & Qt::LeftButton){
        move(event->globalPos() - dragPosition);
+       emit currentItemChanged(this);
     }
 }
 
-void FormWindow::mousePressEvent(QMouseEvent *event)
+void EWindow::mousePressEvent(QMouseEvent *event)
 {
     event->ignore();
     if (event->button() == Qt::LeftButton)  //每当按下鼠标左键就记录一下位置
@@ -66,14 +95,21 @@ void FormWindow::mousePressEvent(QMouseEvent *event)
 }
 
 
-void FormWindow::focusChanged(QWidget *old, QWidget *now)
+
+
+void EWindow::focusChanged(QWidget *old, QWidget *now)
 {
-    if (sel->isWidgetSelected(old)){
+    if (sel->isContainWidget(old)){
         //old->setStyleSheet("border: none;");
     }
 
-    if (sel->isWidgetSelected(now)){
+    if (sel->isContainWidget(now)){
         setCurrent(now);
     }
+}
+
+void EWindow::propertyChanged(QWidget *now)
+{
+    emit currentItemChanged(now);
 }
 

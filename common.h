@@ -6,6 +6,7 @@
 #include <QDesktopWidget>
 #include <QMdiArea>
 #include <QMdiSubWindow>
+#include <QScrollArea>
 #include <QMenuBar>
 #include <QToolBar>
 #include <QStatusBar>
@@ -113,6 +114,7 @@ static inline void list_move_tail(struct list_head *list,
 #define list_first_entry(ptr, type, member) list_entry((ptr)->next, type, member)
 
 #define list_for_each(pos, head) for (pos = (head)->next; ; pos = pos->next)
+
 
 
 typedef enum _eWidgetType
