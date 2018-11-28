@@ -20,18 +20,23 @@ private:
     void createToolBars();
     void createStatusBar();
     void setupUi();
+    void initBuf();
 
-
+    QDomElement getWidgetDom(QWidget *w, int idx);
+    bool docXmlRead(QString &filename);
+    bool docXmlCreate(QString &filename);
+    bool docXmlWrite(QString &filename);
+    bool saveProjectFile(QString &filename);
 
     void set_text_info(TextPara *text, QWidget *w);
-
+    int alignmentConvert(int align);
     uint QColorToEColor(QColor color);
     int set_color_info(int *color, QWidget *w);
 
-    void QStringToMultBytes(QString str, char *array);
+    char* QStringToMultBytes(QString str);
     BasePara* set_base_info(BasePara *base, QWidget *w);
     void for_each_app(const struct list_head *head);
-    void destroy_app_list(struct list_head *head);
+
 private slots:
     void newFile();
     bool open();
@@ -51,6 +56,8 @@ private slots:
     void download();
 
     void addWidget();
+
+    void ResProgress_slt(int pos, QString msg="");
 signals:
     void DownLoad_sig(const int cmd, const int addr, const QByteArray data);
 private:
@@ -94,14 +101,24 @@ private:
     LeftWidget *m_leftW;
 
 private:
+    QDomDocument doc;
     EWindow *curWin;
     ComDriver *com;
     QString m_charList;
-    struct SendBuf{
-       int len;
-       char buf[10240];
-    }sendBuf;
 
+    struct WidgetBuf{
+       int pos;
+       char buf[10240];
+    }widgetBuf;
+    struct StringBuf{
+       int pos;
+       char buf[10240];
+    }stringBuf;
+    struct PicBuf{
+       int pos;
+       char buf[10240];
+    }picBuf;
+    int downloadStep;
 };
 
 #endif // MAINWINDOW_H

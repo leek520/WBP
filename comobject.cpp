@@ -250,6 +250,7 @@ void ComDriver::DownLoad_slt(const int cmd, const int addr, const QByteArray dat
     m_sendTimer->start(500);
 }
 
+
 void ComDriver::ReceiveMsg()
 {
     m_sendTimer->stop();
@@ -373,6 +374,7 @@ void ComDriver::ReceiveMsg()
             break;
         case 0x60:
             if (status){
+                emit ResProgress_sig(101, "done");
                 qDebug()<<"Download finshed!";
             }else{
 

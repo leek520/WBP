@@ -33,7 +33,7 @@ EText::EText(QWidget *parent) : QLabel(parent)
     setMouseTracking(true); //开启鼠标追踪
     setFocusPolicy(Qt::StrongFocus);
     setStyleSheet("border: 1px solid black;");
-    m_propertyList<<"backColor"<<"text";
+    m_propertyList<<"backColor"<<"text"<<"alignment";
 }
 
 void EText::mouseMoveEvent(QMouseEvent *event)
@@ -56,12 +56,12 @@ void EText::mousePressEvent(QMouseEvent *event)
 }
 EEdit::EEdit(QWidget *parent) :
     QLineEdit(parent),
-    maxLen(10)
+    maxLen(30)      //每个字符3个字节，30为10个字符大小
 {
     setObjectName("Edit");
     setMouseTracking(true); //开启鼠标追踪
     setFocusPolicy(Qt::StrongFocus);
-    m_propertyList<<"backColor"<<"text"<<"maxLen";
+    m_propertyList<<"backColor"<<"text"<<"alignment"<<"maxLen";
 }
 
 void EEdit::mouseMoveEvent(QMouseEvent *event)

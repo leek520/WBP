@@ -134,7 +134,6 @@ void LeftWidget::valueChanged(QtProperty *property, const QVariant &value)
 
 void LeftWidget::currentItemChanged(QWidget *w)
 {
-    qDebug()<<w;
     updateExpandState();
     //删除原有属性map
     QMap<QtProperty *, QString>::ConstIterator itProp = propertyToId.constBegin();
@@ -201,7 +200,8 @@ void LeftWidget::currentItemChanged(QWidget *w)
         property->setValue(textColor);
         addProperty(property, QLatin1String("textColor"));
 
-
+    }
+    if (propertyList.contains("alignment")){
         QtVariantProperty *Gproperty = variantManager->addProperty(QtVariantPropertyManager::groupTypeId(), tr("alignment"));
 
         property = variantManager->addProperty(QtVariantPropertyManager::enumTypeId(), tr("Horizontal"));
@@ -231,3 +231,5 @@ void LeftWidget::addProperty(QtVariantProperty *property, const QString &id)
     if (idToExpanded.contains(id))
         propertyEditor->setExpanded(item, idToExpanded[id]);
 }
+
+

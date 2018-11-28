@@ -24,6 +24,7 @@ private:
     void createPropertyTree();
     void updateExpandState();
     void addProperty(QtVariantProperty *property, const QString &id);
+
 public slots:
     void valueChanged(QtProperty *property, const QVariant &value);
     void currentItemChanged(QWidget *w);

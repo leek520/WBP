@@ -13,7 +13,7 @@ MainWindow::MainWindow(QWidget *parent)
     createStatusBar();
 
     setupUi();
-
+    initBuf();
     readText();
 
 }
@@ -221,6 +221,156 @@ void MainWindow::setupUi()
 
 }
 
+void MainWindow::initBuf()
+{
+    //先初始化buf
+    memset(widgetBuf.buf, 0, 10240);
+    widgetBuf.pos = 0;
+
+    memset(stringBuf.buf, 0, 10240);
+    stringBuf.pos = 0;
+
+    memset(picBuf.buf, 0, 10240);
+    picBuf.pos = 0;
+}
+
+
+/**
+* 函数说明：创建xml文件
+*
+* @param
+*
+* @return
+**/
+bool MainWindow::docXmlCreate(QString &filename)
+{
+    QFile file(filename);
+
+    if(!file.open(QIODevice::WriteOnly))
+    {
+        return false;
+    }
+
+    doc.clear();
+
+    QDomProcessingInstruction instruction;
+    instruction = doc.createProcessingInstruction("xml","version=\"1.0\" encoding=\"UTF-8\"");
+    doc.appendChild(instruction);
+
+    QTextStream out(&file);
+    doc.save(out,4);        //缩进4格
+
+    file.close();
+    return true;
+
+}
+/**
+* 函数说明：写入xml文件
+*
+* @param
+*
+* @return
+**/
+bool MainWindow::docXmlWrite(QString &filename)
+{
+    QFile file(filename);
+    if(!file.open(QIODevice::WriteOnly | QIODevice::Truncate))
+    {
+        return false;
+    }
+    QTextStream out(&file);
+    doc.save(out,4);
+    file.close();
+    return true;
+}
+/**
+* 函数说明：读取xml文件
+*
+* @param
+*
+* @return
+**/
+bool MainWindow::docXmlRead(QString &filename)
+{
+    QString errorStr;
+    int errorLine;
+    int errorCol;
+
+    QFile file(filename);
+    if(!file.open(QIODevice::ReadOnly))
+    {
+        return false;
+    }
+
+    //setContent是将指定的内容指定给QDomDocument解析，
+    //第一参数可以是QByteArray或者是文件名等
+    if(!doc.setContent(&file,true,&errorStr,&errorLine,&errorCol))
+    {
+        file.close();
+        qDebug() << errorStr << "line: " << errorLine << "col: " << errorCol;
+        return false;
+    }
+
+    file.close();
+    return true;
+}
+QDomElement MainWindow::getWidgetDom(QWidget *w, int idx)
+{
+    QDomElement dom = doc.createElement(w->objectName());
+    QDomAttr index = doc.createAttribute(QString("index"));
+    index.setValue(QString::number(idx));
+    dom.setAttributeNode(index);
+
+    QDomAttr x0 = doc.createAttribute(QString("x0"));
+    x0.setValue(QString::number(w->geometry().left()));
+    dom.setAttributeNode(x0);
+    QDomAttr y0 = doc.createAttribute(QString("y0"));
+    y0.setValue(QString::number(w->geometry().top()));
+    dom.setAttributeNode(y0);
+    QDomAttr xSize = doc.createAttribute(QString("xSize"));
+    xSize.setValue(QString::number(w->width()));
+    dom.setAttributeNode(xSize);
+    QDomAttr ySize = doc.createAttribute(QString("ySize"));
+    ySize.setValue(QString::number(w->height()));
+    dom.setAttributeNode(ySize);
+
+    QDomAttr bkColor = doc.createAttribute(QString("bkColor"));
+    bkColor.setValue(QString::number(w->height()));
+    dom.setAttributeNode(bkColor);
+
+    return dom;
+}
+bool MainWindow::saveProjectFile(QString &filename)
+{
+    // 1、先创建xml文件
+    if (!docXmlCreate(filename))
+    {
+        return false;
+    }
+    //加入根节点
+    QDateTime datetime = QDateTime::currentDateTime();
+    QString currentDate = datetime.toString("yyyy-MM-dd dddd hh:mm");
+    QDomElement root = doc.createElement(QString("PLT"));
+    QDomAttr curDate = doc.createAttribute(QString("date"));
+    curDate.setValue(currentDate);
+    root.setAttributeNode(curDate);
+    doc.appendChild(root);
+    QWidgetList winList = EWindow::windowList();
+    for(int i=0;i<winList.count();i++){
+        QDomElement win = getWidgetDom(winList[i], i);
+        root.appendChild(win);
+
+        QWidgetList childList = ((EWindow *)winList[i])->childWidgets();
+        for(int j=0;j<childList.count();j++){
+            QDomElement child = getWidgetDom(childList[j], j);
+            win.appendChild(child);
+        }
+    }
+    // 2、写入到文件
+    docXmlWrite(filename);
+    return true;
+}
+
 
 
 void MainWindow::addWidget()
@@ -249,6 +399,9 @@ void MainWindow::addWidget()
     case 1:
     {
         EButton *btn = new EButton(curWin);
+        QFont font = btn->font();
+        font.setPixelSize(28);
+        btn->setFont(font);
         btn->resize(80,50);
         curWin->addWidget(btn);
         connect(btn, SIGNAL(currentItemChanged(QWidget*)), curWin, SLOT(propertyChanged(QWidget*)));
@@ -258,6 +411,9 @@ void MainWindow::addWidget()
     case 2:
     {
         EText *text = new EText(curWin);
+        QFont font = text->font();
+        font.setPixelSize(28);
+        text->setFont(font);
         text->resize(100,50);
         curWin->addWidget(text);
         connect(text, SIGNAL(currentItemChanged(QWidget*)), curWin, SLOT(propertyChanged(QWidget*)));
@@ -267,6 +423,9 @@ void MainWindow::addWidget()
     case 3:
     {
         EEdit *edit = new EEdit(curWin);
+        QFont font = edit->font();
+        font.setPixelSize(28);
+        edit->setFont(font);
         edit->resize(100,50);
         curWin->addWidget(edit);
         connect(edit, SIGNAL(currentItemChanged(QWidget*)), curWin, SLOT(propertyChanged(QWidget*)));
@@ -278,7 +437,44 @@ void MainWindow::addWidget()
     }
 }
 
-void MainWindow::QStringToMultBytes(QString str, char *array)
+void MainWindow::ResProgress_slt(int pos, QString msg)
+{
+    if ((pos >= 100) && (msg == "done")){
+        downloadStep++;
+        int erase;
+        int address;
+        QByteArray byte;
+        switch (downloadStep) {
+        case 1:
+            //擦除20K，下载地址，下载窗体数据包
+            erase = 0x5c;
+            address = START_ADDR_FLASH_WIDGET;
+            byte.resize(widgetBuf.pos);
+            for(int i=0;i<widgetBuf.pos;i++) {
+                byte[i] = widgetBuf.buf[i];
+            }
+            emit DownLoad_sig(erase, address, byte);
+            break;
+        case 2:
+            //擦除20K，下载地址，下载文本数据包
+            erase = 0x5c;
+            address = START_ADDR_FLASH_STRING;
+            byte.resize(stringBuf.pos);
+            for(int i=0;i<stringBuf.pos;i++) {
+                byte[i] = stringBuf.buf[i];
+            }
+            emit DownLoad_sig(erase, address, byte);
+            break;
+        default:
+            break;
+        }
+
+    }
+
+
+}
+
+char* MainWindow::QStringToMultBytes(QString str)
 {
 //    char* ptr;
 //    QByteArray ba;
@@ -287,7 +483,8 @@ void MainWindow::QStringToMultBytes(QString str, char *array)
 //    memset(array, 0, 128);
 //    strcpy(array, ptr);
 
-    memset(array, 0, 128);
+
+    char* textAddr = &stringBuf.buf[stringBuf.pos];
 
     int i = 0;
     QByteArray data;
@@ -322,10 +519,15 @@ void MainWindow::QStringToMultBytes(QString str, char *array)
 
         data.append (lo);
         //第二步：unicode转3字节码
-        array[i*3+0] = 0xe0 | ((num >> 12) & 0xf);
-        array[i*3+1] = 0x80 | ((num >> 6) & 0x3f);
-        array[i*3+2] = 0x80 | ((num >> 0) & 0x3f);
+        stringBuf.buf[stringBuf.pos++] = 0xe0 | ((num >> 12) & 0xf);
+        stringBuf.buf[stringBuf.pos++] = 0x80 | ((num >> 6) & 0x3f);
+        stringBuf.buf[stringBuf.pos++] = 0x80 | ((num >> 0) & 0x3f);
     }
+    //添加字符串结束标识符
+    stringBuf.buf[stringBuf.pos++] = 0x00;
+    stringBuf.buf[stringBuf.pos++] = 0x00;
+    stringBuf.buf[stringBuf.pos++] = 0x00;
+    return (char *)textAddr;
 }
 
 void MainWindow::newFile()
@@ -340,6 +542,21 @@ bool MainWindow::open()
 
 bool MainWindow::save()
 {
+    QString filename = QFileDialog::getSaveFileName(this,
+                                                    tr("保存项目文件"),
+                                                    "",
+                                                    tr("保存为 (*.eprg)"));
+    if(filename.isEmpty())
+    {
+        return false;              //如果关闭窗口或者点击取消，则返回-1，并退出
+    }
+    //1、先保存工程文件
+    if (!saveProjectFile(filename))
+    {
+        qDebug()<<"保存工程文件失败！";
+
+        return false;
+    }
     return true;
 }
 
@@ -385,10 +602,6 @@ void MainWindow::remove()
 
 void MainWindow::readText()
 {
-    memset(sendBuf.buf, 0, 1024);
-    sendBuf.len = 0;
-
-
     QFile f1(":/char3000.txt");
     if(!f1.open(QIODevice::ReadOnly | QIODevice::Text))
     {
@@ -404,10 +617,15 @@ void MainWindow::readText()
     com_thread->start();
     connect(this, SIGNAL(DownLoad_sig(int,int,QByteArray)),
             com, SLOT(DownLoad_slt(int,int,QByteArray)));
+    connect(com, SIGNAL(ResProgress_sig(int,QString)),
+            this, SLOT(ResProgress_slt(int,QString)));
 }
 
 void MainWindow::build()
 {
+
+    initBuf();
+
     //创建一个app_info
     struct list_head *head;
     struct list_head *childHead;
@@ -471,18 +689,8 @@ void MainWindow::build()
 
 void MainWindow::download()
 {
-
-
-    //擦除20K，下载地址，下载数据包
-    int erase = 0x5c;
-    int address = START_ADDR_FLASH;
-    QByteArray byte;
-    byte.resize(sendBuf.len);
-    for(int i=0;i<sendBuf.len;i++) {
-        byte[i] = sendBuf.buf[i];
-    }
-    emit DownLoad_sig(erase, address, byte);
-
+    downloadStep = 0;
+    ResProgress_slt(101, "done");
 }
 BasePara* MainWindow::set_base_info(BasePara *base, QWidget *w)
 {
@@ -518,21 +726,33 @@ void MainWindow::set_text_info(TextPara *text, QWidget *w)
         text->color = QColorToEColor(bc);
         text->alignment = (2<<0) | (3<<2);
 
-        QStringToMultBytes(((EButton *)w)->text(), text->string);
+        text->string = QStringToMultBytes(((EButton *)w)->text());
     }else if (w->objectName() == "Text"){
         bc = ((EText *)w)->palette().color(QPalette::WindowText);
         text->color = QColorToEColor(bc);
-        text->alignment = (2<<0) | (3<<2);
-
-        QStringToMultBytes(((EText *)w)->text(), text->string);
+        //text->alignment = (2<<0) | (3<<2);
+        text->alignment = alignmentConvert(((EText *)w)->alignment());
+        text->string = QStringToMultBytes(((EText *)w)->text());
     }else if (w->objectName() == "Edit"){
         bc = ((EEdit *)w)->palette().color(QPalette::Text);
         text->color = QColorToEColor(bc);
-        text->alignment = (2<<0) | (3<<2);
-
-        QStringToMultBytes(((EEdit *)w)->text(), text->string);
+        //text->alignment = (2<<0) | (3<<2);
+        text->alignment = alignmentConvert(((EEdit *)w)->alignment());
+        text->string = QStringToMultBytes(((EEdit *)w)->text());
     }
 
+}
+
+int MainWindow::alignmentConvert(int align)
+{
+    int aH = align & 0xf;
+    int aV = (align >> 4) & 0xf;
+    aH = aH >> 1;
+    aV = aV >> 2;
+    if (aV == 2){
+        aV = 3;
+    }
+    return ((aH<<0) | (aV<<2));
 }
 uint MainWindow::QColorToEColor(QColor color)
 {
@@ -566,7 +786,7 @@ int MainWindow::set_color_info(int *color, QWidget *w)
         bc = ((EEdit *)w)->palette().color(QPalette::Disabled, QPalette::Base);
         color[0] = QColorToEColor(bc);
         color[0] = INVALID_COLOR;
-        bc = ((EEdit *)w)->palette().color(QPalette::Active, QPalette::Base);
+        bc = ((EEdit *)w)->palette().color(QPalette::Base);
         color[1] = QColorToEColor(bc);
     }
 
@@ -589,17 +809,19 @@ void MainWindow::for_each_app(const struct list_head *head)
         case Window:
             winInfo = (WindowInfo *)baseInfo;
 
-            dstWin = (WindowInfo *)(sendBuf.buf + sendBuf.len);
+            dstWin = (WindowInfo *)(widgetBuf.buf + widgetBuf.pos);
             memcpy(dstWin, winInfo, sizeof(WindowInfo));
-            sendBuf.len += sizeof(WindowInfo);
-            dstWin->firstChild = (BasePara *)(sendBuf.len + START_ADDR_SDRAM);
-            if (!winInfo->firstChild) break;
+            widgetBuf.pos += sizeof(WindowInfo);
+            dstWin->firstChild = (BasePara *)(widgetBuf.pos + START_ADDR_SDRAM_WIDGET);
+            if (!winInfo->firstChild){
+                break;
+            }
             for_each_app(&winInfo->firstChild->node_info);
 
             dstWin->base.node_info.prev = NULL;
             //是否结束
             if (pos != head){
-                dstWin->base.node_info.next = (list_head *)(sendBuf.len + START_ADDR_SDRAM);
+                dstWin->base.node_info.next = (list_head *)(widgetBuf.pos + START_ADDR_SDRAM_WIDGET);
             }else{
                 dstWin->base.node_info.next = NULL;
             }
@@ -607,47 +829,47 @@ void MainWindow::for_each_app(const struct list_head *head)
         case Button:
             btnInfo = (ButtonInfo *)baseInfo;
 
-            dstBtn = (ButtonInfo *)(sendBuf.buf + sendBuf.len);
+            dstBtn = (ButtonInfo *)(widgetBuf.buf + widgetBuf.pos);
             memcpy(dstBtn, btnInfo, sizeof(ButtonInfo));
-            sendBuf.len += sizeof(ButtonInfo);
+            widgetBuf.pos += sizeof(ButtonInfo);
             dstBtn->base.node_info.prev = NULL;
+            dstBtn->text.string = (char *)(START_ADDR_SDRAM_STRING + (dstBtn->text.string - stringBuf.buf));
             //是否结束
             if (pos != head){
-                dstBtn->base.node_info.next = (list_head *)(sendBuf.len + START_ADDR_SDRAM);
+                dstBtn->base.node_info.next = (list_head *)(widgetBuf.pos + START_ADDR_SDRAM_WIDGET);
             }else{
                 dstBtn->base.node_info.next = NULL;
             }
-            qDebug()<<QString(btnInfo->text.string);
             break;
         case Text:
             textInfo = (TextInfo *)baseInfo;
 
-            dstText = (TextInfo *)(sendBuf.buf + sendBuf.len);
+            dstText = (TextInfo *)(widgetBuf.buf + widgetBuf.pos);
             memcpy(dstText, textInfo, sizeof(TextInfo));
-            sendBuf.len += sizeof(TextInfo);
+            widgetBuf.pos += sizeof(TextInfo);
             dstText->base.node_info.prev = NULL;
+            dstText->text.string = (char *)(START_ADDR_SDRAM_STRING + (dstText->text.string - stringBuf.buf));
             //是否结束
             if (pos != head){
-                dstText->base.node_info.next = (list_head *)(sendBuf.len + START_ADDR_SDRAM);
+                dstText->base.node_info.next = (list_head *)(widgetBuf.pos + START_ADDR_SDRAM_WIDGET);
             }else{
                 dstText->base.node_info.next = NULL;
             }
-            qDebug()<<QString(textInfo->text.string);
             break;
         case Edit:
             editInfo = (EditInfo *)baseInfo;
 
-            dstEdit = (EditInfo *)(sendBuf.buf + sendBuf.len);
+            dstEdit = (EditInfo *)(widgetBuf.buf + widgetBuf.pos);
             memcpy(dstEdit, editInfo, sizeof(EditInfo));
-            sendBuf.len += sizeof(EditInfo);
+            widgetBuf.pos += sizeof(EditInfo);
             dstEdit->base.node_info.prev = NULL;
+            dstEdit->text.string = (char *)(START_ADDR_SDRAM_STRING + (dstEdit->text.string - stringBuf.buf));
             //是否结束
             if (pos != head){
-                dstEdit->base.node_info.next = (list_head *)(sendBuf.len + START_ADDR_SDRAM);
+                dstEdit->base.node_info.next = (list_head *)(widgetBuf.pos + START_ADDR_SDRAM_WIDGET);
             }else{
                 dstEdit->base.node_info.next = NULL;
             }
-            qDebug()<<QString(editInfo->text.string);
             break;
         default:
             break;
@@ -656,15 +878,4 @@ void MainWindow::for_each_app(const struct list_head *head)
     }
 }
 
-void MainWindow::destroy_app_list(struct list_head *head)
-{
-    struct list_head *pos = head->next;
-    struct list_head *tmp = NULL;
-    while (pos != head)
-    {
-        tmp = pos->next;
-        list_del(pos);
-        pos = tmp;
-    }
-}
 

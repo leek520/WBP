@@ -36,15 +36,25 @@
 #include <QSplitter>
 #include <QPushButton>
 #include <QMessageBox>
+#include <QDomDocument>
 #include <QDebug>
 
 
 
+#define START_ADDR_SDRAM_WIDGET  0xa0300000
+#define START_ADDR_FLASH_WIDGET  0x100000
 
-#define START_ADDR_SDRAM  0xa0300000
-#define START_ADDR_FLASH  0x100000
-#define CHAR_START_UNICODE    0x4e00
+#define START_ADDR_SDRAM_STRING  0xa043F000
+#define START_ADDR_FLASH_STRING  0x23F000
+
+#define START_ADDR_SDRAM_PIC  0xa047E000
+#define START_ADDR_FLASH_PIC  0x27E000
+
 #define INVALID_COLOR 0x80000000
+
+
+#define CHAR_START_UNICODE    0x4e00
+
 /************双向循环链表*************/
 
 //计算member在type中的位置
@@ -136,13 +146,13 @@ typedef struct _tBasePara
     uchar type;
     char resv[3];
     struct list_head node_info;//链表节点
-}BasePara;
+}BasePara; //20bytes
 /*********ÎÄ±¾ÐÅÏ¢½á¹¹************/
 typedef struct _tTextPara
 {
     int alignment;
     int color;
-    char string[128];
+    char *string;
 }TextPara;
 /*********´°ÌåÐÅÏ¢½á¹¹************/
 typedef struct _tWindowInfo
