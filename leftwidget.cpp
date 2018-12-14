@@ -54,6 +54,10 @@ void LeftWidget::createPropertyTree()
     QtVariantEditorFactory *variantFactory = new QtVariantEditorFactory(this);
     propertyEditor = new QtTreePropertyBrowser();
     propertyEditor->setFactoryForManager(variantManager, variantFactory);
+
+
+
+
 }
 
 void LeftWidget::updateExpandState()
@@ -79,6 +83,8 @@ void LeftWidget::valueChanged(QtProperty *property, const QVariant &value)
     QPalette palette(currentItem->palette());
     if (id == QLatin1String("geometry")) {
         currentItem->setGeometry(value.toRect());
+    }else if (id == QLatin1String("Id")) {
+        ((EWindow *)currentItem)->Id = value.toInt();
     }else if (id == QLatin1String("backColor")) {
         if (currentItem->objectName() == "Window"){
             palette.setColor(QPalette::Window, value.value<QColor>());
@@ -130,6 +136,7 @@ void LeftWidget::valueChanged(QtProperty *property, const QVariant &value)
     }else if (id == QLatin1String("maxLen")){
         ((EEdit *)currentItem)->maxLen = value.toInt();
     }
+    currentItem->setAutoFillBackground(true);
 }
 
 void LeftWidget::currentItemChanged(QWidget *w)
@@ -174,7 +181,17 @@ void LeftWidget::currentItemChanged(QWidget *w)
     }
 
     QtVariantProperty *property;
+
     //共有属性
+    if (propertyList.contains("Id")){
+        property = variantManager->addProperty(QVariant::StringList, tr("Id"));
+        //property->setValue(((EWindow *)w)->Id);
+        QStringList enumNames1;
+        enumNames1 << "AlignLeft"  << "AlignRight" << "AlignHCenter";
+        property->setAttribute(QLatin1String("enumNames"), enumNames1);
+        property->setValue(0);
+        addProperty(property, QLatin1String("Id"));
+    }
     property = variantManager->addProperty(QVariant::Rect, tr("geometry"));
     property->setValue(w->geometry());
     addProperty(property, QLatin1String("geometry"));
@@ -221,6 +238,8 @@ void LeftWidget::currentItemChanged(QWidget *w)
         Gproperty->addSubProperty(property);
 
     }
+
+
 
 }
 void LeftWidget::addProperty(QtVariantProperty *property, const QString &id)

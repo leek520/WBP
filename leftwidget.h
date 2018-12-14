@@ -7,7 +7,7 @@
 
 #include "qtvariantproperty.h"
 #include "qttreepropertybrowser.h"
-
+#include "qtbuttonpropertybrowser.h"
 class LeftWidget : public QWidget
 {
     Q_OBJECT

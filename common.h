@@ -139,13 +139,14 @@ typedef enum _eWidgetType
 /*********»ù´¡ÐÅÏ¢½á¹¹************/
 typedef struct _tBasePara
 {
+    struct list_head node_info;//链表节点
     ushort x0;
     ushort y0;
     ushort xsize;
     ushort ysize;
+    ushort Id;
     uchar type;
-    char resv[3];
-    struct list_head node_info;//链表节点
+    char resv;
 }BasePara; //20bytes
 /*********ÎÄ±¾ÐÅÏ¢½á¹¹************/
 typedef struct _tTextPara

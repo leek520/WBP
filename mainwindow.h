@@ -6,7 +6,7 @@
 #include "basewidget.h"
 #include "widgetselection.h"
 #include "comobject.h"
-
+#include "bmp2array.h"
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -23,14 +23,14 @@ private:
     void initBuf();
 
     QDomElement getWidgetDom(QWidget *w, int idx);
+    QWidget *setWidgetDom(QDomElement dom);
+
     bool docXmlRead(QString &filename);
     bool docXmlCreate(QString &filename);
     bool docXmlWrite(QString &filename);
     bool saveProjectFile(QString &filename);
-
+    bool openProjectFile(QString &filename);
     void set_text_info(TextPara *text, QWidget *w);
-    int alignmentConvert(int align);
-    uint QColorToEColor(QColor color);
     int set_color_info(int *color, QWidget *w);
 
     char* QStringToMultBytes(QString str);
@@ -55,7 +55,7 @@ private slots:
     void build();
     void download();
 
-    void addWidget();
+    void addWidget(int idx=-1);
 
     void ResProgress_slt(int pos, QString msg="");
 signals:

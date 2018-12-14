@@ -334,11 +334,49 @@ QDomElement MainWindow::getWidgetDom(QWidget *w, int idx)
     ySize.setValue(QString::number(w->height()));
     dom.setAttributeNode(ySize);
 
-    QDomAttr bkColor = doc.createAttribute(QString("bkColor"));
-    bkColor.setValue(QString::number(w->height()));
-    dom.setAttributeNode(bkColor);
-
+    QDomAttr backColor = doc.createAttribute(QString("backColor"));
+    backColor.setValue(getWidgetProperty(w, "backColor"));
+    dom.setAttributeNode(backColor);
+    if (w->objectName() != "Window"){
+        QDomAttr text = doc.createAttribute(QString("text"));
+        text.setValue(getWidgetProperty(w, "text"));
+        dom.setAttributeNode(text);
+        QDomAttr textColor = doc.createAttribute(QString("textColor"));
+        textColor.setValue(getWidgetProperty(w, "textColor"));
+        dom.setAttributeNode(textColor);
+    }
     return dom;
+}
+
+QWidget *MainWindow::setWidgetDom(QDomElement dom)
+{
+    QWidget *ret;
+    QString name = dom.tagName();
+    if (name == "Window"){
+        addWidget(Window);
+        ret = curWin;
+    }else if (name == "Button"){
+        addWidget(Button);
+        ret = curWin->childWidgets().last();
+    }else if (name == "Text"){
+        addWidget(Text);
+        ret = curWin->childWidgets().last();
+    }else if (name == "Edit"){
+        addWidget(Edit);
+        ret = curWin->childWidgets().last();
+    }
+    int x0 = dom.attribute(tr("x0")).toInt();
+    int y0 = dom.attribute(tr("y0")).toInt();
+    int xSize = dom.attribute(tr("xSize")).toInt();
+    int ySize = dom.attribute(tr("ySize")).toInt();
+
+    ret->setGeometry(x0, y0, xSize, ySize);
+
+    setWidgetProperty(ret, "backColor", dom.attribute(tr("backColor")));
+    setWidgetProperty(ret, "textColor", dom.attribute(tr("textColor")));
+    setWidgetProperty(ret, "text", dom.attribute(tr("text")));
+
+    return ret;
 }
 bool MainWindow::saveProjectFile(QString &filename)
 {
@@ -371,12 +409,47 @@ bool MainWindow::saveProjectFile(QString &filename)
     return true;
 }
 
-
-
-void MainWindow::addWidget()
+bool MainWindow::openProjectFile(QString &filename)
 {
+    // 先读取xml文件
+    if (!docXmlRead(filename))
+    {
+        return false;
+    }
 
-    int index = m_graphActList.indexOf((QAction *)sender());
+    QDomElement root = doc.documentElement();
+    QString title = root.tagName();
+    QString date = root.attribute(tr("date"));
+
+    //按驱动器循环
+    QDomNode winNode = root.firstChild();
+    while (!winNode.isNull())
+    {
+        QDomElement win_info = winNode.toElement();
+        setWidgetDom(win_info);
+
+        QDomNode child_node = win_info.firstChild();
+        while (!child_node.isNull())
+        {
+            QDomElement child_info = child_node.toElement();
+            setWidgetDom(child_info);
+            child_node = child_node.nextSibling();
+        }
+        winNode = winNode.nextSibling();
+    }
+}
+
+
+
+void MainWindow::addWidget(int idx)
+{
+    int index = 0;
+    if (idx == -1){
+        index = m_graphActList.indexOf((QAction *)sender());
+    }else{
+        index = idx;
+    }
+
     if (index < 0){
         return;
     }else if (index != 0){
@@ -537,6 +610,22 @@ void MainWindow::newFile()
 
 bool MainWindow::open()
 {
+    //弹出打开对话框
+    QString filename = QFileDialog::getOpenFileName(this,
+                                                    tr("打开工程文件"),
+                                                    "",
+                                                    tr("工程文件(*.eprg);;All files(*.*)"));
+    if(filename.isEmpty())
+    {
+        return false;              //如果关闭窗口或者点击取消，则返回-1，并退出
+    }
+    //1、先保存工程文件
+    if (!openProjectFile(filename))
+    {
+        qDebug()<<"打开工程文件失败！";
+
+        return false;
+    }
     return true;
 }
 
@@ -612,7 +701,7 @@ void MainWindow::readText()
 
     //1、初始化串口线程
     QThread *com_thread = new QThread;
-    com = new ComDriver("COM1", "9600", "Even", "1");
+    com = new ComDriver("COM8", "9600", "Even", "1");
     com->moveToThread(com_thread);
     com_thread->start();
     connect(this, SIGNAL(DownLoad_sig(int,int,QByteArray)),
@@ -703,18 +792,21 @@ BasePara* MainWindow::set_base_info(BasePara *base, QWidget *w)
     base->y0 = w->geometry().top();
     base->xsize = w->width();
     base->ysize = w->height();
-    base->resv[0] = 0;
-    base->resv[1] = 0;
-    base->resv[2] = 0;
+
+    base->resv = 0;
 
     if (w->objectName() == "Window"){
         base->type = 0;
+        base->Id = ((EWindow *)w)->Id;
     }else if (w->objectName() == "Button"){
         base->type = 1;
+        base->Id = ((EWindow *)(w->parentWidget()))->childWidgets().count()-1;
     }else if (w->objectName() == "Text"){
         base->type = 2;
+        base->Id = ((EWindow *)(w->parentWidget()))->childWidgets().count()-1;
     }else if (w->objectName() == "Edit"){
         base->type = 3;
+        base->Id = ((EWindow *)(w->parentWidget()))->childWidgets().count()-1;
     }
     return base;
 }
@@ -741,27 +833,6 @@ void MainWindow::set_text_info(TextPara *text, QWidget *w)
         text->string = QStringToMultBytes(((EEdit *)w)->text());
     }
 
-}
-
-int MainWindow::alignmentConvert(int align)
-{
-    int aH = align & 0xf;
-    int aV = (align >> 4) & 0xf;
-    aH = aH >> 1;
-    aV = aV >> 2;
-    if (aV == 2){
-        aV = 3;
-    }
-    return ((aH<<0) | (aV<<2));
-}
-uint MainWindow::QColorToEColor(QColor color)
-{
-    uint rgb = color.rgb();
-    qDebug()<<QString::number(rgb, 16);
-    //互换rb颜色
-    rgb = ((rgb & 0x000000ff) << 16) | (rgb & 0x0000ff00) | ((rgb & 0x00ff0000) >> 16);
-    qDebug()<<QString::number(rgb, 16);
-    return rgb;
 }
 
 int MainWindow::set_color_info(int *color, QWidget *w)

@@ -26,8 +26,10 @@ public slots:
     void focusChanged(QWidget *old, QWidget *now);
     void propertyChanged(QWidget *now);
 public:
+    int Id;
     QStringList m_propertyList;
 private:
+    QWidgetList childs;
     Selection *sel;
     QPoint dragPosition;   //鼠标拖动的位置
     static QWidgetList winList;
@@ -35,5 +37,8 @@ public:
 
 
 };
-
+QString getWidgetProperty(QWidget *w, QString property);
+void setWidgetProperty(QWidget *w, QString property, QString value);
+uint QColorToEColor(QColor color);
+int alignmentConvert(int align);
 #endif // FORMWINDOW_H

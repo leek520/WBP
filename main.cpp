@@ -10,7 +10,6 @@ int main(int argc, char *argv[])
     QTextCodec::setCodecForLocale(codec);
 
 
-
     MainWindow w;
     w.show();
 

@@ -22,7 +22,8 @@ SOURCES += main.cpp\
     widgetselection.cpp \
     formwindow.cpp \
     basewidget.cpp \
-    comobject.cpp
+    comobject.cpp \
+    bmp2array.cpp
 
 HEADERS  += mainwindow.h \
     widget.h \
@@ -31,7 +32,8 @@ HEADERS  += mainwindow.h \
     widgetselection.h \
     formwindow.h \
     basewidget.h \
-    comobject.h
+    comobject.h \
+    bmp2array.h
 
 RESOURCES += \
     application.qrc
