@@ -12,28 +12,27 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = WBP
 TEMPLATE = app
 
-
+INCLUDEPATH += \
+               ./com
+               ./window
 include(./qtpropertybrowser/src/qtpropertybrowser.pri)
 
 SOURCES += main.cpp\
-        mainwindow.cpp \
-    widget.cpp \
-    leftwidget.cpp \
-    widgetselection.cpp \
-    formwindow.cpp \
-    basewidget.cpp \
-    comobject.cpp \
-    bmp2array.cpp
+        ./window/mainwindow.cpp \
+    ./window/leftwidget.cpp \
+    ./window/widgetselection.cpp \
+    ./com/comobject.cpp \
+    window/propertywidget.cpp \
+    window/widget.cpp
 
-HEADERS  += mainwindow.h \
-    widget.h \
-    common.h \
-    leftwidget.h \
-    widgetselection.h \
-    formwindow.h \
-    basewidget.h \
-    comobject.h \
-    bmp2array.h
+HEADERS  += common.h \
+    ./window/mainwindow.h \
+    ./window/leftwidget.h \
+    ./window/widgetselection.h \
+    ./com/comobject.h \
+    window/propertywidget.h \
+    window/widget.h
+
 
 RESOURCES += \
     application.qrc

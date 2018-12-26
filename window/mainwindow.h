@@ -1,12 +1,13 @@
 ﻿#ifndef MAINWINDOW_H
 #define MAINWINDOW_H
-#include "widget.h"
+
 #include "leftwidget.h"
-#include "formwindow.h"
-#include "basewidget.h"
+#include "propertywidget.h"
 #include "widgetselection.h"
+#include "widget.h"
+
 #include "comobject.h"
-#include "bmp2array.h"
+
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -20,22 +21,12 @@ private:
     void createToolBars();
     void createStatusBar();
     void setupUi();
-    void initBuf();
-
-    QDomElement getWidgetDom(QWidget *w, int idx);
-    QWidget *setWidgetDom(QDomElement dom);
 
     bool docXmlRead(QString &filename);
     bool docXmlCreate(QString &filename);
     bool docXmlWrite(QString &filename);
     bool saveProjectFile(QString &filename);
     bool openProjectFile(QString &filename);
-    void set_text_info(TextPara *text, QWidget *w);
-    int set_color_info(int *color, QWidget *w);
-
-    char* QStringToMultBytes(QString str);
-    BasePara* set_base_info(BasePara *base, QWidget *w);
-    void for_each_app(const struct list_head *head);
 
 private slots:
     void newFile();
@@ -51,13 +42,10 @@ private slots:
     void cut();
     void remove();
 
-    void readText();
     void build();
     void download();
 
-    void addWidget(int idx=-1);
-
-    void ResProgress_slt(int pos, QString msg="");
+    void addWidget();
 signals:
     void DownLoad_sig(const int cmd, const int addr, const QByteArray data);
 private:
@@ -99,26 +87,8 @@ private:
 
     QScrollArea *m_mdiArea;
     LeftWidget *m_leftW;
-
-private:
+    PropertyWidget *m_propW;
     QDomDocument doc;
-    EWindow *curWin;
-    ComDriver *com;
-    QString m_charList;
-
-    struct WidgetBuf{
-       int pos;
-       char buf[10240];
-    }widgetBuf;
-    struct StringBuf{
-       int pos;
-       char buf[10240];
-    }stringBuf;
-    struct PicBuf{
-       int pos;
-       char buf[10240];
-    }picBuf;
-    int downloadStep;
 };
 
 #endif // MAINWINDOW_H
