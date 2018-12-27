@@ -43,8 +43,9 @@ public:
     WidgetType getType();
     QList<QPair<QVariant::Type, QString> > getPropertyTable();
 private:
-    void createProperyTable(WidgetType type);
-    void addTextPropery();
+    void createCenterWidget();
+    void createPropertyTable();
+
     int assignId();
 protected:
     bool eventFilter(QObject *watched, QEvent *event);

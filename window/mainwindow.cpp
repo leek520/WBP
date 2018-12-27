@@ -422,11 +422,23 @@ void MainWindow::DomToWidget(QDomElement root, Widget *w)
             w->setProperty(propTable[i].second.toLocal8Bit(), attrVaue);
             break;
         case QVariant::Color:
-            w->setProperty(propTable[i].second.toLocal8Bit(), QColor(attrVaue.toInt()));
+            w->setProperty(propTable[i].second.toLocal8Bit(), QColor(attrVaue));
             break;
         case QVariant::Rect:
-
+        {
+            QRegExp rx("(\\d+)");
+            QStringList list;
+            int pos = 0;
+            while ((pos = rx.indexIn(attrVaue, pos)) != -1) {
+                list << rx.cap(1);
+                pos += rx.matchedLength();
+            }
+            if (list.count() == 4){
+                QRect rect(list[0].toInt(), list[1].toInt(), list[2].toInt(), list[3].toInt());
+                w->setProperty(propTable[i].second.toLocal8Bit(), rect);
+            }
             break;
+        }
         default:
             value = QVariant::fromValue<QString>(attrVaue);
             break;

@@ -11,7 +11,8 @@ Widget::Widget(WidgetType type, QWidget *parent) :
     layout()->setMargin(1);
     layout()->setSpacing(0);
 
-    createProperyTable(type);
+    createCenterWidget();
+    createPropertyTable();
 }
 
 WidgetType Widget::getType()
@@ -24,31 +25,23 @@ QList<QPair<QVariant::Type, QString> > Widget::getPropertyTable()
     return m_propTable;
 }
 
-void Widget::createProperyTable(WidgetType type)
+void Widget::createCenterWidget()
 {
-    m_propTable << qMakePair(QVariant::Int, QString("Id"));
-    m_propTable << qMakePair(QVariant::Rect, QString("geometry"));
-    m_propTable << qMakePair(QVariant::Color, QString("BkColor"));
-
-
-    m_Id = 0;
     QLabel *child = new QLabel(this);
+    child->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
     m_CentralWidget = static_cast<QWidget *>(child);
-    switch (type) {
+    switch (m_Type) {
     case Window:
         break;
     case Button:
         child->setLineWidth(1);
         child->setFrameStyle(QFrame::WinPanel | QFrame::Raised);
-        addTextPropery();
         break;
     case Text:
-        addTextPropery();
         break;
     case Edit:
         child->setLineWidth(2);
         child->setFrameStyle(QFrame::Panel | QFrame::Sunken);
-        addTextPropery();
         break;
     default:
         break;
@@ -59,19 +52,38 @@ void Widget::createProperyTable(WidgetType type)
     layout()->addWidget(WigetEntry(m_CentralWidget, m_Type));
 }
 
-void Widget::addTextPropery()
+void Widget::createPropertyTable()
 {
-    m_propTable << qMakePair(QVariant::String, QString("String"));
-    m_propTable << qMakePair(QVariant::Color, QString("TextColor"));
-    m_propTable << qMakePair(QVariant::TextFormat, QString("AlignH"));
-    m_propTable << qMakePair(QVariant::TextFormat, QString("AlignV"));
+    m_propTable << qMakePair(QVariant::Int, QString("Id"));
+    m_propTable << qMakePair(QVariant::Rect, QString("geometry"));
+    m_propTable << qMakePair(QVariant::Color, QString("BkColor"));
 
-    QLabel *label = (QLabel *)m_CentralWidget;
-    m_String = label->text();
+    m_Id = 0;
     m_BkColor = m_CentralWidget->palette().color(QPalette::Window);
-    m_TextColor = m_CentralWidget->palette().color(QPalette::WindowText);
-    m_AlignH = ((int)label->alignment() & 0x0f) >> 1;
-    m_AlignV = ((int)label->alignment() & 0xff) >> 6;
+
+    switch (m_Type) {
+    case Window:
+        break;
+    case Button:
+    case Text:
+    case Edit:
+    {
+        m_propTable << qMakePair(QVariant::String, QString("String"));
+        m_propTable << qMakePair(QVariant::Color, QString("TextColor"));
+        m_propTable << qMakePair(QVariant::TextFormat, QString("AlignH"));
+        m_propTable << qMakePair(QVariant::TextFormat, QString("AlignV"));
+
+        QLabel *label = (QLabel *)m_CentralWidget;
+        m_String = label->text();
+        m_TextColor = m_CentralWidget->palette().color(QPalette::WindowText);
+        m_AlignH = ((int)label->alignment() & 0x0f) >> 1;
+        m_AlignV = ((int)label->alignment() & 0xff) >> 6;
+        break;
+    }
+    default:
+        break;
+    }
+
 }
 
 int Widget::assignId()
