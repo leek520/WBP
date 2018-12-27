@@ -12,10 +12,14 @@ public:
     void addWidget(QWidget *w);
     void removeWidget(QWidget *w);
 signals:
+
+public slots:
+    void propertyChanged(QWidget *w);
 private:
     void setCurrent(QWidget *w);
 private slots:
     void focusChanged(QWidget *old, QWidget *now);
+
 private:
     QWidgetList m_childList;
     static QList<FormWindow *> m_windowList;

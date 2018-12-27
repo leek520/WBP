@@ -9,6 +9,8 @@ FormWindow::FormWindow(QWidget *parent) :
     addWidget(this);
     connect(qApp, SIGNAL(focusChanged(QWidget *, QWidget *)),
                 this, SLOT(focusChanged(QWidget *, QWidget *)));
+    connect(SEL, SIGNAL(sizeChanged(QWidget*,QRect,QRect)),
+                this, SLOT(propertyChanged(QWidget*)));
 }
 
 void FormWindow::addWidget(QWidget *w)
@@ -23,7 +25,7 @@ void FormWindow::addWidget(QWidget *w)
 void FormWindow::removeWidget(QWidget *w)
 {
     Widget *rw = (Widget *)w;
-    if (Window == rw->getWidgetType()){
+    if (Window == rw->getType()){
         FormWindow *win = (FormWindow *)w;
         QWidgetList childs = win->m_childList;
         for(int i=0;i<childs.count();i++){
@@ -48,6 +50,7 @@ void FormWindow::setCurrent(QWidget *w)
     SEL->setCurrent(w);
     SEL->show(w);
     w->show();
+    emit currentItemChanged((Widget *)w);
 }
 
 void FormWindow::focusChanged(QWidget *old, QWidget *now)
@@ -55,7 +58,7 @@ void FormWindow::focusChanged(QWidget *old, QWidget *now)
     if (SEL->isContainWidget(now)){
         setCurrent(now);
         Widget *rw = (Widget *)now;
-        if (Window == rw->getWidgetType()){
+        if (Window == rw->getType()){
             m_curWin = (FormWindow *)now;
         }else{
             if (m_childList.indexOf(now) > -1){
@@ -64,4 +67,9 @@ void FormWindow::focusChanged(QWidget *old, QWidget *now)
         }
     }
 
+}
+
+void FormWindow::propertyChanged(QWidget *w)
+{
+    emit currentItemChanged((Widget *)w);
 }

@@ -461,9 +461,12 @@ void MainWindow::addWidget(WidgetType type)
 {
     if (type == Window){
         FormWindow *win = new FormWindow(m_mdiArea);
+        connect(win, SIGNAL(currentItemChanged(Widget*)),
+                m_propW, SLOT(currentItemChanged(Widget*)));
         connect(win, SIGNAL(MouseButtonDblClick(QWidget*)),
                 this, SLOT(MouseButtonDblClick(QWidget*)));
         win->resize(800, 480);
+        win->propertyChanged(win);
         FormWindow::m_curWin = win;
     }else{
         if (!FormWindow::m_curWin){
@@ -471,6 +474,8 @@ void MainWindow::addWidget(WidgetType type)
             return;
         }
         Widget *w = new Widget(type, FormWindow::m_curWin);
+        connect(w, SIGNAL(currentItemChanged(Widget*)),
+                m_propW, SLOT(currentItemChanged(Widget*)));
         connect(w, SIGNAL(MouseButtonDblClick(QWidget*)),
                 this, SLOT(MouseButtonDblClick(QWidget*)));
         w->resize(50, 30);
