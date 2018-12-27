@@ -464,10 +464,12 @@ void WidgetSelection::mouse_button_release(const QRect &old, const QRect &now)
     emit sizeChanged(m_widget,old,now);
 }
 
+Selection* Selection::m_instance = NULL;
 Selection::Selection(QWidget *formwindow):
     m_current(NULL),
     m_formwindow(formwindow)
 {
+    m_instance = this;
 }
 
 Selection::~Selection()

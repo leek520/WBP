@@ -5,9 +5,9 @@
 #include "propertywidget.h"
 #include "widgetselection.h"
 #include "widget.h"
-
+#include "formwindow.h"
 #include "comobject.h"
-
+#include "propertydialog.h"
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -45,7 +45,9 @@ private slots:
     void build();
     void download();
 
+    void MouseButtonDblClick(QWidget *w);
     void addWidget();
+    void addWidget(WidgetType type);
 signals:
     void DownLoad_sig(const int cmd, const int addr, const QByteArray data);
 private:
@@ -86,9 +88,10 @@ private:
     QList <QAction *>m_graphActList;
 
     QScrollArea *m_mdiArea;
+    QDomDocument doc;
     LeftWidget *m_leftW;
     PropertyWidget *m_propW;
-    QDomDocument doc;
+    PropertyDialog *m_propD;
 };
 
 #endif // MAINWINDOW_H

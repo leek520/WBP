@@ -1,7 +1,7 @@
 ﻿#include "mainwindow.h"
 
-MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent)
+MainWindow::MainWindow(QWidget *parent) :
+    QMainWindow(parent)
 {
     setWindowTitle(tr("WBP"));//设置窗口标题
     setWindowIcon(QIcon(":/mamtool.ico"));
@@ -205,9 +205,10 @@ void MainWindow::createStatusBar()
 
 void MainWindow::setupUi()
 {
-    resize(1000,600);
+    resize(1400,800);
     m_mdiArea = new QScrollArea(this);
     setCentralWidget(m_mdiArea);
+    new Selection(m_mdiArea);
 
     m_leftW = new LeftWidget();
     QDockWidget *m_dockLeft = new QDockWidget(tr("window"), this);
@@ -428,7 +429,7 @@ void MainWindow::cut()
 
 void MainWindow::remove()
 {
-
+    FormWindow::m_curWin->removeWidget(focusWidget());
 }
 
 
@@ -444,15 +445,38 @@ void MainWindow::download()
 
 }
 
+void MainWindow::MouseButtonDblClick(QWidget *w)
+{
+    m_propD = new PropertyDialog(this);
+    m_propD->show();
+}
+
 void MainWindow::addWidget()
 {
-    Widget *w = new Widget(m_mdiArea);
+    WidgetType type = (WidgetType)m_graphActList.indexOf((QAction *)sender());
+    addWidget(type);
+}
 
-    Selection *sel = new Selection(m_mdiArea);
-    sel->addWidget(w);
-    sel->setCurrent(w);
-    w->setGeometry(20,20,200,100);
-    w->show();
+void MainWindow::addWidget(WidgetType type)
+{
+    if (type == Window){
+        FormWindow *win = new FormWindow(m_mdiArea);
+        connect(win, SIGNAL(MouseButtonDblClick(QWidget*)),
+                this, SLOT(MouseButtonDblClick(QWidget*)));
+        win->resize(800, 480);
+        FormWindow::m_curWin = win;
+    }else{
+        if (!FormWindow::m_curWin){
+            QMessageBox::warning(NULL, "警告", "请先创建窗体！", QMessageBox::Yes, QMessageBox::Yes);
+            return;
+        }
+        Widget *w = new Widget(type, FormWindow::m_curWin);
+        connect(w, SIGNAL(MouseButtonDblClick(QWidget*)),
+                this, SLOT(MouseButtonDblClick(QWidget*)));
+        w->resize(50, 30);
+        FormWindow::m_curWin->addWidget(w);
+    }
+
 }
 
 

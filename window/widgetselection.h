@@ -3,7 +3,7 @@
 
 #include <QWidget>
 #include <QHash>
-
+#define SEL (Selection::GetInstance())
 class WidgetHandle: public QWidget
 {
     Q_OBJECT
@@ -81,8 +81,15 @@ class Selection :   public QObject
 {
     Q_OBJECT
 public:
-    Selection(QWidget *formwindow);
+    Selection(QWidget *formwindow=0);
     ~Selection();
+    //GetInstance是获得此类实例的唯一全局访问点
+    static Selection* GetInstance() {
+        if (m_instance == NULL) {
+            m_instance = new Selection();
+        }
+        return m_instance;
+    }
 
     void clear();
 
@@ -112,7 +119,7 @@ signals:
     void sizeChanged(QWidget* wid,const QRect& old,const QRect & now);
 
 private:
-
+    static Selection *m_instance;
     typedef QList<WidgetSelection *> SelectionPool;
     SelectionPool m_selectionPool;
 

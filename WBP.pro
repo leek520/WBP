@@ -23,7 +23,9 @@ SOURCES += main.cpp\
     ./window/widgetselection.cpp \
     ./com/comobject.cpp \
     window/propertywidget.cpp \
-    window/widget.cpp
+    window/widget.cpp \
+    window/formwindow.cpp \
+    window/propertydialog.cpp
 
 HEADERS  += common.h \
     ./window/mainwindow.h \
@@ -31,8 +33,13 @@ HEADERS  += common.h \
     ./window/widgetselection.h \
     ./com/comobject.h \
     window/propertywidget.h \
-    window/widget.h
+    window/widget.h \
+    window/formwindow.h \
+    window/propertydialog.h
 
 
 RESOURCES += \
     application.qrc
+
+FORMS += \
+    window/propertydialog.ui
