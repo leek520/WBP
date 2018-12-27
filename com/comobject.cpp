@@ -62,6 +62,22 @@ const unsigned char gCrcLow[256]=
 };
 
 
+QString ComDriver::name     = "COM1";
+QString ComDriver::baud     = "9600";
+QString ComDriver::parity   = "None";
+QString ComDriver::databit  = "8";
+QString ComDriver::stopbit  = "1";
+ComDriver::ComDriver(QObject *parent) : QObject(parent)
+{
+    //打开窗口
+    m_com = new QSerialPort();
+    SetSerialPara(name, baud, parity, stopbit);
+    connect(m_com,SIGNAL(readyRead()),this,SLOT(ReceiveMsg()));
+    qDebug()<<"SerialPort is open";
+
+    m_sendTimer = new QTimer(this);
+    connect(m_sendTimer, SIGNAL(timeout()), this, SLOT(SendMsg()));
+}
 
 ComDriver::ComDriver(QString name, QString baud, QString parity, QString stopbit, QObject *parent) :
     QObject(parent)

@@ -85,6 +85,11 @@ void MainWindow::createActions()
     removeAct->setStatusTip(tr("Remove the current selection"));
     connect(removeAct, SIGNAL(triggered()), this, SLOT(remove()));
 
+    /****set****/
+    setComAct = new QAction(QIcon(":/images/about.png"), tr("&SetCom"), this);
+    setComAct->setStatusTip(tr(""));
+    connect(setComAct, SIGNAL(triggered()), this, SLOT(setCom()));
+
     /****about****/
     aboutAct = new QAction(QIcon(":/images/about.png"), tr("&About"), this);
     aboutAct->setStatusTip(tr("Show the application's About box"));
@@ -144,6 +149,9 @@ void MainWindow::createMenus()
     editMenu->addAction(copyAct);
     editMenu->addAction(pasteAct);
     editMenu->addAction(removeAct);
+
+    setMenu = menuBar()->addMenu(tr("&Set"));
+    setMenu->addAction(setComAct);
 
     buildMenu = menuBar()->addMenu(tr("&Build"));
     buildMenu->addAction(buildAct);
@@ -205,7 +213,7 @@ void MainWindow::createStatusBar()
 
 void MainWindow::setupUi()
 {
-    resize(1400,800);
+    setWindowState(Qt::WindowMaximized);
     m_mdiArea = new QScrollArea(this);
     setCentralWidget(m_mdiArea);
     new Selection(m_mdiArea);
@@ -324,6 +332,13 @@ bool MainWindow::saveProjectFile(QString &filename)
     root.setAttributeNode(curDate);
     doc.appendChild(root);
 
+    QList<FormWindow *> winList = FormWindow::getWindowList();
+    for(int i=0;i<winList.count();i++){
+        QWidgetList childList = winList[i]->getChildList();
+        for(int j=0;j<childList.count();j++){
+
+        }
+    }
     // 2、写入到文件
     docXmlWrite(filename);
     return true;
@@ -443,6 +458,12 @@ void MainWindow::build()
 void MainWindow::download()
 {
 
+}
+
+void MainWindow::setCom()
+{
+    m_comD = new ComDialog(this);
+    m_comD->show();
 }
 
 void MainWindow::MouseButtonDblClick(QWidget *w)

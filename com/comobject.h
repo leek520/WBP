@@ -42,16 +42,21 @@ class ComDriver : public QObject
 {
     Q_OBJECT
 public:
+    ComDriver(QObject *parent = 0);
     ComDriver(QString name, QString baud, QString parity, QString stopbit, QObject *parent = 0);
-
-private:
     void SetSerialPara(QString name, QString baud, QString parity, QString stopbit);
+private:
     //CRC-16校验
     unsigned int CRC16Check(uchar *pchMsg, ushort wDataLen);
     unsigned int CRC16Check_CCITT(uchar *pchMsg, uint wDataLen);
     bool SendMsgDownLoad(const int cmd, const int addr, const uchar *data, const int len, const int flag=0);
     bool FetchData(uchar *data, int *len, int stat_pos);
-
+public:
+    static QString name;
+    static QString baud;
+    static QString parity;
+    static QString databit;
+    static QString stopbit;
 public slots:
     void SendMsg();
     void DownLoad_slt(const int cmd, const int addr, const QByteArray data);

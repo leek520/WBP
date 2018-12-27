@@ -8,6 +8,7 @@
 #include "formwindow.h"
 #include "comobject.h"
 #include "propertydialog.h"
+#include "comdialog.h"
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -45,6 +46,8 @@ private slots:
     void build();
     void download();
 
+    void setCom();
+
     void MouseButtonDblClick(QWidget *w);
     void addWidget();
     void addWidget(WidgetType type);
@@ -57,6 +60,7 @@ private:
     QMenu *helpMenu;
     QMenu *buildMenu;
     QMenu *viewMenu;
+    QMenu *setMenu;
     QMenu *windowMenu;
 
 
@@ -82,6 +86,8 @@ private:
 
     QAction *aboutAct;
 
+    QAction *setComAct;
+
     QAction *buildAct;
     QAction *downAct;
 
@@ -92,6 +98,7 @@ private:
     LeftWidget *m_leftW;
     PropertyWidget *m_propW;
     PropertyDialog *m_propD;
+    ComDialog *m_comD;
 };
 
 #endif // MAINWINDOW_H

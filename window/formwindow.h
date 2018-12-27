@@ -11,6 +11,8 @@ public:
     explicit FormWindow(QWidget *parent = 0);
     void addWidget(QWidget *w);
     void removeWidget(QWidget *w);
+    QWidgetList getChildList();
+    static QList<FormWindow *> getWindowList();
 signals:
 
 public slots:

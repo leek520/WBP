@@ -41,6 +41,16 @@ void FormWindow::removeWidget(QWidget *w)
     }
 }
 
+QWidgetList FormWindow::getChildList()
+{
+    return m_childList;
+}
+
+QList<FormWindow *> FormWindow::getWindowList()
+{
+    return m_windowList;
+}
+
 void FormWindow::setCurrent(QWidget *w)
 {
     QWidget *curWidget = SEL->current();

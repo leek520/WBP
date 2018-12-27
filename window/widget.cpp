@@ -38,16 +38,16 @@ void Widget::createProperyTable(WidgetType type)
     case Window:
         break;
     case Button:
-        child->setFrameShadow(QFrame::Raised);
-        child->setFrameShape(QFrame::WinPanel);
+        child->setLineWidth(1);
+        child->setFrameStyle(QFrame::WinPanel | QFrame::Raised);
         addTextPropery();
         break;
     case Text:
         addTextPropery();
         break;
     case Edit:
-        child->setFrameShadow(QFrame::Sunken);
-        child->setFrameShape(QFrame::Panel);
+        child->setLineWidth(2);
+        child->setFrameStyle(QFrame::Panel | QFrame::Sunken);
         addTextPropery();
         break;
     default:
