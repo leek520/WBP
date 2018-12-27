@@ -28,6 +28,8 @@ private:
     bool docXmlWrite(QString &filename);
     bool saveProjectFile(QString &filename);
     bool openProjectFile(QString &filename);
+    QDomElement widgetToDom(Widget *w, QDomElement root);
+    void DomToWidget(QDomElement root, Widget *w);
 
 private slots:
     void newFile();
@@ -50,7 +52,7 @@ private slots:
 
     void MouseButtonDblClick(QWidget *w);
     void addWidget();
-    void addWidget(WidgetType type);
+    Widget* addWidget(WidgetType type);
 signals:
     void DownLoad_sig(const int cmd, const int addr, const QByteArray data);
 private:

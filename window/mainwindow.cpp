@@ -334,9 +334,11 @@ bool MainWindow::saveProjectFile(QString &filename)
 
     QList<FormWindow *> winList = FormWindow::getWindowList();
     for(int i=0;i<winList.count();i++){
+        QDomElement winDom = widgetToDom(winList[i], root);
+
         QWidgetList childList = winList[i]->getChildList();
         for(int j=0;j<childList.count();j++){
-
+            widgetToDom((Widget *)childList[j], winDom);
         }
     }
     // 2、写入到文件
@@ -355,6 +357,82 @@ bool MainWindow::openProjectFile(QString &filename)
     QDomElement root = doc.documentElement();
     QString title = root.tagName();
     QString date = root.attribute(tr("date"));
+
+    QDomNode winNode = root.firstChild();
+    while (!winNode.isNull())
+    {
+        QDomElement wDom = winNode.toElement();
+        QString type = wDom.tagName();
+
+        Widget *win = addWidget(Window);
+        DomToWidget(wDom, win);
+        QDomNode childNode = winNode.firstChild();
+        while (!childNode.isNull()){
+            wDom = childNode.toElement();
+            type = wDom.tagName();
+            Widget *child = addWidget(StrToEnum(type));
+            DomToWidget(wDom, child);
+
+            childNode = childNode.nextSibling();
+        }
+
+        winNode = winNode.nextSibling();
+    }
+    return true;
+}
+
+QDomElement MainWindow::widgetToDom(Widget *w, QDomElement root)
+{
+    QList<QPair<QVariant::Type, QString> > propTable;
+    propTable = w->getPropertyTable();
+
+    QDomElement childDom = doc.createElement(EnumToStr(w->getType()));
+    for(int k=0;k<propTable.count();k++){
+        QDomAttr propNode = doc.createAttribute(propTable[k].second);
+        QVariant value = w->property(propTable[k].second.toLocal8Bit());
+        if (propTable[k].second == "geometry"){
+            QRect rect = value.toRect();
+            propNode.setValue(QString("[(%1,%2)],%3×%4")
+                             .arg(rect.left())
+                             .arg(rect.top())
+                             .arg(rect.width())
+                             .arg(rect.height()));
+        }else{
+            propNode.setValue(value.toString());
+        }
+
+        childDom.setAttributeNode(propNode);
+    }
+    root.appendChild(childDom);
+    return childDom;
+}
+
+void MainWindow::DomToWidget(QDomElement root, Widget *w)
+{
+    QList<QPair<QVariant::Type, QString> > propTable;
+    propTable = w->getPropertyTable();
+    for(int i=0;i<propTable.count();i++){
+        QString attrVaue = root.attribute(propTable[i].second);
+        QVariant value;
+        switch (propTable[i].first){
+        case QVariant::Int:
+            w->setProperty(propTable[i].second.toLocal8Bit(), attrVaue.toInt());
+            break;
+        case QVariant::String:
+            w->setProperty(propTable[i].second.toLocal8Bit(), attrVaue);
+            break;
+        case QVariant::Color:
+            w->setProperty(propTable[i].second.toLocal8Bit(), QColor(attrVaue.toInt()));
+            break;
+        case QVariant::Rect:
+
+            break;
+        default:
+            value = QVariant::fromValue<QString>(attrVaue);
+            break;
+        }
+
+    }
 
 }
 
@@ -478,7 +556,7 @@ void MainWindow::addWidget()
     addWidget(type);
 }
 
-void MainWindow::addWidget(WidgetType type)
+Widget* MainWindow::addWidget(WidgetType type)
 {
     if (type == Window){
         FormWindow *win = new FormWindow(m_mdiArea);
@@ -489,10 +567,11 @@ void MainWindow::addWidget(WidgetType type)
         win->resize(800, 480);
         win->propertyChanged(win);
         FormWindow::m_curWin = win;
+        return win;
     }else{
         if (!FormWindow::m_curWin){
             QMessageBox::warning(NULL, "警告", "请先创建窗体！", QMessageBox::Yes, QMessageBox::Yes);
-            return;
+            return NULL;
         }
         Widget *w = new Widget(type, FormWindow::m_curWin);
         connect(w, SIGNAL(currentItemChanged(Widget*)),
@@ -501,6 +580,7 @@ void MainWindow::addWidget(WidgetType type)
                 this, SLOT(MouseButtonDblClick(QWidget*)));
         w->resize(50, 30);
         FormWindow::m_curWin->addWidget(w);
+        return w;
     }
 
 }

@@ -14,6 +14,18 @@
          (type == Edit) ? (QLabel *)ptr :\
          (QLabel *)ptr)
 
+#define EnumToStr(type) \
+        ((type == Window) ? QString("Window") :\
+         (type == Button) ? QString("Button") :\
+         (type == Text) ? QString("Text") :\
+         (type == Edit) ? QString("Edit") : QString(""))
+
+#define StrToEnum(str) \
+        ((str == QString("Window")) ? Window :\
+         (str == QString("Button")) ? Button :\
+         (str == QString("Text")) ? Text :\
+         (str == QString("Edit")) ? Edit : Edit)
+
 class Widget : public QWidget
 {
     Q_OBJECT
