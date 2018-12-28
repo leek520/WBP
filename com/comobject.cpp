@@ -71,9 +71,7 @@ ComDriver::ComDriver(QObject *parent) : QObject(parent)
 {
     //打开窗口
     m_com = new QSerialPort();
-    SetSerialPara(name, baud, parity, stopbit);
     connect(m_com,SIGNAL(readyRead()),this,SLOT(ReceiveMsg()));
-    qDebug()<<"SerialPort is open";
 
     m_sendTimer = new QTimer(this);
     connect(m_sendTimer, SIGNAL(timeout()), this, SLOT(SendMsg()));
@@ -85,7 +83,7 @@ ComDriver::ComDriver(QString name, QString baud, QString parity, QString stopbit
 
     //打开窗口
     m_com = new QSerialPort();
-    SetSerialPara(name, baud, parity, stopbit);
+    OpenSerial(name, baud, parity, stopbit);
     connect(m_com,SIGNAL(readyRead()),this,SLOT(ReceiveMsg()));
     qDebug()<<"SerialPort is open";
 
@@ -94,14 +92,19 @@ ComDriver::ComDriver(QString name, QString baud, QString parity, QString stopbit
     connect(m_sendTimer, SIGNAL(timeout()), this, SLOT(SendMsg()));
 }
 
-void ComDriver::SetSerialPara(QString name, QString baud, QString parity, QString stopbit)
+bool ComDriver::OpenSerial()
+{
+    return OpenSerial(name, baud, parity, stopbit);
+}
+
+bool ComDriver::OpenSerial(QString name, QString baud, QString parity, QString stopbit)
 {
     if (m_com->isOpen()){
         m_com->close();
     }
     m_com->setPortName(name);
     if (!m_com->open(QIODevice::ReadWrite)){
-        return;
+        return false;
     }
     if (baud == "9600")
         m_com->setBaudRate(QSerialPort::Baud9600);
@@ -124,6 +127,7 @@ void ComDriver::SetSerialPara(QString name, QString baud, QString parity, QStrin
     m_com->setFlowControl(QSerialPort::NoFlowControl);
 
     qDebug()<<"parity:"<<m_com->parity();
+    return true;
 }
 /**
 * 函数说明：CRC校验

@@ -6,6 +6,7 @@
 #include <QPair>
 #include <QDate>
 #include "common.h"
+#include "comobject.h"
 
 #define WigetEntry(ptr, type) \
         ((type == Window) ? (QLabel *)ptr :\
@@ -25,6 +26,10 @@
          (str == QString("Button")) ? Button :\
          (str == QString("Text")) ? Text :\
          (str == QString("Edit")) ? Edit : Edit)
+
+#define CalWidgetAdd(pos) ((struct list_head *)((pos) + START_ADDR_SDRAM_WIDGET))
+
+#define ConvListAdd(addr) ((struct list_head *)addr);
 
 class Widget : public QWidget
 {
@@ -50,6 +55,7 @@ private:
 protected:
     bool eventFilter(QObject *watched, QEvent *event);
     void paintEvent(QPaintEvent *event);
+    void keyPressEvent(QKeyEvent *event);
 signals:
     void MouseButtonDblClick(QWidget *w);
     void currentItemChanged(Widget *w);
@@ -90,6 +96,44 @@ private:
     int m_AlignV;
     QColor m_TextColor;
     QString m_String;
+};
+
+class BuildInfo : public QObject
+{
+    Q_OBJECT
+public:
+    explicit BuildInfo();
+    void initBuild();
+    uint QColorToEColor(QColor color);
+    int QAlignToEAlign(int align);
+    char *QStringToMultBytes(QString str);
+    struct list_head *headToBuildInfo(const struct list_head *head);
+    struct list_head *widgetToBuildInfo(const struct list_head *head, list_head *prevHead, int *prevSize=NULL);
+
+    void widgetToBuildInfo(const struct list_head *head);
+    void downLoadInfo();
+private slots:
+    void readCharList();
+    void ResProgress_slt(int pos, QString msg="");
+signals:
+    void DownLoad_sig(const int cmd, const int addr, const QByteArray data);
+private:
+    ComDriver *com;
+    QString m_charList;
+
+    struct WidgetBuf{
+       int pos;
+       char buf[10240];
+    }widgetBuf;
+    struct StringBuf{
+       int pos;
+       char buf[10240];
+    }stringBuf;
+    struct PicBuf{
+       int pos;
+       char buf[10240];
+    }picBuf;
+    int downloadStep;
 };
 
 #endif // WIDGET_H

@@ -31,6 +31,12 @@ private:
     QDomElement widgetToDom(Widget *w, QDomElement root);
     void DomToWidget(QDomElement root, Widget *w);
 
+    char *QStringToMultBytes(QString str);
+
+    struct list_head *setWidgetInfo(Widget *w, struct list_head *head);
+    void setBaseInfo(Widget *w, BasePara *base);
+    void setTextInfo(Widget *w, TextPara *text);
+
 private slots:
     void newFile();
     bool open();
@@ -54,7 +60,7 @@ private slots:
     void addWidget();
     Widget* addWidget(WidgetType type);
 signals:
-    void DownLoad_sig(const int cmd, const int addr, const QByteArray data);
+
 private:
     QStatusBar *stateBar;
     QMenu *fileMenu;
@@ -101,6 +107,9 @@ private:
     PropertyWidget *m_propW;
     PropertyDialog *m_propD;
     ComDialog *m_comD;
+
+    BuildInfo *buildInfo;
+    WindowInfo winHead;
 };
 
 #endif // MAINWINDOW_H

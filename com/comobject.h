@@ -44,7 +44,8 @@ class ComDriver : public QObject
 public:
     ComDriver(QObject *parent = 0);
     ComDriver(QString name, QString baud, QString parity, QString stopbit, QObject *parent = 0);
-    void SetSerialPara(QString name, QString baud, QString parity, QString stopbit);
+    bool OpenSerial();
+    bool OpenSerial(QString name, QString baud, QString parity, QString stopbit);
 private:
     //CRC-16校验
     unsigned int CRC16Check(uchar *pchMsg, ushort wDataLen);

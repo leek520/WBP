@@ -1,7 +1,8 @@
 ﻿#include "mainwindow.h"
 
 MainWindow::MainWindow(QWidget *parent) :
-    QMainWindow(parent)
+    QMainWindow(parent),
+    buildInfo(new BuildInfo())
 {
     setWindowTitle(tr("WBP"));//设置窗口标题
     setWindowIcon(QIcon(":/mamtool.ico"));
@@ -12,7 +13,6 @@ MainWindow::MainWindow(QWidget *parent) :
     createStatusBar();
 
     setupUi();
-
 }
 
 MainWindow::~MainWindow()
@@ -449,8 +449,6 @@ void MainWindow::DomToWidget(QDomElement root, Widget *w)
 }
 
 
-
-
 void MainWindow::newFile()
 {
 
@@ -537,17 +535,104 @@ void MainWindow::remove()
     FormWindow::m_curWin->removeWidget(focusWidget());
 }
 
+struct list_head *MainWindow::setWidgetInfo(Widget *w, struct list_head *head)
+{
+    struct list_head *child = NULL;
+    BasePara *base;
+    switch (w->getType()) {
+    case Window:
+    {
+        WindowInfo *winInfo = (WindowInfo*)malloc(sizeof(WindowInfo));
+        child = &winInfo->childList;
+        init_list_head(child);
+        winInfo->BkColor[0] = buildInfo->QColorToEColor(w->getBkColor());
+        base = &winInfo->base;
+        break;
+    }
+    case Button:
+    {
+        ButtonInfo *btnInfo = (ButtonInfo*)malloc(sizeof(ButtonInfo));
+        btnInfo->BkColor[0] = buildInfo->QColorToEColor(w->getBkColor());
+        setTextInfo(w, &btnInfo->text);
+        base = &btnInfo->base;
+        break;
+    }
+    case Text:
+    {
+        TextInfo *textInfo = (TextInfo*)malloc(sizeof(TextInfo));
+        textInfo->BkColor[0] = buildInfo->QColorToEColor(w->getBkColor());
+        setTextInfo(w, &textInfo->text);
+        base = &textInfo->base;
+        break;
+    }
+    case Edit:
+    {
+        EditInfo *editInfo = (EditInfo*)malloc(sizeof(EditInfo));
+        editInfo->BkColor[0] = buildInfo->QColorToEColor(w->getBkColor());
+        setTextInfo(w, &editInfo->text);
+        base = &editInfo->base;
+        break;
+    }
+    default:
+        break;
+    }
 
+    setBaseInfo(w, base);
+
+    list_add_tail(&base->list, head);
+
+    return child;
+}
+
+void MainWindow::setBaseInfo(Widget *w, BasePara *base)
+{
+    //设置base信息
+    base->Id = w->getId();
+    base->x0 = w->geometry().left();
+    base->y0 = w->geometry().top();
+    base->xsize = w->width();
+    base->ysize = w->height();
+
+    base->resv = 0;
+    base->type = int(w->getType());
+}
+
+void MainWindow::setTextInfo(Widget *w, TextPara *text)
+{
+    text->color = buildInfo->QColorToEColor(w->getTextColor());
+    text->alignment = buildInfo->QAlignToEAlign((w->getAlignH() << 1) | (w->getAlignV() << 6));
+    text->string = buildInfo->QStringToMultBytes(w->getString());
+}
 
 void MainWindow::build()
 {
+    memset(&winHead, 0, sizeof(WindowInfo));
+    buildInfo->initBuild();
 
 
+    init_list_head(&winHead.base.list);
+    init_list_head(&winHead.childList);
+
+    QList<FormWindow *> winList = FormWindow::getWindowList();
+    for(int i=0;i<winList.count();i++){
+        FormWindow *win = winList[i];
+
+        struct list_head* childHead = setWidgetInfo(win, &winHead.base.list);
+
+        QWidgetList childList = win->getChildList();
+        for(int j=0;j<childList.count();j++){
+            Widget *child = (Widget *)childList[j];
+            setWidgetInfo(child, childHead);
+        }
+    }
+    struct list_head *prevHead = buildInfo->headToBuildInfo(&winHead.base.list);
+    //buildInfo->widgetToBuildInfo(&winHead.base.list, prevHead);
+    buildInfo->widgetToBuildInfo(&winHead.base.list);
 }
 
 void MainWindow::download()
 {
-
+    buildInfo->downLoadInfo();
 }
 
 void MainWindow::setCom()
