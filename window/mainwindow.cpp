@@ -535,42 +535,48 @@ void MainWindow::remove()
     FormWindow::m_curWin->removeWidget(focusWidget());
 }
 
-struct list_head *MainWindow::setWidgetInfo(Widget *w, struct list_head *head)
+struct list_head *MainWindow::setWidgetInfo(Widget *w, struct list_head *head, int *pos, int start)
 {
+    int curPos = (*pos);
     struct list_head *child = NULL;
     BasePara *base;
     switch (w->getType()) {
     case Window:
     {
-        WindowInfo *winInfo = (WindowInfo*)malloc(sizeof(WindowInfo));
+        WindowInfo *winInfo = (WindowInfo*)(start + curPos);
         child = &winInfo->childList;
         init_list_head(child);
         winInfo->BkColor[0] = buildInfo->QColorToEColor(w->getBkColor());
         base = &winInfo->base;
+        *pos = curPos + sizeof(WindowInfo);
         break;
     }
     case Button:
     {
-        ButtonInfo *btnInfo = (ButtonInfo*)malloc(sizeof(ButtonInfo));
+        ButtonInfo *btnInfo = (ButtonInfo*)(start + curPos);
         btnInfo->BkColor[0] = buildInfo->QColorToEColor(w->getBkColor());
+        btnInfo->cmd = buildInfo->QStringToChar(w->getLuaCmd());
         setTextInfo(w, &btnInfo->text);
         base = &btnInfo->base;
+        *pos = curPos + sizeof(ButtonInfo);
         break;
     }
     case Text:
     {
-        TextInfo *textInfo = (TextInfo*)malloc(sizeof(TextInfo));
+        TextInfo *textInfo = (TextInfo*)(start + curPos);
         textInfo->BkColor[0] = buildInfo->QColorToEColor(w->getBkColor());
         setTextInfo(w, &textInfo->text);
         base = &textInfo->base;
+        *pos = curPos + sizeof(TextInfo);
         break;
     }
     case Edit:
     {
-        EditInfo *editInfo = (EditInfo*)malloc(sizeof(EditInfo));
+        EditInfo *editInfo = (EditInfo*)(start + curPos);
         editInfo->BkColor[0] = buildInfo->QColorToEColor(w->getBkColor());
         setTextInfo(w, &editInfo->text);
         base = &editInfo->base;
+        *pos = curPos + sizeof(EditInfo);
         break;
     }
     default:
@@ -602,32 +608,55 @@ void MainWindow::setTextInfo(Widget *w, TextPara *text)
     text->color = buildInfo->QColorToEColor(w->getTextColor());
     text->alignment = buildInfo->QAlignToEAlign((w->getAlignH() << 1) | (w->getAlignV() << 6));
     text->string = buildInfo->QStringToMultBytes(w->getString());
+
 }
 
 void MainWindow::build()
 {
-    memset(&winHead, 0, sizeof(WindowInfo));
+
     buildInfo->initBuild();
 
+    BuildInfo::WidgetBuf *widgetBuf = buildInfo->getWidgetBuf();
+    int startAddress = (int)(&widgetBuf->buf);
+    WindowInfo *headInfo = (WindowInfo *)(startAddress);
+    struct list_head *winHead = &headInfo->base.list;
 
-    init_list_head(&winHead.base.list);
-    init_list_head(&winHead.childList);
+    init_list_head(winHead);
+    init_list_head(&headInfo->childList);
+
+    widgetBuf->pos += sizeof(WindowInfo);
 
     QList<FormWindow *> winList = FormWindow::getWindowList();
     for(int i=0;i<winList.count();i++){
         FormWindow *win = winList[i];
 
-        struct list_head* childHead = setWidgetInfo(win, &winHead.base.list);
+        struct list_head* childHead = setWidgetInfo(win, winHead, &widgetBuf->pos, startAddress);
 
         QWidgetList childList = win->getChildList();
         for(int j=0;j<childList.count();j++){
             Widget *child = (Widget *)childList[j];
-            setWidgetInfo(child, childHead);
+            setWidgetInfo(child, childHead, &widgetBuf->pos, startAddress);
         }
     }
-    struct list_head *prevHead = buildInfo->headToBuildInfo(&winHead.base.list);
-    //buildInfo->widgetToBuildInfo(&winHead.base.list, prevHead);
-    buildInfo->widgetToBuildInfo(&winHead.base.list);
+    //处理地址
+    int offset = START_ADDR_SDRAM_WIDGET - startAddress;
+    struct list_head *win;
+
+    list_for_each(win, winHead){
+        win->prev->next = ConvListAdd(win->prev->next, offset);
+        win->prev = ConvListAdd(win->prev, offset);
+
+        struct list_head *child;
+        struct list_head *childHead = &((WindowInfo *)win)->childList;
+        list_for_each(child, childHead){
+            child->prev->next = ConvListAdd(child->prev->next, offset);
+            child->prev = ConvListAdd(child->prev, offset);
+        }
+        childHead->prev->next = ConvListAdd(childHead->prev->next, offset);
+        childHead->prev = ConvListAdd(childHead->prev, offset);
+    }
+    winHead->prev->next = ConvListAdd(winHead->prev->next, offset);
+    winHead->prev = ConvListAdd(winHead->prev, offset);
 }
 
 void MainWindow::download()

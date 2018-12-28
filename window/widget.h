@@ -27,9 +27,7 @@
          (str == QString("Text")) ? Text :\
          (str == QString("Edit")) ? Edit : Edit)
 
-#define CalWidgetAdd(pos) ((struct list_head *)((pos) + START_ADDR_SDRAM_WIDGET))
-
-#define ConvListAdd(addr) ((struct list_head *)addr);
+#define ConvListAdd(addr, offset) ((struct list_head *)((int)addr + offset));
 
 class Widget : public QWidget
 {
@@ -41,6 +39,7 @@ class Widget : public QWidget
     Q_PROPERTY(int AlignH READ getAlignH WRITE setAlignH)
     Q_PROPERTY(int AlignV READ getAlignV WRITE setAlignV)
 
+    Q_PROPERTY(QString LuaCmd READ getLuaCmd WRITE setLuaCmd)
 
     Q_PROPERTY(QVariant BkColor1 READ getBkColor1 WRITE setBkColor1)
 public:
@@ -51,6 +50,7 @@ private:
     void createCenterWidget();
     void createPropertyTable();
 
+    void setTextParaProp();
     int assignId();
 protected:
     bool eventFilter(QObject *watched, QEvent *event);
@@ -83,9 +83,13 @@ public:
     int getAlignV();
     void setAlignV(int Align);
 
+    QString getLuaCmd();
+    void setLuaCmd(QString LuaCmd);
+
     QVariant getBkColor1();
     void setBkColor1(QVariant bkColor);
 private:
+    static QMap<WidgetType, int> m_IdPool;
     /*****属性表****/
     WidgetType m_Type;
     int m_Id;
@@ -96,21 +100,38 @@ private:
     int m_AlignV;
     QColor m_TextColor;
     QString m_String;
+    QString m_LudCmd;
 };
 
 class BuildInfo : public QObject
 {
     Q_OBJECT
 public:
+    struct WidgetBuf{
+       int pos;
+       char buf[10240];
+    };
+    struct StringBuf{
+       int pos;
+       char buf[10240];
+    };
+    struct LuaBuf{
+       int pos;
+       char buf[10240];
+    };
+    struct PicBuf{
+       int pos;
+       char buf[10240];
+    };
+public:
     explicit BuildInfo();
     void initBuild();
+    WidgetBuf *getWidgetBuf();
     uint QColorToEColor(QColor color);
     int QAlignToEAlign(int align);
     char *QStringToMultBytes(QString str);
-    struct list_head *headToBuildInfo(const struct list_head *head);
-    struct list_head *widgetToBuildInfo(const struct list_head *head, list_head *prevHead, int *prevSize=NULL);
+    char *QStringToChar(QString str);
 
-    void widgetToBuildInfo(const struct list_head *head);
     void downLoadInfo();
 private slots:
     void readCharList();
@@ -121,18 +142,10 @@ private:
     ComDriver *com;
     QString m_charList;
 
-    struct WidgetBuf{
-       int pos;
-       char buf[10240];
-    }widgetBuf;
-    struct StringBuf{
-       int pos;
-       char buf[10240];
-    }stringBuf;
-    struct PicBuf{
-       int pos;
-       char buf[10240];
-    }picBuf;
+    struct WidgetBuf widgetBuf;
+    struct StringBuf stringBuf;
+    struct LuaBuf luaBuf;
+    struct PicBuf picBuf;
     int downloadStep;
 };
 

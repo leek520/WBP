@@ -76,6 +76,10 @@
 
 #define INVALID_COLOR 0x80000000
 
+#define GUI_ID_WINDOW   0000  //4096个
+#define GUI_ID_BUTTON   1000
+#define GUI_ID_TEXT     2000
+#define GUI_ID_EDIT     3000
 /************??????*************/
 //链表结构
 struct list_head
@@ -117,7 +121,7 @@ typedef struct _tWindowInfo
     BasePara base;
     int BkColor[1];
     struct list_head childList;
-}WindowInfo;
+}WindowInfo;    //8*4byte
 
 /*********°´Å¥ÐÅÏ¢½á¹¹************/
 typedef struct _tButtonInfo
@@ -126,14 +130,14 @@ typedef struct _tButtonInfo
     int BkColor[3];
     TextPara text;
     char *cmd;
-}ButtonInfo;
+}ButtonInfo;    //12*4byte
 /*********ÎÄ±¾¿òÐÅÏ¢½á¹¹************/
 typedef struct _tTextInfo
 {
     BasePara base;
     int BkColor[1];
     TextPara text;
-}TextInfo;
+}TextInfo;      //9*4byte
 /*********ÊäÈë¿òÐÅÏ¢½á¹¹************/
 typedef struct _tEditInfo
 {
@@ -142,7 +146,7 @@ typedef struct _tEditInfo
     TextPara text;
     uchar maxLen;
     char resv[3];
-}EditInfo;
+}EditInfo;      //11*4byte
 
 /************双向循环链表*************/
 

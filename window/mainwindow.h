@@ -33,7 +33,7 @@ private:
 
     char *QStringToMultBytes(QString str);
 
-    struct list_head *setWidgetInfo(Widget *w, struct list_head *head);
+    struct list_head *setWidgetInfo(Widget *w, struct list_head *head, int *pos, int start);
     void setBaseInfo(Widget *w, BasePara *base);
     void setTextInfo(Widget *w, TextPara *text);
 
@@ -109,7 +109,6 @@ private:
     ComDialog *m_comD;
 
     BuildInfo *buildInfo;
-    WindowInfo winHead;
 };
 
 #endif // MAINWINDOW_H

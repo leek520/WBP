@@ -1,5 +1,5 @@
 ﻿#include "widget.h"
-
+QMap<WidgetType, int> Widget::m_IdPool;
 Widget::Widget(WidgetType type, QWidget *parent) :
     QWidget(parent),
     m_Type(type)
@@ -58,37 +58,67 @@ void Widget::createPropertyTable()
     m_propTable << qMakePair(QVariant::Rect, QString("geometry"));
     m_propTable << qMakePair(QVariant::Color, QString("BkColor"));
 
-    m_Id = 0;
+    m_Id = assignId();
     m_BkColor = m_CentralWidget->palette().color(QPalette::Window);
 
     switch (m_Type) {
     case Window:
         break;
     case Button:
-    case Text:
-    case Edit:
-    {
-        m_propTable << qMakePair(QVariant::String, QString("String"));
-        m_propTable << qMakePair(QVariant::Color, QString("TextColor"));
-        m_propTable << qMakePair(QVariant::TextFormat, QString("AlignH"));
-        m_propTable << qMakePair(QVariant::TextFormat, QString("AlignV"));
-
-        QLabel *label = (QLabel *)m_CentralWidget;
-        m_String = label->text();
-        m_TextColor = m_CentralWidget->palette().color(QPalette::WindowText);
-        m_AlignH = ((int)label->alignment() & 0x0f) >> 1;
-        m_AlignV = ((int)label->alignment() & 0xff) >> 6;
+        m_propTable << qMakePair(QVariant::String, QString("LuaCmd"));
+        setTextParaProp();
         break;
-    }
+    case Text:
+        setTextParaProp();
+        break;
+    case Edit:
+
+        setTextParaProp();
+        break;
     default:
         break;
     }
 
 }
 
+void Widget::setTextParaProp()
+{
+    m_propTable << qMakePair(QVariant::String, QString("String"));
+    m_propTable << qMakePair(QVariant::Color, QString("TextColor"));
+    m_propTable << qMakePair(QVariant::TextFormat, QString("AlignH"));
+    m_propTable << qMakePair(QVariant::TextFormat, QString("AlignV"));
+
+    QLabel *label = (QLabel *)m_CentralWidget;
+    m_String = label->text();
+    m_TextColor = m_CentralWidget->palette().color(QPalette::WindowText);
+    m_AlignH = ((int)label->alignment() & 0x0f) >> 1;
+    m_AlignV = ((int)label->alignment() & 0xff) >> 6;
+}
+
 int Widget::assignId()
 {
-
+    if (!m_IdPool.contains(m_Type)){
+        m_IdPool.insert(m_Type, 0);
+    }
+    int id = m_IdPool.value(m_Type);
+    m_IdPool[m_Type] = id + 1;
+    switch (m_Type) {
+    case Window:
+        id += GUI_ID_WINDOW;
+        break;
+    case Button:
+        id += GUI_ID_BUTTON;
+        break;
+    case Text:
+        id += GUI_ID_TEXT;
+        break;
+    case Edit:
+        id += GUI_ID_EDIT;
+        break;
+    default:
+        break;
+    }
+    return id;
 }
 
 bool Widget::eventFilter(QObject *watched, QEvent *event)
@@ -234,6 +264,16 @@ void Widget::setAlignV(int Align)
     WigetEntry(m_CentralWidget, m_Type)->setAlignment(Qt::Alignment((m_AlignV << 6) | (m_AlignH << 1)));
 }
 
+QString Widget::getLuaCmd()
+{
+    return m_LudCmd;
+}
+
+void Widget::setLuaCmd(QString LuaCmd)
+{
+    m_LudCmd = LuaCmd;
+}
+
 QVariant Widget::getBkColor1()
 {
     return QVariant::fromValue<QList<QColor> >(m_BkColor1);
@@ -271,7 +311,14 @@ void BuildInfo::initBuild()
 
     memset(picBuf.buf, 0, 10240);
     picBuf.pos = 0;
+
 }
+
+BuildInfo::WidgetBuf *BuildInfo::getWidgetBuf()
+{
+    return (&widgetBuf);
+}
+
 void BuildInfo::readCharList()
 {
     QFile file(":/char3000.txt");
@@ -305,15 +352,8 @@ int BuildInfo::QAlignToEAlign(int align)
 }
 char *BuildInfo::QStringToMultBytes(QString str)
 {
-    //    char* ptr;
-    //    QByteArray ba;
-    //    ba = str.toLocal8Bit();
-    //    ptr = ba.data();
-    //    memset(array, 0, 128);
-    //    strcpy(array, ptr);
 
-
-    char* textAddr = &stringBuf.buf[stringBuf.pos];
+    int address = START_ADDR_SDRAM_STRING + stringBuf.pos;
 
     int i = 0;
     QByteArray data;
@@ -356,242 +396,23 @@ char *BuildInfo::QStringToMultBytes(QString str)
     stringBuf.buf[stringBuf.pos++] = 0x00;
     stringBuf.buf[stringBuf.pos++] = 0x00;
     stringBuf.buf[stringBuf.pos++] = 0x00;
-    return (char *)textAddr;
+
+    return (char *)address;
 }
 
-struct list_head *BuildInfo::headToBuildInfo(const list_head *head)
+char *BuildInfo::QStringToChar(QString str)
 {
-    struct list_head *ret = CalWidgetAdd(widgetBuf.pos);  //记录本次拷贝buf之前的位置
-    BasePara *baseInfo;
-    baseInfo = list_entry(head, BasePara, list);
-    WindowInfo *winInfo = (WindowInfo *)baseInfo;
-    WindowInfo *dstWin = (WindowInfo *)(widgetBuf.buf + widgetBuf.pos);
-    memcpy(dstWin, winInfo, sizeof(WindowInfo));
-    widgetBuf.pos += sizeof(WindowInfo);
+    int address = START_ADDR_SDRAM_LUA + luaBuf.pos;
 
-    dstWin->base.list.next = CalWidgetAdd(widgetBuf.pos);
-
-    return ret;
-}
-
-list_head *BuildInfo::widgetToBuildInfo(const list_head *head, list_head *prevHead, int *prevSize)
-{
-    //遍历链表生成buf
-    struct list_head *ret = CalWidgetAdd(widgetBuf.pos);  //记录本次拷贝buf之前的位置
-    struct list_head *pos;
-    BasePara *baseInfo;
-    list_for_each(pos, head){
-        baseInfo = list_entry(pos, BasePara, list);
-        switch (baseInfo->type) {
-        case Window:
-        {
-            WindowInfo *winInfo = (WindowInfo *)baseInfo;
-            WindowInfo *dstWin = (WindowInfo *)(widgetBuf.buf + widgetBuf.pos);
-            memcpy(dstWin, winInfo, sizeof(WindowInfo));
-            widgetBuf.pos += sizeof(WindowInfo);
-
-            dstWin->base.list.prev = prevHead;
-            //迭代计算child
-            if (list_empty(&winInfo->childList)){
-                dstWin->childList.next = CalWidgetAdd(widgetBuf.pos - 8);
-                dstWin->childList.prev = dstWin->childList.next;
-            }else{
-                dstWin->childList.next = CalWidgetAdd(widgetBuf.pos);
-                int lastSize;
-                dstWin->childList.prev = widgetToBuildInfo(&winInfo->childList, CalWidgetAdd(widgetBuf.pos-8), &lastSize);
-                // 重置子窗体的最后一个的next
-                BasePara *lastChild = (BasePara *)(widgetBuf.buf + widgetBuf.pos - lastSize);
-                lastChild->list.next = (struct list_head *)((int)dstWin->childList.next - 8);
-
-            }
-
-            if (pos == head->prev){ //是否为最后一个窗体
-                dstWin->base.list.next = CalWidgetAdd(0);
-                WindowInfo *headWin = (WindowInfo *)widgetBuf.buf;
-
-                if (list_empty(&winInfo->childList)){
-                    headWin->base.list.prev = CalWidgetAdd(widgetBuf.pos-sizeof(WindowInfo));
-                }else{
-                    headWin->base.list.prev = (struct list_head *)((int)dstWin->childList.next-sizeof(WindowInfo));
-                }
-
-            }else{
-                dstWin->base.list.next = CalWidgetAdd(widgetBuf.pos);
-            }
-
-            break;
-        }
-        case Button:
-        {
-            ButtonInfo *btnInfo = (ButtonInfo *)baseInfo;
-
-            ButtonInfo *dstBtn = (ButtonInfo *)(widgetBuf.buf + widgetBuf.pos);
-            memcpy(dstBtn, btnInfo, sizeof(ButtonInfo));
-            dstBtn->base.list.prev = prevHead;
-            widgetBuf.pos += sizeof(ButtonInfo);
-
-            dstBtn->text.string = (char *)(START_ADDR_SDRAM_STRING + (dstBtn->text.string - stringBuf.buf));
-
-            dstBtn->base.list.next = CalWidgetAdd(widgetBuf.pos);
-            *prevSize = sizeof(ButtonInfo);
-            prevHead = &btnInfo->base.list;
-            break;
-        }
-        case Text:
-        {
-            TextInfo *textInfo = (TextInfo *)baseInfo;
-
-            TextInfo *dstText = (TextInfo *)(widgetBuf.buf + widgetBuf.pos);
-            memcpy(dstText, textInfo, sizeof(TextInfo));
-            widgetBuf.pos += sizeof(TextInfo);
-
-            dstText->text.string = (char *)(START_ADDR_SDRAM_STRING + (dstText->text.string - stringBuf.buf));
-            dstText->base.list.prev = prevHead;
-            dstText->base.list.next = CalWidgetAdd(widgetBuf.pos);
-            *prevSize = sizeof(TextInfo);
-            prevHead = &textInfo->base.list;
-            break;
-        }
-        case Edit:
-        {
-            EditInfo *editInfo = (EditInfo *)baseInfo;
-
-            EditInfo *dstEdit = (EditInfo *)(widgetBuf.buf + widgetBuf.pos);
-            memcpy(dstEdit, editInfo, sizeof(EditInfo));
-            widgetBuf.pos += sizeof(EditInfo);
-
-            dstEdit->text.string = (char *)(START_ADDR_SDRAM_STRING + (dstEdit->text.string - stringBuf.buf));
-            dstEdit->base.list.prev = prevHead;
-            dstEdit->base.list.next = CalWidgetAdd(widgetBuf.pos);
-            *prevSize = sizeof(EditInfo);
-            prevHead = &editInfo->base.list;
-            break;
-        }
-        default:
-            break;
-        }
+    int RealLen = str.toLocal8Bit().length();
+    if (RealLen>0)
+    {
+        memcpy(&luaBuf.buf[luaBuf.pos], str.toLocal8Bit().data(), RealLen);
     }
-
-    return ret;
+    luaBuf.pos += RealLen;
+    return (char *)address;
 }
 
-void BuildInfo::widgetToBuildInfo(const list_head *head)
-{
-    struct list_head *pos;
-    struct list_head *rootNode = ConvListAdd(START_ADDR_SDRAM_WIDGET);
-    struct list_head *prevNode = rootNode;
-    struct list_head *curNode;
-
-
-    list_for_each(pos, head){
-        //当前节点地址
-        curNode = CalWidgetAdd(widgetBuf.pos);
-        BasePara *wBaseInfo = list_entry(pos, BasePara, list);
-        if (Window != wBaseInfo->type) break;
-
-        WindowInfo *winInfo = (WindowInfo *)wBaseInfo;
-        WindowInfo *dstWin = (WindowInfo *)(widgetBuf.buf + prevPos);
-        memcpy(dstWin, winInfo, sizeof(WindowInfo));
-        widgetBuf.pos += sizeof(WindowInfo);
-
-        //第一个节点
-        if (pos == head->next){
-            dstWin->base.list.prev = rootNode;
-        }else{
-            dstWin->base.list.prev = prevNode;
-        }
-
-        //最后一个节点
-        if (pos == head->prev){
-            dstWin->base.list.next = rootNode;
-
-            WindowInfo *firstWin = (WindowInfo *)(widgetBuf.buf);
-            firstWin->base.list.prev = curNode;
-        }else{
-            dstWin->base.list.next = CalWidgetAdd(widgetBuf.pos);
-        }
-        prevNode = CalWidgetAdd(widgetBuf.pos);
-        //计算child
-        if (list_empty(&winInfo->childList)){
-            dstWin->childList.next = CalWidgetAdd(widgetBuf.pos - 8);
-            dstWin->childList.prev = CalWidgetAdd(widgetBuf.pos - 8);
-        }else{
-
-            struct list_head *rootChild = CalWidgetAdd(widgetBuf.pos-8);
-            struct list_head *prevChild = rootChild;
-            struct list_head *curChild = CalWidgetAdd(widgetBuf.pos-8);
-            int rootChildPos = widgetBuf.pos - sizeof(WindowInfo);
-
-            dstWin->childList.next = curChild;
-
-            int childSize = 0;
-
-            struct list_head *childPos;
-            struct list_head *childHead = &winInfo->childList;
-            list_for_each(childPos, childHead){
-                BasePara *baseInfo = list_entry(childPos, BasePara, list);
-                BasePara *dstBase;
-                TextPara *dstString;
-                switch (baseInfo->type) {
-                case Button:
-                {
-                    ButtonInfo *btnInfo = (ButtonInfo *)baseInfo;
-                    ButtonInfo *dstBtn = (ButtonInfo *)(widgetBuf.buf + widgetBuf.pos);
-                    dstBase = (BasePara *)dstBtn;
-                    dstString = (TextPara *)(&dstBtn->text);
-                    memcpy(dstBtn, btnInfo, sizeof(ButtonInfo));
-                    childSize = sizeof(ButtonInfo);
-                    break;
-                }
-                case Text:
-                {
-                    TextInfo *textInfo = (TextInfo *)baseInfo;
-                    TextInfo *dstText = (TextInfo *)(widgetBuf.buf + widgetBuf.pos);
-                    dstBase = (BasePara *)dstText;
-                    dstString = (TextPara *)(&dstText->text);
-                    memcpy(dstText, textInfo, sizeof(TextInfo));
-                    childSize = sizeof(TextInfo);
-                    break;
-                }
-                case Edit:
-                {
-                    EditInfo *editInfo = (EditInfo *)baseInfo;
-                    EditInfo *dstEdit = (EditInfo *)(widgetBuf.buf + widgetBuf.pos);
-                    dstBase = (BasePara *)dstEdit;
-                    dstString = (TextPara *)(&dstEdit->text);
-                    memcpy(dstEdit, editInfo, sizeof(EditInfo));
-                    childSize = sizeof(EditInfo);
-                    break;
-                }
-                default:
-                    break;
-                }
-                //第一个节点
-                if (pos == childHead->next){
-                    dstBase->list.prev = rootChild;
-                }else{
-                    dstBase->list.prev = prevChild;
-                }
-
-                widgetBuf.pos += childSize;
-
-                dstString->string = (char *)(START_ADDR_SDRAM_STRING + (dstString->string - stringBuf.buf));
-
-                //最后一个节点
-                if (pos == childHead->prev){
-                    dstBase->list.next = rootChild;
-                }else{
-                    dstBase->list.next = CalWidgetAdd(widgetBuf.pos);
-
-                    WindowInfo *rootWin = (WindowInfo *)(widgetBuf.buf + rootChildPos);
-                    rootWin->childList.prev = curNode;
-                }
-                //记录本次
-                prevChild = CalWidgetAdd(widgetBuf.pos);
-            }
-        }
-    }
-}
 
 void BuildInfo::downLoadInfo()
 {
