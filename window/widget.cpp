@@ -2,8 +2,10 @@
 QMap<WidgetType, int> Widget::m_IdPool;
 Widget::Widget(WidgetType type, QWidget *parent) :
     QWidget(parent),
-    m_Type(type)
+    m_Type(type),
+    m_imageW(NULL)
 {
+    m_styleSheet = styleSheet();
     setMouseTracking(true); //开启鼠标追踪
     setFocusPolicy(Qt::StrongFocus);    //可获得焦点
     setAutoFillBackground(true);
@@ -28,6 +30,7 @@ QList<QPair<QVariant::Type, QString> > Widget::getPropertyTable()
 void Widget::createCenterWidget()
 {
     QLabel *child = new QLabel(this);
+    child->setFont(QFont("Times", 26, QFont::Normal));
     child->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
     m_CentralWidget = static_cast<QWidget *>(child);
     switch (m_Type) {
@@ -60,11 +63,15 @@ void Widget::createPropertyTable()
 
     m_Id = assignId();
     m_BkColor = m_CentralWidget->palette().color(QPalette::Window);
-
+    m_BkPressColor = m_BkDisableColor = m_BkColor;
     switch (m_Type) {
     case Window:
+        m_propTable << qMakePair(QVariant::String, QString("BkImage"));
+        m_propTable << qMakePair(QVariant::Point, QString("ImagePos"));
         break;
     case Button:
+        m_propTable << qMakePair(QVariant::Color, QString("BkPressColor"));
+        m_propTable << qMakePair(QVariant::Color, QString("BkDisableColor"));
         m_propTable << qMakePair(QVariant::String, QString("LuaCmd"));
         setTextParaProp();
         break;
@@ -72,7 +79,7 @@ void Widget::createPropertyTable()
         setTextParaProp();
         break;
     case Edit:
-
+        m_propTable << qMakePair(QVariant::Color, QString("BkDisableColor"));
         setTextParaProp();
         break;
     default:
@@ -119,6 +126,33 @@ int Widget::assignId()
         break;
     }
     return id;
+}
+
+void Widget::setImage()
+{
+    if (NULL == m_imageW){
+        m_imageW = new QLabel(m_CentralWidget);
+        m_imageW->installEventFilter(this);
+        m_imageW->setAutoFillBackground(true);
+        m_imageW->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+        m_CentralWidget->setLayout(new QHBoxLayout(m_CentralWidget));
+        QLayout *box = m_CentralWidget->layout();
+        box->setMargin(0);
+        box->setSpacing(0);
+        box->addWidget(m_imageW);
+    }
+    if (QFile::exists(m_BkImage)){
+        QFileInfo file(m_BkImage);
+        QString sheet = QString("background:url(%1) no-repeat;margin-left:%2px;margin-top:%3px;")
+                .arg(file.absoluteFilePath())
+                .arg(m_ImagePos.x())
+                .arg(m_ImagePos.y());
+        m_imageW->setStyleSheet(sheet);
+    }else{
+        m_CentralWidget->layout()->removeWidget(m_imageW);
+        delete m_imageW;
+        m_imageW = NULL;
+    }
 }
 
 bool Widget::eventFilter(QObject *watched, QEvent *event)
@@ -212,6 +246,61 @@ void Widget::setBkColor(QColor BkColor)
     QPalette palette(m_CentralWidget->palette());
     palette.setColor(QPalette::Window, BkColor);
     m_CentralWidget->setPalette(palette);
+
+//    QVariant variant = BkColor;
+//    if (m_styleSheet.contains("background-color:")){
+//        QRegExp rx("background-color:.+;");
+//        rx.setMinimal(true);
+//        m_styleSheet.replace(rx, "");
+//    }
+//    m_styleSheet = QString("%1background-color: %2;")
+//            .arg(m_styleSheet)
+//            .arg(variant.toString());
+//    m_CentralWidget->setStyleSheet(m_styleSheet);
+}
+
+QString Widget::getBkImage()
+{
+    return m_BkImage;
+}
+
+void Widget::setBkImage(QString BkImage)
+{
+    m_BkImage = BkImage;
+
+    setImage();
+}
+
+QPoint Widget::getImagePos()
+{
+    return m_ImagePos;
+}
+
+void Widget::setImagePos(QPoint pos)
+{
+    m_ImagePos = pos;
+
+    setImage();
+}
+
+QColor Widget::getBkPressColor()
+{
+    return m_BkPressColor;
+}
+
+void Widget::setBkPressColor(QColor BkColor)
+{
+    m_BkPressColor = BkColor;
+}
+
+QColor Widget::getBkDisableColor()
+{
+    return m_BkDisableColor;
+}
+
+void Widget::setBkDisableColor(QColor BkColor)
+{
+    m_BkDisableColor = BkColor;
 }
 
 QString Widget::getString()
@@ -303,14 +392,17 @@ BuildInfo::BuildInfo()
 void BuildInfo::initBuild()
 {
     //先初始化buf
-    memset(widgetBuf.buf, 0, 10240);
+    memset(widgetBuf.buf, 0, WidgetLen);
     widgetBuf.pos = 0;
 
-    memset(stringBuf.buf, 0, 10240);
+    memset(stringBuf.buf, 0, StringLen);
     stringBuf.pos = 0;
 
-    memset(picBuf.buf, 0, 10240);
-    picBuf.pos = 0;
+    memset(luaBuf.buf, 0, LuaLen);
+    luaBuf.pos = 0;
+
+    memset(imageBuf.buf, 0, ImageLen);
+    imageBuf.pos = 0;
 
 }
 
@@ -403,14 +495,119 @@ char *BuildInfo::QStringToMultBytes(QString str)
 char *BuildInfo::QStringToChar(QString str)
 {
     int address = START_ADDR_SDRAM_LUA + luaBuf.pos;
-
+    str.append("\n");
     int RealLen = str.toLocal8Bit().length();
     if (RealLen>0)
     {
         memcpy(&luaBuf.buf[luaBuf.pos], str.toLocal8Bit().data(), RealLen);
     }
     luaBuf.pos += RealLen;
+    luaBuf.buf[luaBuf.pos++] = '\0';
     return (char *)address;
+}
+
+GUI_Image *BuildInfo::QImageToEImage(QString filename, QPoint leftTop)
+{
+    ImageMethods type = GUI_DRAW_BMP565;   //0:无压缩，1：压缩
+
+    int address = START_ADDR_SDRAM_IMAGE + imageBuf.pos;
+    if (!QFile::exists(filename)){
+        return NULL;
+    }
+    //1.获取文件size信息
+    GUI_Image image;
+    QSize size = QPixmap(filename).size();
+    qDebug() << size;
+    image.x = leftTop.x();
+    image.y = leftTop.y();
+    image.GUI_Image.XSize = size.width();
+    image.GUI_Image.YSize = size.height();
+    image.GUI_Image.BytesPerLine = 2 * image.GUI_Image.XSize;
+    image.GUI_Image.BitsPerPixel = 16;
+    image.GUI_Image.pPal = 0;
+    image.GUI_Image.pMethods = type;
+    image.GUI_Image.pData = (uchar *)(address + sizeof(GUI_Image));
+
+    memcpy(&imageBuf.buf[imageBuf.pos], &image, sizeof(GUI_Image));
+    imageBuf.pos += sizeof(GUI_Image);
+
+    //2.先调用BmpToC转换为data
+    QString outname = "123";
+    QString EXE_PATH = QDir::currentPath() + "/BmpCvt.exe";
+    int format = (type == GUI_DRAW_BMP565 ? 8:12); //8:565无压缩，12：565压缩
+    QString build_cmd = QString("start \"\" /min \"%1\" \"%2\" -saveas%3,1,%4 -exit")
+            .arg(EXE_PATH)
+            .arg(filename)
+            .arg(outname)
+            .arg(format);
+    system(build_cmd.toLocal8Bit());
+    outname = filename.left(filename.lastIndexOf("\\")+1) + outname + ".c";
+    qDebug()<<outname;
+    //3.将图片data写入picBuf中，并返回首地址
+    /*3.1：打开生成的.c文件*/
+    QFile file(outname);
+    if(!file.open(QIODevice::ReadOnly | QIODevice::Text)){
+        return NULL;
+    }
+    QTextStream input(&file);
+    QString tmpStr = input.readAll();
+    file.close();
+    /*3.2：取出有效部分*/
+    QRegExp rx1("static GUI_CONST_STORAGE.+\n([.\n]+)GUI_CONST_STORAGE");
+    rx1.setMinimal(true);
+    int pos = 0;
+
+    QString datatmpStr;
+    while ((pos = rx1.indexIn(tmpStr, pos)) != -1){
+        datatmpStr.push_back(rx1.capturedTexts().at(0));
+        pos += rx1.matchedLength();
+    }
+    /*3.3：根据压缩方式填写buf*/
+
+    int idx = datatmpStr.indexOf("0x");
+    if (type == GUI_DRAW_BMP565){ //下载无压缩，文本中没有注释
+        if ((datatmpStr[idx+6] != ',') || (datatmpStr[idx+4] == ',')){
+            return NULL;
+        }
+    }else{  //下载压缩图片，文本中有注释，需要去掉注释
+        if ((datatmpStr[idx+6] == ',') || (datatmpStr[idx+4] != ',')){
+            return NULL;
+        }
+        QStringList strList;
+        strList = datatmpStr.split("\n");
+        for (int i=0;i<strList.count();i++){
+            strList[i] = strList[i].mid(strList[i].indexOf("*/")+2);
+        }
+        datatmpStr = strList.join("\n");
+    }
+    pos = 0;
+    bool ok;
+    int value;
+    QString tmp;
+    QRegExp rx(tr("((0[xX])?[0-9a-fA-F]{1,4},)"));
+    while ((pos = rx.indexIn(datatmpStr, pos)) != -1){
+        tmp = rx.capturedTexts().at(0);
+        tmp.replace(",","");
+        if (type == GUI_DRAW_BMP565){   //无压缩
+            if (tmp.indexOf("0x")>-1 || tmp.indexOf("0X")>-1){
+                value = tmp.toInt(&ok, 16);
+            }else{
+                value = tmp.toInt(&ok, 10);
+            }
+            imageBuf.buf[imageBuf.pos++] =(uchar)((value >> 0) & 0xff);
+            imageBuf.buf[imageBuf.pos++] = (uchar)((value >> 8) & 0xff);
+        }else{
+            if (tmp.indexOf("0x")>-1 || tmp.indexOf("0X")>-1){
+                value = tmp.toInt(&ok, 16);
+            }else{
+                value = tmp.toInt(&ok, 10);
+            }
+            imageBuf.buf[imageBuf.pos++] =(uchar)((value >> 0) & 0xff);
+        }
+        pos += rx.matchedLength();
+        if (imageBuf.pos >= ImageLen) break;
+    }
+    return (GUI_Image *)address;
 }
 
 
@@ -422,9 +619,15 @@ void BuildInfo::downLoadInfo()
     }
 }
 
+void BuildInfo::cancel()
+{
+    downloadStep = 10;
+}
+
 
 void BuildInfo::ResProgress_slt(int pos, QString msg)
 {
+    emit ResProgress_sig(downloadStep, pos, msg);
     if (pos >= 100){
         downloadStep++;
         int erase;
@@ -445,9 +648,29 @@ void BuildInfo::ResProgress_slt(int pos, QString msg)
             //擦除20K，下载地址，下载文本数据包
             erase = 0x5c;
             address = START_ADDR_FLASH_STRING;
-            byte.resize(stringBuf.pos);
-            for(int i=0;i<stringBuf.pos;i++) {
+            byte.resize(stringBuf.pos+100);
+            for(int i=0;i<byte.count();i++) {
                 byte[i] = stringBuf.buf[i];
+            }
+            emit DownLoad_sig(erase, address, byte);
+            break;
+        case 3:
+            //擦除20K，下载地址，下载文本数据包
+            erase = 0x5c;
+            address = START_ADDR_FLASH_LUA;
+            byte.resize(luaBuf.pos);
+            for(int i=0;i<luaBuf.pos;i++) {
+                byte[i] = luaBuf.buf[i];
+            }
+            emit DownLoad_sig(erase, address, byte);
+            break;
+        case 4:
+            //擦除20K，下载地址，下载文本数据包
+            erase = 0x5f;   //252K
+            address = START_ADDR_FLASH_IMAGE;
+            byte.resize(imageBuf.pos);
+            for(int i=0;i<imageBuf.pos;i++) {
+                byte[i] = imageBuf.buf[i];
             }
             emit DownLoad_sig(erase, address, byte);
             break;

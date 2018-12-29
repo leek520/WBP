@@ -2,7 +2,8 @@
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
-    buildInfo(new BuildInfo())
+    buildInfo(new BuildInfo()),
+    m_progressBar(new ProgressBar())
 {
     setWindowTitle(tr("WBP"));//设置窗口标题
     setWindowIcon(QIcon(":/mamtool.ico"));
@@ -13,6 +14,9 @@ MainWindow::MainWindow(QWidget *parent) :
     createStatusBar();
 
     setupUi();
+
+    connect(buildInfo, SIGNAL(ResProgress_sig(int,int,QString)),
+            this, SLOT(ResProgress_slt(int,int,QString)));
 }
 
 MainWindow::~MainWindow()
@@ -201,7 +205,8 @@ void MainWindow::createStatusBar()
         2.  永久信息，文本会一直显示在状态栏的最右边。
         3. 临时信息，指定信息现实的时间。时间到即信息消失
     */
-    stateBar = statusBar();
+    stateBar = new QStatusBar(this);
+    setStatusBar(stateBar);
     // 设置不显示label的边框
     stateBar->setStyleSheet(QString("QStatusBar::item{border: 0px}"));
     stateBar->setSizeGripEnabled(false); //设置是否显示右边的大小控制点
@@ -527,7 +532,7 @@ void MainWindow::paste()
 
 void MainWindow::cut()
 {
-
+//    buildInfo->QImageToEImage(FormWindow::m_curWin->getBkImage(), FormWindow::m_curWin->getImagePos());
 }
 
 void MainWindow::remove()
@@ -547,6 +552,7 @@ struct list_head *MainWindow::setWidgetInfo(Widget *w, struct list_head *head, i
         child = &winInfo->childList;
         init_list_head(child);
         winInfo->BkColor[0] = buildInfo->QColorToEColor(w->getBkColor());
+        winInfo->Image = buildInfo->QImageToEImage(w->getBkImage(), w->getImagePos());
         base = &winInfo->base;
         *pos = curPos + sizeof(WindowInfo);
         break;
@@ -555,6 +561,8 @@ struct list_head *MainWindow::setWidgetInfo(Widget *w, struct list_head *head, i
     {
         ButtonInfo *btnInfo = (ButtonInfo*)(start + curPos);
         btnInfo->BkColor[0] = buildInfo->QColorToEColor(w->getBkColor());
+        btnInfo->BkColor[1] = buildInfo->QColorToEColor(w->getBkPressColor());
+        btnInfo->BkColor[2] = buildInfo->QColorToEColor(w->getBkDisableColor());
         btnInfo->cmd = buildInfo->QStringToChar(w->getLuaCmd());
         setTextInfo(w, &btnInfo->text);
         base = &btnInfo->base;
@@ -574,6 +582,7 @@ struct list_head *MainWindow::setWidgetInfo(Widget *w, struct list_head *head, i
     {
         EditInfo *editInfo = (EditInfo*)(start + curPos);
         editInfo->BkColor[0] = buildInfo->QColorToEColor(w->getBkColor());
+        editInfo->BkColor[1] = buildInfo->QColorToEColor(w->getBkDisableColor());
         setTextInfo(w, &editInfo->text);
         base = &editInfo->base;
         *pos = curPos + sizeof(EditInfo);
@@ -657,6 +666,8 @@ void MainWindow::build()
     }
     winHead->prev->next = ConvListAdd(winHead->prev->next, offset);
     winHead->prev = ConvListAdd(winHead->prev, offset);
+
+    stateBar->showMessage("编译完成！", 3000); // 显示临时信息，时间3秒钟.
 }
 
 void MainWindow::download()
@@ -668,6 +679,29 @@ void MainWindow::setCom()
 {
     m_comD = new ComDialog(this);
     m_comD->show();
+}
+
+void MainWindow::ResProgress_slt(int step, int pos, QString msg)
+{
+    if (step == 0){
+        connect(m_progressBar, SIGNAL(cancel_sig(int,int)),
+                this, SLOT(ResProgress_slt(int,int)));
+        m_progressBar->setMaxStep(4);
+        m_progressBar->setValue(0, 0);
+        stateBar->addWidget(m_progressBar);
+    }else{
+        m_progressBar->setValue(step, pos);
+        if (step > 4){
+            stateBar->removeWidget(m_progressBar);
+            disconnect(m_progressBar, SIGNAL(cancel_sig(int,int)),
+                    this, SLOT(ResProgress_slt(int,int)));
+            if ((pos >= 100) && (step < 6)){
+                QMessageBox::information(this, tr("提示"), tr("下载完成！"));
+            }else{
+                buildInfo->cancel();
+            }
+        }
+    }
 }
 
 void MainWindow::MouseButtonDblClick(QWidget *w)

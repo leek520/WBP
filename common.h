@@ -38,7 +38,7 @@
 #include <QMessageBox>
 #include <QDomDocument>
 #include <QDebug>
-
+#include <QProgressBar>
 
 
 #define START_ADDR_SDRAM_WIDGET  0xa0300000
@@ -68,8 +68,8 @@
 #define START_ADDR_SDRAM_LUA  0xa045F000
 #define START_ADDR_FLASH_LUA  0x25F000
 
-#define START_ADDR_SDRAM_PIC  0xa047E000
-#define START_ADDR_FLASH_PIC  0x27E000
+#define START_ADDR_SDRAM_IMAGE  0xa047E000
+#define START_ADDR_FLASH_IMAGE  0x27E000
 
 
 #define VAR_BUF_LEN		128
@@ -95,7 +95,12 @@ typedef enum _eWidgetType
     Text,
     Edit,
 }WidgetType;
-
+typedef enum _eTextType
+{
+    String,
+    Number,
+    StringList,
+}TextType;
 /*********»ù´¡ÐÅÏ¢½á¹¹************/
 typedef struct _tBasePara
 {
@@ -115,11 +120,31 @@ typedef struct _tTextPara
     int color;
     char *string;
 }TextPara;
+
+typedef struct {
+  ushort XSize;
+  ushort YSize;
+  ushort BytesPerLine;
+  ushort BitsPerPixel;
+  uchar * pData;
+  int pPal;
+  int pMethods;
+}GUI_BITMAP;
+typedef enum{
+    GUI_DRAW_BMP565,
+    GUI_DRAW_RLE16,
+}ImageMethods;
+typedef struct {
+    ushort x;
+    ushort y;
+    GUI_BITMAP GUI_Image;
+}GUI_Image;
 /*********´°ÌåÐÅÏ¢½á¹¹************/
 typedef struct _tWindowInfo
 {
     BasePara base;
     int BkColor[1];
+    GUI_Image *Image;
     struct list_head childList;
 }WindowInfo;    //8*4byte
 

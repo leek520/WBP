@@ -56,6 +56,7 @@ private slots:
 
     void setCom();
 
+    void ResProgress_slt(int step, int pos, QString msg="");
     void MouseButtonDblClick(QWidget *w);
     void addWidget();
     Widget* addWidget(WidgetType type);
@@ -107,6 +108,7 @@ private:
     PropertyWidget *m_propW;
     PropertyDialog *m_propD;
     ComDialog *m_comD;
+    ProgressBar *m_progressBar;
 
     BuildInfo *buildInfo;
 };

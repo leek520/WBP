@@ -83,3 +83,50 @@ void FormWindow::propertyChanged(QWidget *w)
 {
     emit currentItemChanged((Widget *)w);
 }
+
+ProgressBar::ProgressBar(QWidget *parent) : QWidget(parent)
+{
+
+    QHBoxLayout *layout = new QHBoxLayout(this);
+    layout->setMargin(0);
+
+    m_progress = new QProgressBar(this);
+    m_progress->setFixedHeight(30);
+    m_progress->setAlignment(Qt::AlignCenter);
+    m_progress->setRange(0,100);
+    m_progress->setFormat(QString("%1%").arg(0));
+
+    QLabel *pLabel = new QLabel("请稍候...");
+    m_progresstext = new QLabel(QString("%1/%2").arg(0).arg(4));
+    QPushButton *cancel = new QPushButton("取消");
+    cancel->setFixedHeight(30);
+    connect(cancel, SIGNAL(clicked()), this, SLOT(cancel_slt()));
+    layout->addWidget(pLabel);//添加到状态栏的左边
+    layout->addWidget(m_progress);
+    layout->addWidget(m_progresstext);//添加到状态栏的左边
+    layout->addWidget(cancel);//添加到状态栏的左边
+}
+
+void ProgressBar::setMaxStep(int max)
+{
+    m_maxStep = max;
+}
+
+void ProgressBar::setValue(int step, int pos)
+{
+    if (step > m_maxStep){
+        hide();
+    }else{
+       show();
+    }
+
+    m_progress->setFormat(QString("%1%").arg(pos));
+    m_progress->setValue(pos);
+    m_progresstext->setText(QString("%1/%2").arg(step).arg(m_maxStep));
+}
+
+void ProgressBar::cancel_slt()
+{
+    emit cancel_sig(m_maxStep+10, 0);
+    hide();
+}

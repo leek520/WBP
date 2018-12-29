@@ -29,4 +29,22 @@ public:
     static FormWindow *m_curWin;
 };
 
+
+class ProgressBar : public QWidget
+{
+    Q_OBJECT
+public:
+    explicit ProgressBar(QWidget *parent = 0);
+    void setMaxStep(int max);
+    void setValue(int step, int pos);
+public slots:
+    void cancel_slt();
+signals:
+    void cancel_sig(int step, int pos);
+private:
+    QProgressBar *m_progress;
+    QLabel *m_progresstext;
+    int m_maxStep;
+};
+
 #endif // FORMWINDOW_H
