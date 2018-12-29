@@ -13,7 +13,7 @@ public:
     explicit LeftWidget(QWidget *parent = 0);
     void initUi();
     QSize sizeHint() const {
-        return QSize(250, 200);
+        return QSize(150, 200);
     }
 
 signals:

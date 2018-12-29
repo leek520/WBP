@@ -69,14 +69,16 @@ void FormWindow::focusChanged(QWidget *old, QWidget *now)
         setCurrent(now);
         Widget *rw = (Widget *)now;
         if (Window == rw->getType()){
-            m_curWin = (FormWindow *)now;
+            m_curWin = (FormWindow *)now; 
         }else{
             if (m_childList.indexOf(now) > -1){
                 m_curWin = this;
+                now->raise();
             }
         }
     }
-
+    //提升当前选中窗口为顶层
+    m_curWin->raise();
 }
 
 void FormWindow::propertyChanged(QWidget *w)

@@ -220,6 +220,8 @@ void MainWindow::setupUi()
 {
     setWindowState(Qt::WindowMaximized);
     m_mdiArea = new QScrollArea(this);
+    m_mdiArea->setObjectName("m_mdiArea");
+    m_mdiArea->setStyleSheet("QScrollArea#m_mdiArea{background-color:gray;}");
     setCentralWidget(m_mdiArea);
     new Selection(m_mdiArea);
 

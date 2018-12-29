@@ -15,7 +15,7 @@ WidgetHandle::WidgetHandle(QWidget *parent, Type t):
     setMouseTracking(false);
     setAutoFillBackground(true);
 
-    setBackgroundRole(QPalette::Text);
+    setBackgroundRole(QPalette::Window);
     setFixedSize(6, 6);
 
     updateCursor();
@@ -73,6 +73,8 @@ void WidgetHandle::paintEvent(QPaintEvent *)
         p.setPen(m_current? Qt::blue : Qt::red);
         p.setBrush(QBrush(QColor(m_current? Qt::darkBlue : Qt::red)));
         p.drawRect(0, 0, width() - 1, height() - 1);
+    }else{
+        hide();
     }
 
 }
