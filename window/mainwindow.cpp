@@ -114,23 +114,44 @@ void MainWindow::createActions()
     act->setStatusTip(tr("Window"));
     act->setShortcut(Qt::Key_F3);
     connect(act, SIGNAL(triggered()), this, SLOT(addWidget()));
-    m_graphActList.append(act);
+    m_widgetActList.append(act);
 
     act = new QAction(QIcon(":/images/widget/button.PNG"), tr("Button"), this);
     act->setStatusTip(tr("Button"));
     act->setShortcut(Qt::Key_F4);
     connect(act, SIGNAL(triggered()), this, SLOT(addWidget()));
-    m_graphActList.append(act);
+    m_widgetActList.append(act);
 
     act = new QAction(QIcon(":/images/widget/text.PNG"), tr("Text"), this);
     act->setStatusTip(tr("Text"));
     act->setShortcut(Qt::Key_F5);
     connect(act, SIGNAL(triggered()), this, SLOT(addWidget()));
-    m_graphActList.append(act);
+    m_widgetActList.append(act);
 
     act = new QAction(QIcon(":/images/widget/edit.PNG"), tr("Edit"), this);
     act->setStatusTip(tr("Edit"));
     act->setShortcut(Qt::Key_F6);
+    connect(act, SIGNAL(triggered()), this, SLOT(addWidget()));
+    m_widgetActList.append(act);
+
+    /****graph****/
+    act = new QAction(QIcon(":/image"), tr("image"), this);
+    act->setStatusTip(tr("image"));
+    connect(act, SIGNAL(triggered()), this, SLOT(addWidget()));
+    m_graphActList.append(act);
+
+    act = new QAction(QIcon(":/line"), tr("line"), this);
+    act->setStatusTip(tr("line"));
+    connect(act, SIGNAL(triggered()), this, SLOT(addWidget()));
+    m_graphActList.append(act);
+
+    act = new QAction(QIcon(":/rect"), tr("rect"), this);
+    act->setStatusTip(tr("rect"));
+    connect(act, SIGNAL(triggered()), this, SLOT(addWidget()));
+    m_graphActList.append(act);
+
+    act = new QAction(QIcon(":/circle"), tr("circle"), this);
+    act->setStatusTip(tr("circle"));
     connect(act, SIGNAL(triggered()), this, SLOT(addWidget()));
     m_graphActList.append(act);
 }
@@ -189,13 +210,21 @@ void MainWindow::createToolBars()
 
     addToolBarBreak(Qt::TopToolBarArea);
 
+    widgetToolBar = addToolBar(tr("Widget"));
+    for(int i=0;i<m_widgetActList.count();i++){
+        widgetToolBar->addAction(m_widgetActList[i]);
+    }
+    widgetToolBar->setIconSize(QSize(100,100));
+    widgetToolBar->setFixedHeight(100);
+
+
     graphToolBar = addToolBar(tr("Widget"));
     for(int i=0;i<m_graphActList.count();i++){
         graphToolBar->addAction(m_graphActList[i]);
+        //m_graphActList[i]->setCheckable(true);
     }
-    graphToolBar->setIconSize(QSize(100,100));
+    graphToolBar->setIconSize(QSize(64,64));
     graphToolBar->setFixedHeight(100);
-
 }
 
 void MainWindow::createStatusBar()
@@ -554,7 +583,12 @@ struct list_head *MainWindow::setWidgetInfo(Widget *w, struct list_head *head, i
         child = &winInfo->childList;
         init_list_head(child);
         winInfo->BkColor[0] = buildInfo->QColorToEColor(w->getBkColor());
-        winInfo->Image = buildInfo->QImageToEImage(w->getBkImage(), w->getImagePos());
+        Widget *imgW = ((FormWindow *)w)->findImageWidget();
+        if (imgW){
+            winInfo->Image = buildInfo->QImageToEImage(imgW->getBkImage(), imgW->getImagePos());
+        }else{
+            winInfo->Image = NULL;
+        }
         base = &winInfo->base;
         *pos = curPos + sizeof(WindowInfo);
         break;
@@ -591,7 +625,7 @@ struct list_head *MainWindow::setWidgetInfo(Widget *w, struct list_head *head, i
         break;
     }
     default:
-        break;
+        return NULL;
     }
 
     setBaseInfo(w, base);
@@ -714,7 +748,12 @@ void MainWindow::MouseButtonDblClick(QWidget *w)
 
 void MainWindow::addWidget()
 {
-    WidgetType type = (WidgetType)m_graphActList.indexOf((QAction *)sender());
+    WidgetType type;
+    if (m_widgetActList.indexOf((QAction *)sender()) > -1){
+        type = (WidgetType)m_widgetActList.indexOf((QAction *)sender());
+    }else{
+        type = (WidgetType)((int)Image + m_graphActList.indexOf((QAction *)sender()));
+    }
     addWidget(type);
 }
 

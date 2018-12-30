@@ -41,6 +41,17 @@ void FormWindow::removeWidget(QWidget *w)
     }
 }
 
+Widget *FormWindow::findImageWidget()
+{
+    for(int i=0;i<m_childList.count();i++){
+        Widget *child = (Widget *)m_childList[i];
+        if (child->getType() == Image){
+            return child;
+        }
+    }
+    return NULL;
+}
+
 QWidgetList FormWindow::getChildList()
 {
     return m_childList;

@@ -11,6 +11,7 @@ public:
     explicit FormWindow(QWidget *parent = 0);
     void addWidget(QWidget *w);
     void removeWidget(QWidget *w);
+    Widget *findImageWidget();
     QWidgetList getChildList();
     static QList<FormWindow *> getWindowList();
 signals:

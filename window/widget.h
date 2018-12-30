@@ -48,6 +48,13 @@ class Widget : public QWidget
     Q_PROPERTY(QString BkImage READ getBkImage WRITE setBkImage)
     Q_PROPERTY(QPoint ImagePos READ getImagePos WRITE setImagePos)
 
+    Q_PROPERTY(QPoint LineStart READ getLineStart WRITE setLineStart)
+    Q_PROPERTY(QPoint LineEnd READ getLineEnd WRITE setLineEnd)
+
+    Q_PROPERTY(QRect Rectangle READ getRectangle WRITE setRectangle)
+    Q_PROPERTY(QPoint Center READ getCenter WRITE setCenter)
+    Q_PROPERTY(int Radius READ getRadius WRITE setRadius)
+
     Q_PROPERTY(QString LuaCmd READ getLuaCmd WRITE setLuaCmd)
 
     Q_PROPERTY(QVariant BkColor1 READ getBkColor1 WRITE setBkColor1)
@@ -91,6 +98,21 @@ public:
     QPoint getImagePos();
     void setImagePos(QPoint pos);
 
+    QPoint getLineStart();
+    void setLineStart(QPoint pos);
+
+    QPoint getLineEnd();
+    void setLineEnd(QPoint pos);
+
+    QRect getRectangle();
+    void setRectangle(QRect rect);
+
+    QPoint getCenter();
+    void setCenter(QPoint pos);
+
+    int getRadius();
+    void setRadius(int radius);
+
     QColor getBkPressColor();
     void setBkPressColor(QColor BkColor);
 
@@ -133,6 +155,13 @@ private:
     QColor m_TextColor;
     QString m_String;
     QString m_LudCmd;
+
+
+    QPoint m_LineStart;
+    QPoint m_LineEnd;
+    QPoint m_Center;
+    QRect m_Rectangle;
+    int m_Radius;
 };
 
 class BuildInfo : public QObject

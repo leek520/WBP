@@ -57,33 +57,56 @@ void Widget::createCenterWidget()
 
 void Widget::createPropertyTable()
 {
-    m_propTable << qMakePair(QVariant::Int, QString("Id"));
-    m_propTable << qMakePair(QVariant::Rect, QString("geometry"));
-    m_propTable << qMakePair(QVariant::Color, QString("BkColor"));
+    if (m_Type < Image){
+        m_propTable << qMakePair(QVariant::Int, QString("Id"));
+        m_propTable << qMakePair(QVariant::Rect, QString("geometry"));
+        m_propTable << qMakePair(QVariant::Color, QString("BkColor"));
 
-    m_Id = assignId();
-    m_BkColor = m_CentralWidget->palette().color(QPalette::Window);
-    m_BkPressColor = m_BkDisableColor = m_BkColor;
-    switch (m_Type) {
-    case Window:
-        m_propTable << qMakePair(QVariant::String, QString("BkImage"));
-        m_propTable << qMakePair(QVariant::Point, QString("ImagePos"));
-        break;
-    case Button:
-        m_propTable << qMakePair(QVariant::Color, QString("BkPressColor"));
-        m_propTable << qMakePair(QVariant::Color, QString("BkDisableColor"));
-        m_propTable << qMakePair(QVariant::String, QString("LuaCmd"));
-        setTextParaProp();
-        break;
-    case Text:
-        setTextParaProp();
-        break;
-    case Edit:
-        m_propTable << qMakePair(QVariant::Color, QString("BkDisableColor"));
-        setTextParaProp();
-        break;
-    default:
-        break;
+        m_Id = assignId();
+        m_BkColor = m_CentralWidget->palette().color(QPalette::Window);
+        m_BkPressColor = m_BkDisableColor = m_BkColor;
+        switch (m_Type) {
+        case Window:
+            break;
+        case Button:
+            m_propTable << qMakePair(QVariant::Color, QString("BkPressColor"));
+            m_propTable << qMakePair(QVariant::Color, QString("BkDisableColor"));
+            m_propTable << qMakePair(QVariant::String, QString("LuaCmd"));
+            setTextParaProp();
+            break;
+        case Text:
+            setTextParaProp();
+            break;
+        case Edit:
+            m_propTable << qMakePair(QVariant::Color, QString("BkDisableColor"));
+            setTextParaProp();
+            break;
+        default:
+            break;
+        }
+    }else{
+        QPalette palette;
+        palette.setColor(QPalette::Background, QColor(192,253,123,100)); // 最后一项为透明度
+        m_CentralWidget->setPalette(palette);
+        switch (m_Type) {
+        case Image:
+            m_propTable << qMakePair(QVariant::String, QString("BkImage"));
+            m_propTable << qMakePair(QVariant::Point, QString("ImagePos"));
+            break;
+        case Line:
+            m_propTable << qMakePair(QVariant::Point, QString("LineStart"));
+            m_propTable << qMakePair(QVariant::Point, QString("LineEnd"));
+            break;
+        case Rect:
+            m_propTable << qMakePair(QVariant::Rect, QString("Rectangle"));
+            break;
+        case Circle:
+            m_propTable << qMakePair(QVariant::Point, QString("Center"));
+            m_propTable << qMakePair(QVariant::Int, QString("Radius"));
+            break;
+        default:
+            break;
+        }
     }
 
 }
@@ -130,29 +153,17 @@ int Widget::assignId()
 
 void Widget::setImage()
 {
-    if (NULL == m_imageW){
-        m_imageW = new QLabel(m_CentralWidget);
-        m_imageW->installEventFilter(this);
-        m_imageW->setAutoFillBackground(true);
-        m_imageW->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-        m_CentralWidget->setLayout(new QHBoxLayout(m_CentralWidget));
-        QLayout *box = m_CentralWidget->layout();
-        box->setMargin(0);
-        box->setSpacing(0);
-        box->addWidget(m_imageW);
-    }
-    if (QFile::exists(m_BkImage)){
-        QFileInfo file(m_BkImage);
-        QString sheet = QString("background:url(%1) no-repeat;margin-left:%2px;margin-top:%3px;")
-                .arg(file.absoluteFilePath())
-                .arg(m_ImagePos.x())
-                .arg(m_ImagePos.y());
-        m_imageW->setStyleSheet(sheet);
-    }else{
-        m_CentralWidget->layout()->removeWidget(m_imageW);
-        delete m_imageW;
-        m_imageW = NULL;
-    }
+    QImage image;
+    image.load(m_BkImage);
+
+    ((QLabel *)m_CentralWidget)->setPixmap(QPixmap::fromImage(image));
+
+    QSize size = image.size();
+    setGeometry(m_ImagePos.x(),
+                m_ImagePos.y(),
+                size.width(),
+                size.height());
+
 }
 
 bool Widget::eventFilter(QObject *watched, QEvent *event)
@@ -179,7 +190,7 @@ bool Widget::eventFilter(QObject *watched, QEvent *event)
         break;
     case QEvent::FocusIn:
         //处理焦点事件
-        if (watched == m_CentralWidget){
+        if (watched != this){
              setFocus();
         }
         break;
@@ -191,17 +202,31 @@ bool Widget::eventFilter(QObject *watched, QEvent *event)
 }
 void Widget::paintEvent(QPaintEvent *event)
 {
-    //绘制边框
     QPainter painter(this);
-    painter.setPen(QColor(139, 139, 139));
-    painter.drawLine(0, 0, this->width() - 1, 0);
-    painter.drawLine(0, 0, 0, this->height() - 1);
-    painter.drawLine(this->width() - 1, 0, this->width() - 1, this->height() - 1);
-    painter.drawLine(0, this->height() - 1, this->width() - 1, this->height() - 1);
+    switch (m_Type) {
+    case Line:
+        painter.drawLine(QPoint(0,0), QPoint(width(), height()));
+        break;
+    case Rect:
+        //绘制边框
+        painter.drawLine(0, 0, this->width() - 1, 0);
+        painter.drawLine(0, 0, 0, this->height() - 1);
+        painter.drawLine(this->width() - 1, 0, this->width() - 1, this->height() - 1);
+        painter.drawLine(0, this->height() - 1, this->width() - 1, this->height() - 1);
+        break;
+    default:
+        //绘制边框
+        painter.setPen(QColor(139, 139, 139));
+        painter.drawLine(0, 0, this->width() - 1, 0);
+        painter.drawLine(0, 0, 0, this->height() - 1);
+        painter.drawLine(this->width() - 1, 0, this->width() - 1, this->height() - 1);
+        painter.drawLine(0, this->height() - 1, this->width() - 1, this->height() - 1);
+    }
 }
 
 void Widget::keyPressEvent(QKeyEvent *event)
 {
+
     //处理按键事件
     QPoint m(0, 0);
     if (event->key() == Qt::Key_Up){
@@ -222,6 +247,7 @@ void Widget::keyPressEvent(QKeyEvent *event)
         move(this->pos() - m);
         emit currentItemChanged(this);
     }
+
 }
 
 int Widget::getId()
@@ -281,6 +307,63 @@ void Widget::setImagePos(QPoint pos)
     m_ImagePos = pos;
 
     setImage();
+}
+
+QPoint Widget::getLineStart()
+{
+    return m_LineStart;
+}
+
+void Widget::setLineStart(QPoint pos)
+{
+    m_LineStart = pos;
+
+    setGeometry(m_LineStart.x(), m_LineStart.y(),
+                m_LineEnd.x()-m_LineStart.x(), m_LineEnd.y()-m_LineStart.y());
+}
+
+QPoint Widget::getLineEnd()
+{
+    return m_LineEnd;
+}
+
+void Widget::setLineEnd(QPoint pos)
+{
+    m_LineEnd = pos;
+
+    setGeometry(m_LineStart.x(), m_LineStart.y(),
+                m_LineEnd.x()-m_LineStart.x(), m_LineEnd.y()-m_LineStart.y());
+}
+
+QRect Widget::getRectangle()
+{
+    return m_Rectangle;
+}
+
+void Widget::setRectangle(QRect rect)
+{
+    m_Rectangle = rect;
+    setGeometry(m_Rectangle);
+}
+
+QPoint Widget::getCenter()
+{
+    return m_Center;
+}
+
+void Widget::setCenter(QPoint pos)
+{
+    m_Center = pos;
+}
+
+int Widget::getRadius()
+{
+    return m_Radius;
+}
+
+void Widget::setRadius(int radius)
+{
+    m_Radius = radius;
 }
 
 QColor Widget::getBkPressColor()

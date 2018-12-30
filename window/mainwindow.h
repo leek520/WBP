@@ -76,6 +76,7 @@ private:
     QToolBar *fileToolBar;
     QToolBar *editToolBar;
     QToolBar *viewToolBar;
+    QToolBar *widgetToolBar;
     QToolBar *graphToolBar;
     QToolBar *buildToolBar;
     QToolBar *windowToolBar;
@@ -100,6 +101,7 @@ private:
     QAction *buildAct;
     QAction *downAct;
 
+    QList <QAction *>m_widgetActList;
     QList <QAction *>m_graphActList;
 
     QScrollArea *m_mdiArea;

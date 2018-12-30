@@ -90,10 +90,15 @@ struct list_head
 
 typedef enum _eWidgetType
 {
-    Window,
+    Window = 0,
     Button,
     Text,
     Edit,
+
+    Image = 10,
+    Line,
+    Rect,
+    Circle,
 }WidgetType;
 typedef enum _eTextType
 {

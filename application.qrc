@@ -18,5 +18,9 @@
         <file>images/widget/edit.PNG</file>
         <file>images/widget/text.PNG</file>
         <file>images/widget/window.PNG</file>
+        <file alias="circle">images/graph/circle.png</file>
+        <file alias="image">images/graph/image.png</file>
+        <file alias="line">images/graph/line.png</file>
+        <file alias="rect">images/graph/rect.png</file>
     </qresource>
 </RCC>
