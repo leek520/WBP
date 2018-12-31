@@ -47,6 +47,17 @@ void PropertyWidget::currentItemChanged(Widget *w)
             property->setValue(value);
             break;
         }
+        case QVariant::Line:
+        {
+            property = variantManager->addProperty(QtVariantPropertyManager::enumTypeId(), propTable[i].second);
+            QStringList enumNames;
+            if (propTable[i].second == "LineType"){
+                enumNames << "Horizontal" << "Vertical";
+                property->setAttribute(QLatin1String("enumNames"), enumNames);
+                property->setValue(value);
+            }
+            break;
+        }
         default:
             property = variantManager->addProperty(propTable[i].first, propTable[i].second);
             property->setValue(value);

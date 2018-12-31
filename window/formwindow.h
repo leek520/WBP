@@ -3,31 +3,38 @@
 
 #include "widget.h"
 #include "widgetselection.h"
-
-class FormWindow : public Widget
+#include "buttonwidget.h"
+#include "editwidget.h"
+#include "textwidget.h"
+#include "imagewidget.h"
+class WindowWidget : public Widget
 {
     Q_OBJECT
 public:
-    explicit FormWindow(QWidget *parent = 0);
+    explicit WindowWidget(QWidget *parent = 0);
     void addWidget(QWidget *w);
     void removeWidget(QWidget *w);
     Widget *findImageWidget();
-    QWidgetList getChildList();
-    static QList<FormWindow *> getWindowList();
+    QWidgetList getChildList(int type=0);
+    static QList<WindowWidget *> getWindowList();
 signals:
-
+protected:
+    void initPropertyTable();
 public slots:
     void propertyChanged(QWidget *w);
 private:
     void setCurrent(QWidget *w);
+    void setWidgetProperty(QWidget *w);
 private slots:
     void focusChanged(QWidget *old, QWidget *now);
 
 private:
     QWidgetList m_childList;
-    static QList<FormWindow *> m_windowList;
+    QWidgetList m_graphList;
+    QWidgetList m_imageList;
+    static QList<WindowWidget *> m_windowList;
 public:
-    static FormWindow *m_curWin;
+    static WindowWidget *m_curWin;
 };
 
 

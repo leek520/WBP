@@ -33,7 +33,7 @@ private:
 
     char *QStringToMultBytes(QString str);
 
-    struct list_head *setWidgetInfo(Widget *w, struct list_head *head, int *pos, int start);
+    WindowInfo *setWidgetInfo(Widget *w, struct list_head *head, int *pos, int start);
     void setBaseInfo(Widget *w, BasePara *base);
     void setTextInfo(Widget *w, TextPara *text);
 
@@ -104,6 +104,7 @@ private:
     QList <QAction *>m_widgetActList;
     QList <QAction *>m_graphActList;
 
+    Selection *m_sel;
     QScrollArea *m_mdiArea;
     QDomDocument doc;
     LeftWidget *m_leftW;

@@ -140,17 +140,32 @@ typedef enum{
     GUI_DRAW_RLE16,
 }ImageMethods;
 typedef struct {
+    struct list_head list;
     ushort x;
     ushort y;
-    GUI_BITMAP GUI_Image;
-}GUI_Image;
+    GUI_BITMAP *GUI_Image;
+}ImageInfo;
+typedef struct {
+    struct list_head list;
+    int lineColor;
+    int fillColor;
+    ushort x;
+    ushort y;
+    ushort width;
+    ushort height;
+    ushort radius;
+    ushort isFill;
+    ushort lineType;
+    ushort lineWidth;
+}GraphInfo;
 /*********´°ÌåÐÅÏ¢½á¹¹************/
 typedef struct _tWindowInfo
 {
     BasePara base;
     int BkColor[1];
-    GUI_Image *Image;
     struct list_head childList;
+    struct list_head imageList;
+    struct list_head graphList;
 }WindowInfo;    //8*4byte
 
 /*********°´Å¥ÐÅÏ¢½á¹¹************/

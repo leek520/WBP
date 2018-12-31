@@ -21,6 +21,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
 MainWindow::~MainWindow()
 {
+    delete m_sel;
 
 }
 
@@ -252,7 +253,7 @@ void MainWindow::setupUi()
     m_mdiArea->setObjectName("m_mdiArea");
     m_mdiArea->setStyleSheet("QScrollArea#m_mdiArea{background-color:gray;}");
     setCentralWidget(m_mdiArea);
-    new Selection(m_mdiArea);
+    m_sel = new Selection(m_mdiArea);
 
     m_leftW = new LeftWidget();
     QDockWidget *m_dockLeft = new QDockWidget(tr("window"), this);
@@ -368,11 +369,19 @@ bool MainWindow::saveProjectFile(QString &filename)
     root.setAttributeNode(curDate);
     doc.appendChild(root);
 
-    QList<FormWindow *> winList = FormWindow::getWindowList();
+    QList<WindowWidget *> winList = WindowWidget::getWindowList();
     for(int i=0;i<winList.count();i++){
         QDomElement winDom = widgetToDom(winList[i], root);
 
-        QWidgetList childList = winList[i]->getChildList();
+        QWidgetList childList = winList[i]->getChildList(0);
+        for(int j=0;j<childList.count();j++){
+            widgetToDom((Widget *)childList[j], winDom);
+        }
+        childList = winList[i]->getChildList(1);
+        for(int j=0;j<childList.count();j++){
+            widgetToDom((Widget *)childList[j], winDom);
+        }
+        childList = winList[i]->getChildList(2);
         for(int j=0;j<childList.count();j++){
             widgetToDom((Widget *)childList[j], winDom);
         }
@@ -422,19 +431,32 @@ QDomElement MainWindow::widgetToDom(Widget *w, QDomElement root)
     QList<QPair<QVariant::Type, QString> > propTable;
     propTable = w->getPropertyTable();
 
-    QDomElement childDom = doc.createElement(EnumToStr(w->getType()));
+    QDomElement childDom = doc.createElement(EnumToStr((WidgetType)w->getType()));
     for(int k=0;k<propTable.count();k++){
         QDomAttr propNode = doc.createAttribute(propTable[k].second);
         QVariant value = w->property(propTable[k].second.toLocal8Bit());
-        if (propTable[k].second == "geometry"){
+        switch (propTable[k].first) {
+        case QVariant::Rect:
+        {
             QRect rect = value.toRect();
             propNode.setValue(QString("[(%1,%2)],%3×%4")
                              .arg(rect.left())
                              .arg(rect.top())
                              .arg(rect.width())
                              .arg(rect.height()));
-        }else{
+            break;
+        }
+        case QVariant::Point:
+        {
+            QPoint point = value.toPoint();
+            propNode.setValue(QString("(%1,%2)")
+                             .arg(point.x())
+                             .arg(point.y()));
+            break;
+        }
+        default:
             propNode.setValue(value.toString());
+            break;
         }
 
         childDom.setAttributeNode(propNode);
@@ -472,6 +494,21 @@ void MainWindow::DomToWidget(QDomElement root, Widget *w)
             if (list.count() == 4){
                 QRect rect(list[0].toInt(), list[1].toInt(), list[2].toInt(), list[3].toInt());
                 w->setProperty(propTable[i].second.toLocal8Bit(), rect);
+            }
+            break;
+        }
+        case QVariant::Point:
+        {
+            QRegExp rx("(\\d+)");
+            QStringList list;
+            int pos = 0;
+            while ((pos = rx.indexIn(attrVaue, pos)) != -1) {
+                list << rx.cap(1);
+                pos += rx.matchedLength();
+            }
+            if (list.count() == 2){
+                QPoint point(list[0].toInt(), list[1].toInt());
+                w->setProperty(propTable[i].second.toLocal8Bit(), point);
             }
             break;
         }
@@ -568,29 +605,27 @@ void MainWindow::cut()
 
 void MainWindow::remove()
 {
-    FormWindow::m_curWin->removeWidget(focusWidget());
+    WindowWidget::m_curWin->removeWidget(focusWidget());
 }
 
-struct list_head *MainWindow::setWidgetInfo(Widget *w, struct list_head *head, int *pos, int start)
+WindowInfo *MainWindow::setWidgetInfo(Widget *w, struct list_head *head, int *pos, int start)
 {
     int curPos = (*pos);
-    struct list_head *child = NULL;
+    WindowInfo *ret = NULL;
     BasePara *base;
     switch (w->getType()) {
     case Window:
     {
         WindowInfo *winInfo = (WindowInfo*)(start + curPos);
-        child = &winInfo->childList;
-        init_list_head(child);
+        ret = winInfo;
+        init_list_head(&winInfo->childList);
         winInfo->BkColor[0] = buildInfo->QColorToEColor(w->getBkColor());
-        Widget *imgW = ((FormWindow *)w)->findImageWidget();
-        if (imgW){
-            winInfo->Image = buildInfo->QImageToEImage(imgW->getBkImage(), imgW->getImagePos());
-        }else{
-            winInfo->Image = NULL;
-        }
+
         base = &winInfo->base;
         *pos = curPos + sizeof(WindowInfo);
+
+        setBaseInfo(w, base);
+        list_add_tail(&base->list, head);
         break;
     }
     case Button:
@@ -603,6 +638,9 @@ struct list_head *MainWindow::setWidgetInfo(Widget *w, struct list_head *head, i
         setTextInfo(w, &btnInfo->text);
         base = &btnInfo->base;
         *pos = curPos + sizeof(ButtonInfo);
+
+        setBaseInfo(w, base);
+        list_add_tail(&base->list, head);
         break;
     }
     case Text:
@@ -612,6 +650,9 @@ struct list_head *MainWindow::setWidgetInfo(Widget *w, struct list_head *head, i
         setTextInfo(w, &textInfo->text);
         base = &textInfo->base;
         *pos = curPos + sizeof(TextInfo);
+
+        setBaseInfo(w, base);
+        list_add_tail(&base->list, head);
         break;
     }
     case Edit:
@@ -622,17 +663,36 @@ struct list_head *MainWindow::setWidgetInfo(Widget *w, struct list_head *head, i
         setTextInfo(w, &editInfo->text);
         base = &editInfo->base;
         *pos = curPos + sizeof(EditInfo);
+
+        setBaseInfo(w, base);
+        list_add_tail(&base->list, head);
+        break;
+    }
+    case Image:
+    {
+        ImageInfo *imageInfo = (ImageInfo*)(start + curPos);
+        buildInfo->QImageToEImage(w->getBkImage(), w->getImagePos(), imageInfo);
+        *pos = curPos + sizeof(ImageInfo);
+
+        list_add_tail(&imageInfo->list, head);
+        break;
+    }
+    case Line:
+    case Rect:
+    case Circle:
+    {
+        GraphInfo *graphInfo = (GraphInfo*)(start + curPos);
+        buildInfo->GraphToEgraph(w, graphInfo);
+        *pos = curPos + sizeof(GraphInfo);
+
+        list_add_tail(&graphInfo->list, head);
         break;
     }
     default:
-        return NULL;
+        break;
     }
 
-    setBaseInfo(w, base);
-
-    list_add_tail(&base->list, head);
-
-    return child;
+    return ret;
 }
 
 void MainWindow::setBaseInfo(Widget *w, BasePara *base)
@@ -663,24 +723,35 @@ void MainWindow::build()
 
     BuildInfo::WidgetBuf *widgetBuf = buildInfo->getWidgetBuf();
     int startAddress = (int)(&widgetBuf->buf);
-    WindowInfo *headInfo = (WindowInfo *)(startAddress);
-    struct list_head *winHead = &headInfo->base.list;
+    struct list_head *winHead = ConvListAdd(startAddress, 0);
 
     init_list_head(winHead);
-    init_list_head(&headInfo->childList);
 
-    widgetBuf->pos += sizeof(WindowInfo);
+    widgetBuf->pos += sizeof(struct list_head);
 
-    QList<FormWindow *> winList = FormWindow::getWindowList();
+    QList<WindowWidget *> winList = WindowWidget::getWindowList();
     for(int i=0;i<winList.count();i++){
-        FormWindow *win = winList[i];
+        WindowWidget *win = winList[i];
 
-        struct list_head* childHead = setWidgetInfo(win, winHead, &widgetBuf->pos, startAddress);
+        WindowInfo* winInfo = setWidgetInfo(win, winHead, &widgetBuf->pos, startAddress);
+        init_list_head(&winInfo->childList);
+        init_list_head(&winInfo->imageList);
+        init_list_head(&winInfo->graphList);
 
-        QWidgetList childList = win->getChildList();
+        QWidgetList childList = win->getChildList(0);
         for(int j=0;j<childList.count();j++){
             Widget *child = (Widget *)childList[j];
-            setWidgetInfo(child, childHead, &widgetBuf->pos, startAddress);
+            setWidgetInfo(child, &winInfo->childList, &widgetBuf->pos, startAddress);
+        }
+        childList = win->getChildList(1);
+        for(int j=0;j<childList.count();j++){
+            Widget *child = (Widget *)childList[j];
+            setWidgetInfo(child, &winInfo->imageList, &widgetBuf->pos, startAddress);
+        }
+        childList = win->getChildList(2);
+        for(int j=0;j<childList.count();j++){
+            Widget *child = (Widget *)childList[j];
+            setWidgetInfo(child, &winInfo->graphList, &widgetBuf->pos, startAddress);
         }
     }
     //处理地址
@@ -699,6 +770,22 @@ void MainWindow::build()
         }
         childHead->prev->next = ConvListAdd(childHead->prev->next, offset);
         childHead->prev = ConvListAdd(childHead->prev, offset);
+
+        struct list_head *imageHead = &((WindowInfo *)win)->imageList;
+        list_for_each(child, imageHead){
+            child->prev->next = ConvListAdd(child->prev->next, offset);
+            child->prev = ConvListAdd(child->prev, offset);
+        }
+        imageHead->prev->next = ConvListAdd(imageHead->prev->next, offset);
+        imageHead->prev = ConvListAdd(imageHead->prev, offset);
+
+        struct list_head *graphHead = &((WindowInfo *)win)->graphList;
+        list_for_each(child, graphHead){
+            child->prev->next = ConvListAdd(child->prev->next, offset);
+            child->prev = ConvListAdd(child->prev, offset);
+        }
+        graphHead->prev->next = ConvListAdd(graphHead->prev->next, offset);
+        graphHead->prev = ConvListAdd(graphHead->prev, offset);
     }
     winHead->prev->next = ConvListAdd(winHead->prev->next, offset);
     winHead->prev = ConvListAdd(winHead->prev, offset);
@@ -760,29 +847,63 @@ void MainWindow::addWidget()
 Widget* MainWindow::addWidget(WidgetType type)
 {
     if (type == Window){
-        FormWindow *win = new FormWindow(m_mdiArea);
+        WindowWidget *win = new WindowWidget(m_mdiArea);
         connect(win, SIGNAL(currentItemChanged(Widget*)),
                 m_propW, SLOT(currentItemChanged(Widget*)));
         connect(win, SIGNAL(MouseButtonDblClick(QWidget*)),
                 this, SLOT(MouseButtonDblClick(QWidget*)));
         win->resize(800, 480);
         win->propertyChanged(win);
-        FormWindow::m_curWin = win;
+        WindowWidget::m_curWin = win;
         return win;
     }else{
-        if (!FormWindow::m_curWin){
+        if (!WindowWidget::m_curWin){
             QMessageBox::warning(NULL, "警告", "请先创建窗体！", QMessageBox::Yes, QMessageBox::Yes);
             return NULL;
         }
-        Widget *w = new Widget(type, FormWindow::m_curWin);
-        connect(w, SIGNAL(currentItemChanged(Widget*)),
-                m_propW, SLOT(currentItemChanged(Widget*)));
-        connect(w, SIGNAL(MouseButtonDblClick(QWidget*)),
-                this, SLOT(MouseButtonDblClick(QWidget*)));
-        w->resize(50, 30);
-        FormWindow::m_curWin->addWidget(w);
-        return w;
     }
+    //新建子窗体
+    Widget *create;
+    switch (type) {
+    case Button:
+        create = new ButtonWidget(WindowWidget::m_curWin);
+        create->resize(80, 50);
+        break;
+    case Text:
+        create = new TextWidget(WindowWidget::m_curWin);
+        create->resize(80, 50);
+        break;
+    case Edit:
+        create = new EditWidget(WindowWidget::m_curWin);
+        create->resize(80, 50);
+        break;
+
+    case Image:
+        create = new ImageWidget(WindowWidget::m_curWin);
+        create->resize(80, 80);
+        break;
+    case Line:
+        create = new LineWidget(WindowWidget::m_curWin);
+        create->setGeometry(100,79,101,3);
+        break;
+    case Rect:
+        create = new RectWidget(WindowWidget::m_curWin);
+        create->resize(80, 50);
+        break;
+    case Circle:
+        create = new CircleWidget(WindowWidget::m_curWin);
+        create->resize(81, 81);
+        break;
+    default:
+        break;
+    }
+
+    WindowWidget::m_curWin->addWidget(create);
+    connect(create, SIGNAL(currentItemChanged(Widget*)),
+            m_propW, SLOT(currentItemChanged(Widget*)));
+    connect(create, SIGNAL(MouseButtonDblClick(QWidget*)),
+            this, SLOT(MouseButtonDblClick(QWidget*)));
+    return create;
 
 }
 

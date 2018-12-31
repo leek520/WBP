@@ -26,7 +26,11 @@ SOURCES += main.cpp\
     window/widget.cpp \
     window/formwindow.cpp \
     window/propertydialog.cpp \
-    window/comdialog.cpp
+    window/comdialog.cpp \
+    window/buttonwidget.cpp \
+    window/textwidget.cpp \
+    window/editwidget.cpp \
+    window/imagewidget.cpp
 
 HEADERS  += common.h \
     ./window/mainwindow.h \
@@ -37,7 +41,11 @@ HEADERS  += common.h \
     window/widget.h \
     window/formwindow.h \
     window/propertydialog.h \
-    window/comdialog.h
+    window/comdialog.h \
+    window/buttonwidget.h \
+    window/textwidget.h \
+    window/editwidget.h \
+    window/imagewidget.h
 
 
 RESOURCES += \

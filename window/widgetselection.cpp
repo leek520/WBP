@@ -310,7 +310,7 @@ void WidgetSelection::setWidget(QWidget *w)
         return;
     }
 
-    m_widget = w;
+    m_widget = (Widget *)w;
 
     for (int i = WidgetHandle::LeftTop; i < WidgetHandle::TypeCount; ++i)
     {
@@ -407,6 +407,15 @@ void WidgetSelection::show()
     {
         WidgetHandle *h = m_handles[ i ];
         if (h) {
+            Widget *w = (Widget *)m_widget;
+            if (w->getType() == Line){
+                if ((i != WidgetHandle::Left) &&
+                    (i != WidgetHandle::Right) &&
+                    (i != WidgetHandle::Top) &&
+                    (i != WidgetHandle::Bottom)){
+                    continue;
+                }
+            }
             h->show();
             h->raise();
         }
@@ -426,6 +435,10 @@ void WidgetSelection::update()
 bool WidgetSelection::eventFilter(QObject *object, QEvent *event)
 {
     QObject *o=m_widget;
+    if(o==NULL)
+    {
+        return false;
+    }
     while(1)
     {
         if(o==object)
@@ -457,6 +470,48 @@ bool WidgetSelection::eventFilter(QObject *object, QEvent *event)
 
 void WidgetSelection::changedsize(int x, int y, int width, int height)
 {
+    Widget *w = (Widget *)m_widget;
+    //qDebug()<<x<<y<<width<<height<<w->width()<<w->height();
+    if(w->getType() == Line){
+        //水平线不允许竖直拉伸
+        if (w->getLineType() == 0){
+            if (y != w->frameGeometry().top()){
+                return;
+            }
+            height = 3;
+        }else if (w->getLineType() == 1){
+            if (x != w->frameGeometry().left()){
+                return;
+            }
+            width = 3;
+        }
+    }else if (w->getType() == Image){
+        //如果已经有图片，则控件不允许改变大小
+        QFileInfo file(w->getBkImage());
+        QString suffix = file.suffix().toLower();
+        if (QFile::exists(w->getBkImage()) &&
+            file.isFile() &&
+            (suffix.contains("bmp") ||
+             suffix.contains("png") ||
+             suffix.contains("jpg"))){
+            return;
+        }
+    }else if (w->getType() == Circle){
+        WidgetHandle *handle = (WidgetHandle *)sender();
+        if (handle == m_handles[WidgetHandle::LeftTop]){
+
+        }else if (handle == m_handles[WidgetHandle::LeftBottom]){
+
+        }else if (handle == m_handles[WidgetHandle::RightTop]){
+
+        }else if (handle == m_handles[WidgetHandle::RightBottom]){
+
+        }else{
+            return;
+        }
+
+    }
+
     m_widget->setProperty("geometry",QRect(x,y,width,height));
     updateGeometry();
 }

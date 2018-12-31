@@ -1,8 +1,8 @@
 ﻿#include "formwindow.h"
-QList<FormWindow *> FormWindow::m_windowList;
-FormWindow *FormWindow::m_curWin = NULL;
-FormWindow::FormWindow(QWidget *parent) :
-    Widget(Window, parent)
+QList<WindowWidget *> WindowWidget::m_windowList;
+WindowWidget *WindowWidget::m_curWin = NULL;
+WindowWidget::WindowWidget(QWidget *parent) :
+    Widget(parent)
 {
     m_curWin = this;
     m_windowList.append(this);
@@ -11,23 +11,62 @@ FormWindow::FormWindow(QWidget *parent) :
                 this, SLOT(focusChanged(QWidget *, QWidget *)));
     connect(SEL, SIGNAL(sizeChanged(QWidget*,QRect,QRect)),
                 this, SLOT(propertyChanged(QWidget*)));
+
+    initPropertyTable();
+    initCenterWidget();
+    initParament();
 }
 
-void FormWindow::addWidget(QWidget *w)
+void WindowWidget::initPropertyTable()
+{
+    m_Type = Window;
+    m_propTable << qMakePair(QVariant::Int, QString("Id"));
+    m_propTable << qMakePair(QVariant::Rect, QString("geometry"));
+    m_propTable << qMakePair(QVariant::Color, QString("BkColor"));
+}
+
+void WindowWidget::addWidget(QWidget *w)
 {
     if (w != this){
-        m_childList.append(w);
+        Widget *child = (Widget *)w;
+        switch (child->getType()) {
+        case Window:
+            break;
+        case Button:
+        case Text:
+        case Edit:
+            m_childList.append(w);
+            break;
+        case Image:
+            m_imageList.append(w);
+            break;
+        case Line:
+        case Rect:
+        case Circle:
+            m_graphList.append(w);
+            break;
+        default:
+            break;
+        }
     }
     SEL->addWidget(w);
     setCurrent(w);
 }
 
-void FormWindow::removeWidget(QWidget *w)
+void WindowWidget::removeWidget(QWidget *w)
 {
     Widget *rw = (Widget *)w;
     if (Window == rw->getType()){
-        FormWindow *win = (FormWindow *)w;
+        WindowWidget *win = (WindowWidget *)w;
         QWidgetList childs = win->m_childList;
+        for(int i=0;i<childs.count();i++){
+            win->removeWidget(childs[i]);
+        }
+        childs = win->m_graphList;
+        for(int i=0;i<childs.count();i++){
+            win->removeWidget(childs[i]);
+        }
+        childs = win->m_imageList;
         for(int i=0;i<childs.count();i++){
             win->removeWidget(childs[i]);
         }
@@ -36,12 +75,28 @@ void FormWindow::removeWidget(QWidget *w)
         delete win;
     }else{
         SEL->removeWidget(w);
-        m_childList.removeOne(w);
+        switch (rw->getType()) {
+        case Button:
+        case Text:
+        case Edit:
+            m_childList.removeOne(w);
+            break;
+        case Image:
+            m_imageList.removeOne(w);
+            break;
+        case Line:
+        case Rect:
+        case Circle:
+            m_graphList.removeOne(w);
+            break;
+        default:
+            break;
+        }
         delete w;
     }
 }
 
-Widget *FormWindow::findImageWidget()
+Widget *WindowWidget::findImageWidget()
 {
     for(int i=0;i<m_childList.count();i++){
         Widget *child = (Widget *)m_childList[i];
@@ -52,17 +107,27 @@ Widget *FormWindow::findImageWidget()
     return NULL;
 }
 
-QWidgetList FormWindow::getChildList()
+QWidgetList WindowWidget::getChildList(int type)
 {
-    return m_childList;
+    switch (type) {
+    case 0:
+        return m_childList;
+    case 1:
+        return m_imageList;
+    case 2:
+        return m_graphList;
+    default:
+        break;
+    }
+
 }
 
-QList<FormWindow *> FormWindow::getWindowList()
+QList<WindowWidget *> WindowWidget::getWindowList()
 {
     return m_windowList;
 }
 
-void FormWindow::setCurrent(QWidget *w)
+void WindowWidget::setCurrent(QWidget *w)
 {
     QWidget *curWidget = SEL->current();
     if (curWidget){
@@ -71,16 +136,23 @@ void FormWindow::setCurrent(QWidget *w)
     SEL->setCurrent(w);
     SEL->show(w);
     w->show();
-    emit currentItemChanged((Widget *)w);
+    propertyChanged(w);
 }
 
-void FormWindow::focusChanged(QWidget *old, QWidget *now)
+void WindowWidget::setWidgetProperty(QWidget *w)
+{
+    Widget *child = (Widget *)w;
+    //设置graph的位置
+    child->setRectangle(w->frameGeometry());
+}
+
+void WindowWidget::focusChanged(QWidget *old, QWidget *now)
 {
     if (SEL->isContainWidget(now)){
         setCurrent(now);
         Widget *rw = (Widget *)now;
         if (Window == rw->getType()){
-            m_curWin = (FormWindow *)now; 
+            m_curWin = (WindowWidget *)now;
         }else{
             if (m_childList.indexOf(now) > -1){
                 m_curWin = this;
@@ -92,8 +164,10 @@ void FormWindow::focusChanged(QWidget *old, QWidget *now)
     m_curWin->raise();
 }
 
-void FormWindow::propertyChanged(QWidget *w)
+void WindowWidget::propertyChanged(QWidget *w)
 {
+    ((Widget *)w)->setPosProperty();
+    ((Widget *)w)->update();
     emit currentItemChanged((Widget *)w);
 }
 
@@ -143,3 +217,4 @@ void ProgressBar::cancel_slt()
     emit cancel_sig(m_maxStep+10, 0);
     hide();
 }
+

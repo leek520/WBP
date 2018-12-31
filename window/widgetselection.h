@@ -3,6 +3,8 @@
 
 #include <QWidget>
 #include <QHash>
+#include <QPointer>
+#include "widget.h"
 #define SEL (Selection::GetInstance())
 class WidgetHandle: public QWidget
 {
@@ -73,7 +75,7 @@ signals:
     void sizeChanged(QWidget* wid,const QRect& old,const QRect & now);
 protected:
     WidgetHandle *m_handles[WidgetHandle::TypeCount];
-    QWidget     *m_widget;
+    QPointer<Widget> m_widget;
     QWidget     *m_formWindow;
 };
 

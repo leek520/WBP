@@ -5,6 +5,7 @@
 #include <QPainter>
 #include <QPair>
 #include <QDate>
+#include <QRectF>
 #include "common.h"
 #include "comobject.h"
 
@@ -12,6 +13,7 @@
 #define StringLen   10240
 #define LuaLen      10240
 #define ImageLen    512000  //500k
+
 #define WigetEntry(ptr, type) \
         ((type == Window) ? (QLabel *)ptr :\
          (type == Button) ? (QLabel *)ptr :\
@@ -23,13 +25,21 @@
         ((type == Window) ? QString("Window") :\
          (type == Button) ? QString("Button") :\
          (type == Text) ? QString("Text") :\
-         (type == Edit) ? QString("Edit") : QString(""))
+         (type == Edit) ? QString("Edit") : \
+         (type == Image) ? QString("Image") : \
+         (type == Line) ? QString("Line") : \
+         (type == Rect) ? QString("Rect") : \
+         (type == Circle) ? QString("Circle") : QString("Unkown"))
 
 #define StrToEnum(str) \
         ((str == QString("Window")) ? Window :\
          (str == QString("Button")) ? Button :\
          (str == QString("Text")) ? Text :\
-         (str == QString("Edit")) ? Edit : Edit)
+         (str == QString("Edit")) ? Edit : \
+         (str == QString("Image")) ? Image : \
+         (str == QString("Line")) ? Line : \
+         (str == QString("Rect")) ? Rect : \
+         (str == QString("Circle")) ? Circle : Text)
 
 #define ConvListAdd(addr, offset) ((struct list_head *)((int)addr + offset));
 
@@ -37,6 +47,7 @@ class Widget : public QWidget
 {
     Q_OBJECT
     Q_PROPERTY(int Id READ getId WRITE setId)
+    Q_PROPERTY(int Type READ getType WRITE setType)
     Q_PROPERTY(QColor BkColor READ getBkColor WRITE setBkColor)
     Q_PROPERTY(QColor BkPressColor READ getBkPressColor WRITE setBkPressColor)
     Q_PROPERTY(QColor BkDisableColor READ getBkDisableColor WRITE setBkDisableColor)
@@ -48,49 +59,87 @@ class Widget : public QWidget
     Q_PROPERTY(QString BkImage READ getBkImage WRITE setBkImage)
     Q_PROPERTY(QPoint ImagePos READ getImagePos WRITE setImagePos)
 
+    Q_PROPERTY(int LineType READ getLineType WRITE setLineType)
     Q_PROPERTY(QPoint LineStart READ getLineStart WRITE setLineStart)
-    Q_PROPERTY(QPoint LineEnd READ getLineEnd WRITE setLineEnd)
+    Q_PROPERTY(int LineLength READ getLineLength WRITE setLineLength)
 
-    Q_PROPERTY(QRect Rectangle READ getRectangle WRITE setRectangle)
+    Q_PROPERTY(int LineWidth READ getLineWidth WRITE setLineWidth)
+    Q_PROPERTY(QRectF Rectangle READ getRectangle WRITE setRectangle)
     Q_PROPERTY(QPoint Center READ getCenter WRITE setCenter)
     Q_PROPERTY(int Radius READ getRadius WRITE setRadius)
+    Q_PROPERTY(bool FillEnable READ getFillEnable WRITE setFillEnable)
+    Q_PROPERTY(QColor FillColor READ getFillColor WRITE setFillColor)
+    Q_PROPERTY(QColor LineColor READ getLineColor WRITE setLineColor)
 
     Q_PROPERTY(QString LuaCmd READ getLuaCmd WRITE setLuaCmd)
 
     Q_PROPERTY(QVariant BkColor1 READ getBkColor1 WRITE setBkColor1)
 public:
-    explicit Widget(WidgetType type= Window, QWidget *parent = 0);
-    WidgetType getType();
+    explicit Widget(QWidget *parent = 0);
     QList<QPair<QVariant::Type, QString> > getPropertyTable();
+    void setPosProperty();
 private:
-    void createCenterWidget();
-    void createPropertyTable();
-
-    void setTextParaProp();
     int assignId();
+
     void setImage();
+
 protected:
     bool eventFilter(QObject *watched, QEvent *event);
-    void paintEvent(QPaintEvent *event);
     void keyPressEvent(QKeyEvent *event);
+
+    void virtual paintEvent(QPaintEvent *event);
+    void virtual initPropertyTable();
+    void virtual initCenterWidget();
+    void virtual initParament();
 signals:
     void MouseButtonDblClick(QWidget *w);
     void currentItemChanged(Widget *w);
 private:
     QPoint dragPosition;   //鼠标拖动的位置
-    QWidget *m_CentralWidget;
+    static QMap<int, int> m_IdPool;
 
+protected:
     QList<QPair<QVariant::Type, QString> > m_propTable;
-    static QMap<WidgetType, int> m_IdPool;
-    QString m_styleSheet;
-    QLabel *m_imageW;
-
+    QLabel *m_CentralWidget;
 public:
     int getId();
     void setId(int Id);
 
-    QColor getBkColor();
-    void setBkColor(QColor BkColor);
+    int getType();
+    void setType(int Type);  
+
+    int getLineType();
+    void setLineType(int type);
+
+    QPoint getLineStart();
+    void setLineStart(QPoint pos);
+
+    int getLineLength();
+    void setLineLength(int length);
+
+    QRectF getRectangle();
+    void setRectangle(QRectF rect);
+
+    QPoint getCenter();
+    void setCenter(QPoint center);
+
+    int getRadius();
+    void virtual setRadius(int radius);
+
+    QColor getFillColor();
+    void setFillColor(QColor Color);
+
+    QColor getLineColor();
+    void setLineColor(QColor Color);
+
+    int getLineWidth();
+    void setLineWidth(int width);
+
+    bool getFillEnable();
+    void setFillEnable(bool enable);
+
+    QString getLuaCmd();
+    void setLuaCmd(QString LuaCmd);
 
     QString getBkImage();
     void setBkImage(QString BkImage);
@@ -98,20 +147,8 @@ public:
     QPoint getImagePos();
     void setImagePos(QPoint pos);
 
-    QPoint getLineStart();
-    void setLineStart(QPoint pos);
-
-    QPoint getLineEnd();
-    void setLineEnd(QPoint pos);
-
-    QRect getRectangle();
-    void setRectangle(QRect rect);
-
-    QPoint getCenter();
-    void setCenter(QPoint pos);
-
-    int getRadius();
-    void setRadius(int radius);
+    QColor getBkColor();
+    void setBkColor(QColor BkColor);
 
     QColor getBkPressColor();
     void setBkPressColor(QColor BkColor);
@@ -131,16 +168,11 @@ public:
     int getAlignV();
     void setAlignV(int Align);
 
-    QString getLuaCmd();
-    void setLuaCmd(QString LuaCmd);
-
     QVariant getBkColor1();
-    void setBkColor1(QVariant bkColor);
-private:
-
-
+    void virtual setBkColor1(QVariant bkColor);
+protected:
     /*****属性表****/
-    WidgetType m_Type;
+    int m_Type;
     int m_Id;
     QColor m_BkColor;
     QString m_BkImage;
@@ -156,12 +188,16 @@ private:
     QString m_String;
     QString m_LudCmd;
 
-
+    int m_LineType;
     QPoint m_LineStart;
-    QPoint m_LineEnd;
+    int m_LineLength;
     QPoint m_Center;
-    QRect m_Rectangle;
+    QRectF m_Rectangle;
     int m_Radius;
+    QColor m_FillColor;
+    bool m_FillEnable;
+    int m_LineWidth;
+    QColor m_LineColor;
 };
 
 class BuildInfo : public QObject
@@ -192,8 +228,8 @@ public:
     int QAlignToEAlign(int align);
     char *QStringToMultBytes(QString str);
     char *QStringToChar(QString str);
-    GUI_Image *QImageToEImage(QString filename, QPoint leftTop);
-
+    void QImageToEImage(QString filename, QPoint leftTop, ImageInfo *imageinfo);
+    void GraphToEgraph(Widget *w, GraphInfo *graphinfo);
 
     void downLoadInfo();
     void cancel();
