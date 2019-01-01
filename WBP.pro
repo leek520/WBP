@@ -32,7 +32,8 @@ SOURCES += main.cpp\
     window/editwidget.cpp \
     window/imagewidget.cpp \
     window/toolbar.cpp \
-    window/scrollarea.cpp
+    window/scrollarea.cpp \
+    window/bottomwidget.cpp
 
 HEADERS  += common.h \
     ./window/mainwindow.h \
@@ -49,7 +50,8 @@ HEADERS  += common.h \
     window/editwidget.h \
     window/imagewidget.h \
     window/toolbar.h \
-    window/scrollarea.h
+    window/scrollarea.h \
+    window/bottomwidget.h
 
 
 RESOURCES += \

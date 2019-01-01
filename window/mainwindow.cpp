@@ -304,6 +304,14 @@ void MainWindow::setupUi()
     m_dockRight->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
     m_dockRight->setWidget(m_propW);
     this->addDockWidget(Qt::RightDockWidgetArea, m_dockRight);//初始位置
+
+    m_bottomW = new BottomWidget();
+    m_dockBottom = new QDockWidget(tr("Out Window"), this);
+    m_dockBottom->setFeatures(QDockWidget::DockWidgetMovable | QDockWidget::DockWidgetClosable);//可移动
+    m_dockBottom->setAllowedAreas(Qt::BottomDockWidgetArea);
+    m_dockBottom->setWidget(m_bottomW);
+    this->addDockWidget(Qt::BottomDockWidgetArea, m_dockBottom);//初始位置
+    m_dockBottom->close();
 }
 
 
@@ -703,6 +711,7 @@ WindowInfo *MainWindow::setWidgetInfo(Widget *w, struct list_head *head, int *po
         EditInfo *editInfo = (EditInfo*)(start + curPos);
         editInfo->BkColor[0] = buildInfo->QColorToEColor(w->getBkColor());
         editInfo->BkColor[1] = buildInfo->QColorToEColor(w->getBkDisableColor());
+        editInfo->maxLen = 100;
         setTextInfo(w, &editInfo->text);
         base = &editInfo->base;
         *pos = curPos + sizeof(EditInfo);
@@ -761,6 +770,8 @@ void MainWindow::setTextInfo(Widget *w, TextPara *text)
 
 void MainWindow::build()
 {
+    m_dockBottom->show();
+    m_bottomW->insertMessage(tr("Build init!"));
 
     buildInfo->initBuild();
 
@@ -786,16 +797,22 @@ void MainWindow::build()
             Widget *child = (Widget *)childList[j];
             setWidgetInfo(child, &winInfo->childList, &widgetBuf->pos, startAddress);
         }
+        m_bottomW->insertMessage(tr("WidgetList sucess!"));
+
         childList = win->getChildList(1);
         for(int j=0;j<childList.count();j++){
             Widget *child = (Widget *)childList[j];
             setWidgetInfo(child, &winInfo->imageList, &widgetBuf->pos, startAddress);
         }
+        m_bottomW->insertMessage(tr("ImageList sucess!"));
+
         childList = win->getChildList(2);
         for(int j=0;j<childList.count();j++){
             Widget *child = (Widget *)childList[j];
             setWidgetInfo(child, &winInfo->graphList, &widgetBuf->pos, startAddress);
         }
+
+        m_bottomW->insertMessage(tr("GraphList sucess!"));
     }
     //处理地址
     int offset = START_ADDR_SDRAM_WIDGET - startAddress;
@@ -833,6 +850,7 @@ void MainWindow::build()
     winHead->prev->next = ConvListAdd(winHead->prev->next, offset);
     winHead->prev = ConvListAdd(winHead->prev, offset);
 
+    m_bottomW->insertMessage(tr("Build sucess!"));
     stateBar->showMessage("编译完成！", 3000); // 显示临时信息，时间3秒钟.
 }
 

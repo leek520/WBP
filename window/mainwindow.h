@@ -11,6 +11,7 @@
 #include "comdialog.h"
 #include "toolbar.h"
 #include "scrollarea.h"
+#include "bottomwidget.h"
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -119,8 +120,10 @@ private:
     LeftWidget *m_leftW;
     PropertyWidget *m_propW;
     PropertyDialog *m_propD;
+    BottomWidget *m_bottomW;
     ComDialog *m_comD;
     ProgressBar *m_progressBar;
+    QDockWidget *m_dockBottom;
 
     BuildInfo *buildInfo;
 };

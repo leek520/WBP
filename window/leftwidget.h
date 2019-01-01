@@ -11,7 +11,7 @@ class LeftWidget : public QWidget
 public:
     explicit LeftWidget(QWidget *parent = 0);
     QSize sizeHint() const {
-        return QSize(200, 200);
+        return QSize(250, 200);
     }
 signals:
 

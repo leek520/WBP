@@ -23,6 +23,7 @@
 #include <QComboBox>
 #include <QTimer>
 #include <QDir>
+#include <QScrollBar>
 #include <QMutex>
 #include <QDateTime>
 #include <QTabWidget>
@@ -42,23 +43,7 @@
 #include <QDrag>
 #include <QToolButton>
 
-#define START_ADDR_SDRAM_WIDGET  0xa0300000
-#define START_ADDR_FLASH_WIDGET  0x100000
-
-#define START_ADDR_SDRAM_STRING  0xa043F000
-#define START_ADDR_FLASH_STRING  0x23F000
-
-#define START_ADDR_SDRAM_PIC  0xa047E000
-#define START_ADDR_FLASH_PIC  0x27E000
-
-#define INVALID_COLOR 0x80000000
-
-
 #define CHAR_START_UNICODE    0x4e00
-
-
-
-
 
 #define START_ADDR_SDRAM_WIDGET  0xa0300000
 #define START_ADDR_FLASH_WIDGET  0x100000
@@ -101,12 +86,14 @@ typedef enum _eWidgetType
     Rect,
     Circle,
 }WidgetType;
+
 typedef enum _eTextType
 {
     String,
     Number,
     StringList,
 }TextType;
+
 /*********»ù´¡ÐÅÏ¢½á¹¹************/
 typedef struct _tBasePara
 {
@@ -136,16 +123,19 @@ typedef struct {
   int pPal;
   int pMethods;
 }GUI_BITMAP;
+
 typedef enum{
     GUI_DRAW_BMP565,
     GUI_DRAW_RLE16,
 }ImageMethods;
+
 typedef struct {
     struct list_head list;
     ushort x;
     ushort y;
     GUI_BITMAP *GUI_Image;
 }ImageInfo;
+
 typedef struct {
     struct list_head list;
     int lineColor;
@@ -159,6 +149,7 @@ typedef struct {
     ushort lineType;
     ushort lineWidth;
 }GraphInfo;
+
 /*********´°ÌåÐÅÏ¢½á¹¹************/
 typedef struct _tWindowInfo
 {
