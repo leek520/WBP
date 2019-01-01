@@ -17,6 +17,7 @@ void ImageWidget::initPropertyTable()
 void ImageWidget::initParament()
 {
     m_Type = Image;
+    Widget::initParament();
 }
 
 LineWidget::LineWidget(QWidget *parent) :
@@ -49,7 +50,6 @@ void LineWidget::initParament()
     m_LineLength = rect.right() - rect.left();
     m_LineWidth = 1;
     m_LineColor = Qt::black;
-
 }
 void LineWidget::paintEvent(QPaintEvent *event)
 {

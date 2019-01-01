@@ -14,17 +14,20 @@ public:
     explicit WindowWidget(QWidget *parent = 0);
     void addWidget(QWidget *w);
     void removeWidget(QWidget *w);
-    Widget *findImageWidget();
+
     QWidgetList getChildList(int type=0);
     static QList<WindowWidget *> getWindowList();
 signals:
+    void clearProperty();
 protected:
     void initPropertyTable();
+    void initParament();
 public slots:
     void propertyChanged(QWidget *w);
 private:
     void setCurrent(QWidget *w);
     void setWidgetProperty(QWidget *w);
+    void resetCurrentWidget();
 private slots:
     void focusChanged(QWidget *old, QWidget *now);
 

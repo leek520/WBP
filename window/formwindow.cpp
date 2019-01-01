@@ -19,10 +19,15 @@ WindowWidget::WindowWidget(QWidget *parent) :
 
 void WindowWidget::initPropertyTable()
 {
-    m_Type = Window;
     m_propTable << qMakePair(QVariant::Int, QString("Id"));
     m_propTable << qMakePair(QVariant::Rect, QString("geometry"));
     m_propTable << qMakePair(QVariant::Color, QString("BkColor"));
+}
+
+void WindowWidget::initParament()
+{
+    m_Type = Window;
+    Widget::initParament();
 }
 
 void WindowWidget::addWidget(QWidget *w)
@@ -72,6 +77,8 @@ void WindowWidget::removeWidget(QWidget *w)
         }
         SEL->removeWidget(win);
         m_windowList.removeOne(win);
+        //resetCurrentWidget一定在delete之前，要不然窗体删除后信号发送不出去了
+        resetCurrentWidget();
         delete win;
     }else{
         SEL->removeWidget(w);
@@ -93,18 +100,32 @@ void WindowWidget::removeWidget(QWidget *w)
             break;
         }
         delete w;
-    }
+        resetCurrentWidget();
+    } 
 }
 
-Widget *WindowWidget::findImageWidget()
+void WindowWidget::resetCurrentWidget()
 {
-    for(int i=0;i<m_childList.count();i++){
-        Widget *child = (Widget *)m_childList[i];
-        if (child->getType() == Image){
-            return child;
+    //重设当前窗口
+    if (!m_childList.isEmpty()){
+        setCurrent(m_childList.last());
+    }else{
+        if (!m_graphList.isEmpty()){
+            setCurrent(m_graphList.last());
+        }else{
+            if (!m_imageList.isEmpty()){
+                setCurrent(m_imageList.last());
+            }else{
+                //通知属性窗口更改
+                if (m_windowList.isEmpty()){
+                    m_curWin = NULL;
+                    emit currentItemChanged((Widget *)NULL);
+                }else{
+                    setCurrent(m_windowList.last());
+                }
+            }
         }
     }
-    return NULL;
 }
 
 QWidgetList WindowWidget::getChildList(int type)

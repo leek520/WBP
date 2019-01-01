@@ -10,8 +10,6 @@ Widget::Widget(QWidget *parent) :
     setLayout(new QGridLayout);
     layout()->setMargin(1);
     layout()->setSpacing(0);
-
-    initParament();
 }
 
 
@@ -72,6 +70,7 @@ void Widget::setImage()
 
 void Widget::setPosProperty()
 {
+    this->setFocus();
     QRect rect = this->frameGeometry();
     m_LineStart = QPoint(rect.left(), (rect.top()+rect.bottom())/2);
     if (0 == m_LineType){  //水平
@@ -158,7 +157,13 @@ void Widget::initCenterWidget()
 void Widget::initParament()
 {
     m_Id = assignId();
-    m_BkColor = this->palette().color(QPalette::Window);
+    m_BkColor = m_CentralWidget->palette().color(QPalette::Window);
+    m_BkPressColor = m_BkDisableColor = m_BkColor;
+    m_String = m_CentralWidget->text();
+    m_TextColor = m_CentralWidget->palette().color(QPalette::WindowText);
+    m_AlignH = (m_CentralWidget->alignment() & 0x0f) >> 1;
+    m_AlignV = (m_CentralWidget->alignment() & 0xff) >> 6;
+
 }
 
 void Widget::keyPressEvent(QKeyEvent *event)

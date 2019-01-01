@@ -606,6 +606,7 @@ void MainWindow::cut()
 void MainWindow::remove()
 {
     WindowWidget::m_curWin->removeWidget(focusWidget());
+
 }
 
 WindowInfo *MainWindow::setWidgetInfo(Widget *w, struct list_head *head, int *pos, int start)

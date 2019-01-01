@@ -82,8 +82,12 @@ void PropertyWidget::addProperty(QtVariantProperty *property, const QString &id)
     propertyToId[property] = id;
     idToProperty[id] = property;
     QtBrowserItem *item = propertyEditor->addProperty(property);
-    if (idToExpanded.contains(id))
+    if (idToExpanded.contains(id)){
         propertyEditor->setExpanded(item, idToExpanded[id]);
+    }else{
+//        idToExpanded[id] = false;
+//        propertyEditor->setExpanded(item, idToExpanded[id]);
+    }
 }
 void PropertyWidget::valueChanged(QtProperty *property, const QVariant &value)
 {
