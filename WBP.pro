@@ -30,7 +30,9 @@ SOURCES += main.cpp\
     window/buttonwidget.cpp \
     window/textwidget.cpp \
     window/editwidget.cpp \
-    window/imagewidget.cpp
+    window/imagewidget.cpp \
+    window/toolbar.cpp \
+    window/scrollarea.cpp
 
 HEADERS  += common.h \
     ./window/mainwindow.h \
@@ -45,11 +47,15 @@ HEADERS  += common.h \
     window/buttonwidget.h \
     window/textwidget.h \
     window/editwidget.h \
-    window/imagewidget.h
+    window/imagewidget.h \
+    window/toolbar.h \
+    window/scrollarea.h
 
 
 RESOURCES += \
     application.qrc
+
+RC_ICONS = images/wbp.ico
 
 FORMS += \
     window/propertydialog.ui \

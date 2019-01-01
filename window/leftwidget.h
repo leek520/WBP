@@ -1,29 +1,29 @@
 ﻿#ifndef LEFTWIDGET_H
 #define LEFTWIDGET_H
 
+#include <QTreeWidgetItem>
 #include "common.h"
+#include "widget.h"
 
-#include "qtvariantproperty.h"
-#include "qttreepropertybrowser.h"
-#include "qtbuttonpropertybrowser.h"
 class LeftWidget : public QWidget
 {
     Q_OBJECT
 public:
     explicit LeftWidget(QWidget *parent = 0);
-    void initUi();
     QSize sizeHint() const {
-        return QSize(150, 200);
+        return QSize(200, 200);
     }
-
 signals:
+
 private:
-
-
 public slots:
-
+    void addWidget(Widget *w);
+    void currentItemChanged(Widget *w);
+    void currentItemChanged(QTreeWidgetItem *current, QTreeWidgetItem *previous);
+    void removeWidgetSlt(Widget *w);
 private:
     QTreeWidget *m_objectTree;
+    QTreeWidgetItem *m_curWinItem;
 };
 
 #endif // LEFTWIDGET_H

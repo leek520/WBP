@@ -9,6 +9,12 @@ int main(int argc, char *argv[])
     QTextCodec *codec = QTextCodec::codecForName("UTF_8");
     QTextCodec::setCodecForLocale(codec);
 
+    //设置字体
+    QFont font;
+    font.setFamily(QObject::tr("微软雅黑"));
+    font.setPixelSize(12);
+    a.setFont(font);
+
 
     MainWindow w;
     w.show();

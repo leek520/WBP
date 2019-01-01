@@ -9,6 +9,8 @@
 #include "comobject.h"
 #include "propertydialog.h"
 #include "comdialog.h"
+#include "toolbar.h"
+#include "scrollarea.h"
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -16,6 +18,8 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = 0);
     ~MainWindow();
+protected:
+    void mouseMoveEvent(QMouseEvent * event);
 private:
     void createActions();
     void createMenus();
@@ -59,6 +63,7 @@ private slots:
     void ResProgress_slt(int step, int pos, QString msg="");
     void MouseButtonDblClick(QWidget *w);
     void addWidget();
+    void addWidgetSlt(WidgetType type, QPoint pos);
     Widget* addWidget(WidgetType type);
 signals:
 
@@ -76,10 +81,12 @@ private:
     QToolBar *fileToolBar;
     QToolBar *editToolBar;
     QToolBar *viewToolBar;
-    QToolBar *widgetToolBar;
-    QToolBar *graphToolBar;
     QToolBar *buildToolBar;
     QToolBar *windowToolBar;
+
+    ToolBar *graphToolBar;
+    ToolBar *widgetToolBar;
+
 
     QAction *newAct;
     QAction *openAct;
@@ -101,11 +108,13 @@ private:
     QAction *buildAct;
     QAction *downAct;
 
+    QPoint dragPosition;
+
     QList <QAction *>m_widgetActList;
     QList <QAction *>m_graphActList;
 
     Selection *m_sel;
-    QScrollArea *m_mdiArea;
+    ScrollArea *m_mdiArea;
     QDomDocument doc;
     LeftWidget *m_leftW;
     PropertyWidget *m_propW;

@@ -7,6 +7,7 @@ WindowWidget::WindowWidget(QWidget *parent) :
     m_curWin = this;
     m_windowList.append(this);
     addWidget(this);
+    setAcceptDrops(true);   //设置接收拖拽
     connect(qApp, SIGNAL(focusChanged(QWidget *, QWidget *)),
                 this, SLOT(focusChanged(QWidget *, QWidget *)));
     connect(SEL, SIGNAL(sizeChanged(QWidget*,QRect,QRect)),
@@ -61,6 +62,8 @@ void WindowWidget::addWidget(QWidget *w)
 void WindowWidget::removeWidget(QWidget *w)
 {
     Widget *rw = (Widget *)w;
+    if (!SEL->isContainWidget(rw)) return;
+    emit removeWidgetSgn(rw);
     if (Window == rw->getType()){
         WindowWidget *win = (WindowWidget *)w;
         QWidgetList childs = win->m_childList;
@@ -146,6 +149,55 @@ QWidgetList WindowWidget::getChildList(int type)
 QList<WindowWidget *> WindowWidget::getWindowList()
 {
     return m_windowList;
+}
+//https://blog.csdn.net/iamshaofa/article/details/17629897
+/******************************************************************************
+* @brief:
+* @author:leek
+* @date 2018/10/10
+*******************************************************************************/
+void WindowWidget::dragEnterEvent(QDragEnterEvent *event)
+{
+    if(event->mimeData()->hasFormat("action/name"))
+    {
+        m_dragMode = 1;
+        event->acceptProposedAction();
+    }
+    else
+    {
+        event->ignore();
+        QWidget::dragEnterEvent(event);
+    }
+}
+
+void WindowWidget::dragLeaveEvent(QDragLeaveEvent *event)
+{
+    m_dragMode = 0;
+    QWidget::dragLeaveEvent(event);
+}
+
+void WindowWidget::dragMoveEvent(QDragMoveEvent *event)
+{
+    if(event->mimeData()->hasFormat("action/name"))
+    {
+        event->acceptProposedAction();
+        return;
+    }
+    QWidget::dragMoveEvent(event);
+}
+
+void WindowWidget::dropEvent(QDropEvent *event)
+{
+    if(event->mimeData()->hasFormat("action/name"))
+    {
+        m_dragMode = 0; // 结束drag mode
+        QString name = QString(event->mimeData()->data("action/name"));
+        WidgetType type = StrToEnum(name);
+        emit addWidgetSgn(type, event->pos());
+        event->acceptProposedAction();
+        return;
+    }
+    QWidget::dropEvent(event);
 }
 
 void WindowWidget::setCurrent(QWidget *w)

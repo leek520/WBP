@@ -9,6 +9,11 @@
 #include "common.h"
 #include "comobject.h"
 
+#define WindowWidth     800
+#define WindowHeight    480
+#define WidgetWidth     80
+#define WidgetHeight    50
+
 #define WidgetLen   10240
 #define StringLen   10240
 #define LuaLen      10240
@@ -32,14 +37,14 @@
          (type == Circle) ? QString("Circle") : QString("Unkown"))
 
 #define StrToEnum(str) \
-        ((str == QString("Window")) ? Window :\
-         (str == QString("Button")) ? Button :\
-         (str == QString("Text")) ? Text :\
-         (str == QString("Edit")) ? Edit : \
-         (str == QString("Image")) ? Image : \
-         (str == QString("Line")) ? Line : \
-         (str == QString("Rect")) ? Rect : \
-         (str == QString("Circle")) ? Circle : Text)
+        ((str.toLower() == QString("Window").toLower()) ? Window :\
+         (str.toLower() == QString("Button").toLower()) ? Button :\
+         (str.toLower() == QString("Text").toLower()) ? Text :\
+         (str.toLower() == QString("Edit").toLower()) ? Edit : \
+         (str.toLower() == QString("Image").toLower()) ? Image : \
+         (str.toLower() == QString("Line").toLower()) ? Line : \
+         (str.toLower() == QString("Rect").toLower()) ? Rect : \
+         (str.toLower() == QString("Circle").toLower()) ? Circle : Text)
 
 #define ConvListAdd(addr, offset) ((struct list_head *)((int)addr + offset));
 
@@ -227,7 +232,7 @@ public:
     uint QColorToEColor(QColor color);
     int QAlignToEAlign(int align);
     char *QStringToMultBytes(QString str);
-    char *QStringToChar(QString str);
+    char *QStringToLuaChar(QString str);
     void QImageToEImage(QString filename, QPoint leftTop, ImageInfo *imageinfo);
     void GraphToEgraph(Widget *w, GraphInfo *graphinfo);
 
@@ -236,6 +241,8 @@ public:
 private slots:
     void readCharList();
     void ResProgress_slt(int pos, QString msg="");
+    void writeBufToTxt();
+    void writeBufToTxt(QTextStream &out, char *buf, int len);
 signals:
     void DownLoad_sig(const int cmd, const int addr, const QByteArray data);
     void ResProgress_sig(int step, int pos, QString msg="");

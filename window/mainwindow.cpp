@@ -25,6 +25,37 @@ MainWindow::~MainWindow()
 
 }
 
+void MainWindow::mouseMoveEvent(QMouseEvent *event)
+{
+    if (!(event->buttons() & Qt::LeftButton))
+        return;
+
+    if ((event->pos() - dragPosition).manhattanLength() < QApplication::startDragDistance())
+        return;
+
+    QDrag *drag = new QDrag(this);
+    QMimeData *mimeData = new QMimeData;
+
+    //设置数据
+    if (!ToolBar::pressAct) return;
+
+    QString name = ToolBar::pressAct->text();
+    mimeData->setData("action/name", name.toLocal8Bit());
+    drag->setMimeData(mimeData);
+
+    // 设置图片
+    QPixmap drag_img(QString(":/%1").arg(name));
+    drag_img.scaled(drag_img.width()/3, drag_img.height()/3, Qt::KeepAspectRatio);
+    drag->setPixmap(drag_img);
+
+    Qt::DropAction resultAction = drag->exec(Qt::MoveAction);
+    if(resultAction == Qt::MoveAction)
+    {
+        // 确认移动操作
+        ToolBar::pressAct = NULL;
+    }
+}
+
 void MainWindow::createActions()
 {
     /****file****/
@@ -111,25 +142,25 @@ void MainWindow::createActions()
 
 
     /****widget****/
-    QAction *act = new QAction(QIcon(":/images/widget/window.PNG"), tr("Window"), this);
+    QAction *act = new QAction(QIcon(":/window"), tr("window"), this);
     act->setStatusTip(tr("Window"));
     act->setShortcut(Qt::Key_F3);
     connect(act, SIGNAL(triggered()), this, SLOT(addWidget()));
     m_widgetActList.append(act);
 
-    act = new QAction(QIcon(":/images/widget/button.PNG"), tr("Button"), this);
+    act = new QAction(QIcon(":/button"), tr("button"), this);
     act->setStatusTip(tr("Button"));
     act->setShortcut(Qt::Key_F4);
     connect(act, SIGNAL(triggered()), this, SLOT(addWidget()));
     m_widgetActList.append(act);
 
-    act = new QAction(QIcon(":/images/widget/text.PNG"), tr("Text"), this);
+    act = new QAction(QIcon(":/text"), tr("text"), this);
     act->setStatusTip(tr("Text"));
     act->setShortcut(Qt::Key_F5);
     connect(act, SIGNAL(triggered()), this, SLOT(addWidget()));
     m_widgetActList.append(act);
 
-    act = new QAction(QIcon(":/images/widget/edit.PNG"), tr("Edit"), this);
+    act = new QAction(QIcon(":/edit"), tr("edit"), this);
     act->setStatusTip(tr("Edit"));
     act->setShortcut(Qt::Key_F6);
     connect(act, SIGNAL(triggered()), this, SLOT(addWidget()));
@@ -211,7 +242,8 @@ void MainWindow::createToolBars()
 
     addToolBarBreak(Qt::TopToolBarArea);
 
-    widgetToolBar = addToolBar(tr("Widget"));
+    widgetToolBar = new ToolBar(tr("Widget"));
+    addToolBar(Qt::TopToolBarArea, widgetToolBar);
     for(int i=0;i<m_widgetActList.count();i++){
         widgetToolBar->addAction(m_widgetActList[i]);
     }
@@ -219,13 +251,15 @@ void MainWindow::createToolBars()
     widgetToolBar->setFixedHeight(100);
 
 
-    graphToolBar = addToolBar(tr("Widget"));
+    graphToolBar = new ToolBar(tr("Graph"));
+    addToolBar(Qt::TopToolBarArea, graphToolBar);
     for(int i=0;i<m_graphActList.count();i++){
         graphToolBar->addAction(m_graphActList[i]);
         //m_graphActList[i]->setCheckable(true);
     }
     graphToolBar->setIconSize(QSize(64,64));
     graphToolBar->setFixedHeight(100);
+
 }
 
 void MainWindow::createStatusBar()
@@ -249,7 +283,9 @@ void MainWindow::createStatusBar()
 void MainWindow::setupUi()
 {
     setWindowState(Qt::WindowMaximized);
-    m_mdiArea = new QScrollArea(this);
+    m_mdiArea = new ScrollArea(this);
+    connect(m_mdiArea, SIGNAL(addWidgetSgn(WidgetType,QPoint)),
+            this, SLOT(addWidgetSlt(WidgetType,QPoint)));
     m_mdiArea->setObjectName("m_mdiArea");
     m_mdiArea->setStyleSheet("QScrollArea#m_mdiArea{background-color:gray;}");
     setCentralWidget(m_mdiArea);
@@ -473,8 +509,14 @@ void MainWindow::DomToWidget(QDomElement root, Widget *w)
         QString attrVaue = root.attribute(propTable[i].second);
         QVariant value;
         switch (propTable[i].first){
+        case QVariant::Bool:
+            w->setProperty(propTable[i].second.toLocal8Bit(), (attrVaue=="true"?true:false));
+            break;
         case QVariant::Int:
             w->setProperty(propTable[i].second.toLocal8Bit(), attrVaue.toInt());
+            break;
+        case QVariant::Double:
+            w->setProperty(propTable[i].second.toLocal8Bit(), attrVaue.toDouble());
             break;
         case QVariant::String:
             w->setProperty(propTable[i].second.toLocal8Bit(), attrVaue);
@@ -635,7 +677,7 @@ WindowInfo *MainWindow::setWidgetInfo(Widget *w, struct list_head *head, int *po
         btnInfo->BkColor[0] = buildInfo->QColorToEColor(w->getBkColor());
         btnInfo->BkColor[1] = buildInfo->QColorToEColor(w->getBkPressColor());
         btnInfo->BkColor[2] = buildInfo->QColorToEColor(w->getBkDisableColor());
-        btnInfo->cmd = buildInfo->QStringToChar(w->getLuaCmd());
+        btnInfo->cmd = buildInfo->QStringToLuaChar(w->getLuaCmd());
         setTextInfo(w, &btnInfo->text);
         base = &btnInfo->base;
         *pos = curPos + sizeof(ButtonInfo);
@@ -845,17 +887,32 @@ void MainWindow::addWidget()
     addWidget(type);
 }
 
+void MainWindow::addWidgetSlt(WidgetType type, QPoint pos)
+{
+    Widget* child = addWidget(type);
+    child->move(pos);
+    WindowWidget::m_curWin->propertyChanged(child);
+}
+
 Widget* MainWindow::addWidget(WidgetType type)
 {
     if (type == Window){
         WindowWidget *win = new WindowWidget(m_mdiArea);
         connect(win, SIGNAL(currentItemChanged(Widget*)),
                 m_propW, SLOT(currentItemChanged(Widget*)));
+        connect(win, SIGNAL(removeWidgetSgn(Widget*)),
+                m_leftW, SLOT(removeWidgetSlt(Widget*)));
+        connect(win, SIGNAL(currentItemChanged(Widget*)),
+                m_leftW, SLOT(currentItemChanged(Widget*)));
         connect(win, SIGNAL(MouseButtonDblClick(QWidget*)),
                 this, SLOT(MouseButtonDblClick(QWidget*)));
-        win->resize(800, 480);
+        connect(win, SIGNAL(addWidgetSgn(WidgetType,QPoint)),
+                this, SLOT(addWidgetSlt(WidgetType,QPoint)));
+
+        win->resize(WindowWidth, WindowHeight);
         win->propertyChanged(win);
         WindowWidget::m_curWin = win;
+        m_leftW->addWidget(win);
         return win;
     }else{
         if (!WindowWidget::m_curWin){
@@ -868,32 +925,32 @@ Widget* MainWindow::addWidget(WidgetType type)
     switch (type) {
     case Button:
         create = new ButtonWidget(WindowWidget::m_curWin);
-        create->resize(80, 50);
+        create->resize(WidgetWidth, WidgetHeight);
         break;
     case Text:
         create = new TextWidget(WindowWidget::m_curWin);
-        create->resize(80, 50);
+        create->resize(WidgetWidth, WidgetHeight);
         break;
     case Edit:
         create = new EditWidget(WindowWidget::m_curWin);
-        create->resize(80, 50);
+        create->resize(WidgetWidth, WidgetHeight);
         break;
 
     case Image:
         create = new ImageWidget(WindowWidget::m_curWin);
-        create->resize(80, 80);
+        create->resize(WidgetWidth, WidgetHeight);
         break;
     case Line:
         create = new LineWidget(WindowWidget::m_curWin);
-        create->setGeometry(100,79,101,3);
+        create->resize(WidgetWidth, 3);
         break;
     case Rect:
         create = new RectWidget(WindowWidget::m_curWin);
-        create->resize(80, 50);
+        create->resize(WidgetWidth, WidgetHeight);
         break;
     case Circle:
         create = new CircleWidget(WindowWidget::m_curWin);
-        create->resize(81, 81);
+        create->resize(WidgetHeight+1, WidgetHeight+1);
         break;
     default:
         break;
@@ -902,8 +959,11 @@ Widget* MainWindow::addWidget(WidgetType type)
     WindowWidget::m_curWin->addWidget(create);
     connect(create, SIGNAL(currentItemChanged(Widget*)),
             m_propW, SLOT(currentItemChanged(Widget*)));
+    connect(create, SIGNAL(currentItemChanged(Widget*)),
+            m_leftW, SLOT(currentItemChanged(Widget*)));
     connect(create, SIGNAL(MouseButtonDblClick(QWidget*)),
             this, SLOT(MouseButtonDblClick(QWidget*)));
+    m_leftW->addWidget(create);
     return create;
 
 }

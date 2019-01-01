@@ -47,7 +47,7 @@ void LineWidget::initParament()
     layout()->setMargin(0);
     QRect rect = this->frameGeometry();
     m_LineStart = QPoint(rect.left(), (rect.top()+rect.bottom())/2);
-    m_LineLength = rect.right() - rect.left();
+    m_LineLength = rect.right() - rect.left() + 1;
     m_LineWidth = 1;
     m_LineColor = Qt::black;
 }

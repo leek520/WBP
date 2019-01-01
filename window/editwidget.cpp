@@ -30,6 +30,7 @@ void EditWidget::initCenterWidget()
     m_CentralWidget->setLineWidth(2);
     m_CentralWidget->setFrameStyle(QFrame::Panel | QFrame::Sunken);
     m_CentralWidget->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+    m_CentralWidget->setFont(QFont("Times", 26, QFont::Normal));
     m_CentralWidget->installEventFilter(this);
     m_CentralWidget->setAutoFillBackground(true);
     m_CentralWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);

@@ -18,8 +18,14 @@ public:
     QWidgetList getChildList(int type=0);
     static QList<WindowWidget *> getWindowList();
 signals:
-    void clearProperty();
+    void removeWidgetSgn(Widget *w);
+    void addWidgetSgn(WidgetType type, QPoint pos);
 protected:
+    void dragEnterEvent(QDragEnterEvent *event);
+    void dragLeaveEvent(QDragLeaveEvent *event);
+    void dragMoveEvent(QDragMoveEvent *event);
+    void dropEvent(QDropEvent *event);
+
     void initPropertyTable();
     void initParament();
 public slots:
@@ -32,6 +38,7 @@ private slots:
     void focusChanged(QWidget *old, QWidget *now);
 
 private:
+    int m_dragMode;
     QWidgetList m_childList;
     QWidgetList m_graphList;
     QWidgetList m_imageList;

@@ -14,10 +14,10 @@
         <file>images/build.png</file>
         <file>images/download.png</file>
         <file>char3000.txt</file>
-        <file>images/widget/button.PNG</file>
-        <file>images/widget/edit.PNG</file>
-        <file>images/widget/text.PNG</file>
-        <file>images/widget/window.PNG</file>
+        <file alias="button">images/widget/button.PNG</file>
+        <file alias="edit">images/widget/edit.PNG</file>
+        <file alias="text">images/widget/text.PNG</file>
+        <file alias="window">images/widget/window.PNG</file>
         <file alias="circle">images/graph/circle.png</file>
         <file alias="image">images/graph/image.png</file>
         <file alias="line">images/graph/line.png</file>

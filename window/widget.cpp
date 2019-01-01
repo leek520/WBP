@@ -65,7 +65,11 @@ void Widget::setImage()
                     m_ImagePos.y(),
                     size.width(),
                     size.height());
+    }else{
+        m_CentralWidget->setPixmap(QPixmap());
+        move(m_ImagePos);
     }
+    repaint();
 }
 
 void Widget::setPosProperty()
@@ -74,9 +78,9 @@ void Widget::setPosProperty()
     QRect rect = this->frameGeometry();
     m_LineStart = QPoint(rect.left(), (rect.top()+rect.bottom())/2);
     if (0 == m_LineType){  //水平
-        m_LineLength = rect.right() - rect.left();
+        m_LineLength = rect.right() - rect.left() + 1;
     }else{
-        m_LineLength = rect.bottom() - rect.top();
+        m_LineLength = rect.bottom() - rect.top() + 1;
     }
     m_Rectangle = rect;
 
@@ -575,17 +579,17 @@ char *BuildInfo::QStringToMultBytes(QString str)
     return (char *)address;
 }
 
-char *BuildInfo::QStringToChar(QString str)
+char *BuildInfo::QStringToLuaChar(QString str)
 {
     int address = START_ADDR_SDRAM_LUA + luaBuf.pos;
-    str.append("\n");
+
     int RealLen = str.toLocal8Bit().length();
-    if (RealLen>0)
-    {
+    if (RealLen>0){
         memcpy(&luaBuf.buf[luaBuf.pos], str.toLocal8Bit().data(), RealLen);
+        luaBuf.pos += RealLen;
+        luaBuf.buf[luaBuf.pos++] = '\n';
+        luaBuf.buf[luaBuf.pos++] = '\0';
     }
-    luaBuf.pos += RealLen;
-    luaBuf.buf[luaBuf.pos++] = '\0';
     return (char *)address;
 }
 
@@ -599,7 +603,6 @@ void BuildInfo::QImageToEImage(QString filename, QPoint leftTop, ImageInfo *imag
     }
     //1.获取文件size信息
     QSize size = QPixmap(filename).size();
-    qDebug() << size;
     imageinfo->x = leftTop.x();
     imageinfo->y = leftTop.y();
     imageinfo->GUI_Image = (GUI_BITMAP *)address;
@@ -627,7 +630,7 @@ void BuildInfo::QImageToEImage(QString filename, QPoint leftTop, ImageInfo *imag
             .arg(format);
     system(build_cmd.toLocal8Bit());
     outname = filename.left(filename.lastIndexOf("\\")+1) + outname + ".c";
-    qDebug()<<outname;
+    //qDebug()<<outname;
     //3.将图片data写入picBuf中，并返回首地址
     /*3.1：打开生成的.c文件*/
     QFile file(outname);
@@ -732,10 +735,14 @@ void BuildInfo::GraphToEgraph(Widget *w, GraphInfo *graphinfo)
 
 void BuildInfo::downLoadInfo()
 {
-    if (com->OpenSerial()){
-        downloadStep = 0;
-        ResProgress_slt(101);
-    }
+//    if (com->OpenSerial()){
+//        downloadStep = 0;
+//        ResProgress_slt(101);
+//    }else{
+//        writeBufToTxt();
+//    }
+
+    writeBufToTxt();
 }
 
 void BuildInfo::cancel()
@@ -743,6 +750,69 @@ void BuildInfo::cancel()
     downloadStep = 10;
 }
 
+void BuildInfo::writeBufToTxt()
+{
+    QString filename = "buf.txt";
+
+    QFile file(filename);
+    if(!file.open(QIODevice::WriteOnly | QIODevice::Text)){
+        return;
+    }
+
+    QTextStream out(&file);
+
+    out << "widgetBuf:";
+    writeBufToTxt(out, widgetBuf.buf, widgetBuf.pos);
+
+    out << "stringBuf:";
+    writeBufToTxt(out, stringBuf.buf, stringBuf.pos);
+
+    out << "luaBuf:";
+    writeBufToTxt(out, luaBuf.buf, luaBuf.pos);
+
+    out << "imageBuf:";
+    writeBufToTxt(out, imageBuf.buf, imageBuf.pos);  
+
+    file.close();
+}
+
+void BuildInfo::writeBufToTxt(QTextStream &out, char *buf, int len)
+{
+    QByteArray byte;
+    QString strHex;
+
+    byte.resize(len);
+    for(int i=0;i<len;i++) {
+        if (i%16 == 0){
+            out << "\n";
+            //打印地址
+            int address = 0;
+            if (buf == widgetBuf.buf){
+                address = START_ADDR_SDRAM_WIDGET + i;
+            }else if (buf == stringBuf.buf){
+                address = START_ADDR_SDRAM_STRING + i;
+            }else if (buf == luaBuf.buf){
+                address = START_ADDR_SDRAM_LUA + i;
+            }else if (buf == imageBuf.buf){
+                address = START_ADDR_SDRAM_IMAGE + i;
+            }
+            out << QString("0x%1: ").arg(QString::number(address, 16).right(8));
+        }
+        byte[i] = buf[i];
+        strHex = QString::number(byte.at(i), 16);
+        int cnt = strHex.count();
+        if (cnt == 1){
+            strHex.prepend("0");
+        }else if (cnt == 2){
+
+        }else{
+            strHex = strHex.right(2);
+        }
+        out << strHex << " ";
+    }
+    out << "\n";
+
+}
 
 void BuildInfo::ResProgress_slt(int pos, QString msg)
 {
@@ -798,4 +868,5 @@ void BuildInfo::ResProgress_slt(int pos, QString msg)
         }
     }
 }
+
 

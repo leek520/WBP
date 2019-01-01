@@ -39,7 +39,8 @@
 #include <QDomDocument>
 #include <QDebug>
 #include <QProgressBar>
-
+#include <QDrag>
+#include <QToolButton>
 
 #define START_ADDR_SDRAM_WIDGET  0xa0300000
 #define START_ADDR_FLASH_WIDGET  0x100000
