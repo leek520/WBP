@@ -13,7 +13,7 @@
 
 #define WindowWidth     800
 #define WindowHeight    480
-#define WidgetWidth     80
+#define WidgetWidth     120
 #define WidgetHeight    50
 
 #define WidgetLen   10240

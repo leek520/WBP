@@ -284,12 +284,12 @@ void MainWindow::createStatusBar()
 void MainWindow::setupUi()
 {
     setWindowState(Qt::WindowMaximized);
-    m_mdiArea = new ScrollArea(this);
-    connect(m_mdiArea, SIGNAL(addWidgetSgn(WidgetType,QPoint)),
-            this, SLOT(addWidgetSlt(WidgetType,QPoint)));
-    m_mdiArea->setObjectName("m_mdiArea");
-    m_mdiArea->setStyleSheet("QScrollArea#m_mdiArea{background-color:gray;}");
+
+    m_mdiArea = new QMdiArea(this);
+    m_mdiArea->setTabsClosable(true);
+    m_mdiArea->setViewMode(QMdiArea::TabbedView);//设为标签栏显示模式
     setCentralWidget(m_mdiArea);
+
     m_sel = new Selection(m_mdiArea);
 
     m_leftW = new LeftWidget();
@@ -298,6 +298,8 @@ void MainWindow::setupUi()
     m_dockLeft->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
     m_dockLeft->setWidget(m_leftW);
     this->addDockWidget(Qt::LeftDockWidgetArea, m_dockLeft);//初始位置
+    connect(m_leftW, SIGNAL(switchTabWindow(Widget*)),
+            this, SLOT(switchTabWindow(Widget*)));
 
     m_propW = new PropertyWidget();
     QDockWidget *m_dockRight = new QDockWidget(tr("Property"), this);
@@ -468,7 +470,7 @@ bool MainWindow::openProjectFile(QString &filename)
         }
         winNode = winNode.nextSibling();
     }
-    //m_leftW->
+    m_leftW->setInit();
     return true;
 }
 
@@ -513,6 +515,7 @@ QDomElement MainWindow::widgetToDom(Widget *w, QDomElement root)
 
 void MainWindow::DomToWidget(QDomElement root, Widget *w)
 {
+    w->setUpdatesEnabled(false);
     QList<QPair<QVariant::Type, QString> > propTable;
     propTable = w->getPropertyTable();
     for(int i=0;i<propTable.count();i++){
@@ -570,7 +573,7 @@ void MainWindow::DomToWidget(QDomElement root, Widget *w)
         }
 
     }
-
+    w->setUpdatesEnabled(true);
 }
 
 
@@ -888,6 +891,22 @@ void MainWindow::setCom()
     m_comD->show();
 }
 
+void MainWindow::switchTabWindow(Widget *w)
+{
+    QMdiSubWindow *findSubWin = NULL;
+    foreach (QMdiSubWindow *subWin, m_mdiArea->subWindowList()) {
+        if(subWin->widget() == w->parentWidget()){
+            findSubWin = subWin;
+            break;
+        }
+    }
+    if (findSubWin){
+        m_mdiArea->setActiveSubWindow(findSubWin);
+    }else{
+        m_mdiArea->addSubWindow(w->parentWidget());
+    }
+}
+
 void MainWindow::ResProgress_slt(int step, int pos, QString msg)
 {
     if (step == 0){
@@ -937,7 +956,14 @@ void MainWindow::addWidgetSlt(WidgetType type, QPoint pos)
 Widget* MainWindow::addWidget(WidgetType type)
 {
     if (type == Window){
-        WindowWidget *win = new WindowWidget(m_mdiArea);
+        m_scollArea = new ScrollArea(this);
+        connect(m_scollArea, SIGNAL(addWidgetSgn(WidgetType,QPoint)),
+                this, SLOT(addWidgetSlt(WidgetType,QPoint)));
+        m_scollArea->setObjectName("m_mdiArea");
+        m_scollArea->setStyleSheet("QScrollArea#m_mdiArea{background-color:gray;}");
+
+
+        WindowWidget *win = new WindowWidget(m_scollArea);
         connect(win, SIGNAL(currentItemChanged(Widget*)),
                 m_propW, SLOT(currentItemChanged(Widget*)));
         connect(win, SIGNAL(removeWidgetSgn(Widget*)),
@@ -953,6 +979,10 @@ Widget* MainWindow::addWidget(WidgetType type)
         win->propertyChanged(win);
         WindowWidget::m_curWin = win;
         m_leftW->addWidget(win);
+
+        m_scollArea->setWidget(win);
+        m_scollArea->setWindowTitle(QString("Window-%1").arg(win->getId()));
+        m_mdiArea->addSubWindow(m_scollArea);
         return win;
     }else{
         if (!WindowWidget::m_curWin){

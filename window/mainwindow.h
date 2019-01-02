@@ -61,6 +61,7 @@ private slots:
 
     void setCom();
 
+    void switchTabWindow(Widget *w);
     void ResProgress_slt(int step, int pos, QString msg="");
     void MouseButtonDblClick(Widget *w);
     void addWidget();
@@ -115,7 +116,8 @@ private:
     QList <QAction *>m_graphActList;
 
     Selection *m_sel;
-    ScrollArea *m_mdiArea;
+    ScrollArea *m_scollArea;
+    QMdiArea *m_mdiArea;
     QDomDocument doc;
     LeftWidget *m_leftW;
     PropertyWidget *m_propW;

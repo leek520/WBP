@@ -182,7 +182,7 @@ void Widget::initParament()
     m_Id = assignId();
     m_BkColor = m_CentralWidget->palette().color(QPalette::Window);
     m_BkPressColor = m_BkDisableColor = m_BkColor;
-    m_TextString = m_CentralWidget->text();
+
     m_TextColor = m_CentralWidget->palette().color(QPalette::WindowText);
     m_AlignH = (m_CentralWidget->alignment() & 0x0f) >> 1;
     m_AlignV = (m_CentralWidget->alignment() & 0xff) >> 6;

@@ -39,6 +39,7 @@ void ButtonWidget::initCenterWidget()
 void ButtonWidget::initParament()
 {
     m_Type = Button;
+    setTextString("button");
     Widget::initParament();
 }
 

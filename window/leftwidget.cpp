@@ -20,8 +20,13 @@ LeftWidget::LeftWidget(QWidget *parent) :
 
 void LeftWidget::setInit()
 {
-    m_objectTree->expandAll();
-    //m_objectTree->collapse();
+    m_objectTree->collapseAll();
+    QTreeWidgetItem *topItem = m_objectTree->topLevelItem(0);
+    if (topItem){
+        m_objectTree->expandItem(topItem);
+        m_objectTree->setCurrentItem(topItem);
+    }
+
 }
 
 void LeftWidget::addWidget(Widget *w)
@@ -85,7 +90,17 @@ void LeftWidget::currentItemChanged(Widget *w)
 void LeftWidget::currentItemChanged(QTreeWidgetItem *current, QTreeWidgetItem *previous)
 {
     if (!current) return;
-    Widget *pItem = (Widget *)(current->data(0, Qt::UserRole).toInt());
+    Widget *pItem;
+    QTreeWidgetItem *curParent = current->parent();
+    if (curParent){
+        pItem = (Widget *)(curParent->data(0, Qt::UserRole).toInt());
+    }else{
+        pItem = (Widget *)(current->data(0, Qt::UserRole).toInt());
+    }
+    emit switchTabWindow(pItem);
+
+    //设置焦点
+    pItem = (Widget *)(current->data(0, Qt::UserRole).toInt());
     pItem->setFocus();
 }
 

@@ -235,7 +235,6 @@ void WindowWidget::focusChanged(QWidget *old, QWidget *now)
             }
         }
     }
-    //提升当前选中窗口为顶层
     m_curWin->raise();
 }
 

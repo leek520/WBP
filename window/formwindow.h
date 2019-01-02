@@ -7,6 +7,7 @@
 #include "editwidget.h"
 #include "textwidget.h"
 #include "imagewidget.h"
+#include "scrollarea.h"
 class WindowWidget : public Widget
 {
     Q_OBJECT

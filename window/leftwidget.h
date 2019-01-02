@@ -15,7 +15,7 @@ public:
     }
     void setInit();
 signals:
-
+    void switchTabWindow(Widget *w);
 private:
 public slots:
     void addWidget(Widget *w);
