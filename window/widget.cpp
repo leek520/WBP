@@ -3,13 +3,14 @@ QMap<int, int> Widget::m_IdPool;
 Widget::Widget(QWidget *parent) :
     QWidget(parent)
 {
+    setObjectName("Widget");
     setMinimumSize(0, 0);
     setMouseTracking(true); //开启鼠标追踪
     setFocusPolicy(Qt::StrongFocus);    //可获得焦点
     setAutoFillBackground(true);
     setLayout(new QGridLayout);
     layout()->setMargin(1);
-    layout()->setSpacing(0);
+    layout()->setSpacing(0); 
 }
 
 
@@ -133,13 +134,13 @@ bool Widget::eventFilter(QObject *watched, QEvent *event)
 }
 void Widget::paintEvent(QPaintEvent *event)
 {
-    QPainter painter(this);
-    //绘制边框
-    painter.setPen(QColor(139, 139, 139));
-    painter.drawLine(0, 0, this->width() - 1, 0);
-    painter.drawLine(0, 0, 0, this->height() - 1);
-    painter.drawLine(this->width() - 1, 0, this->width() - 1, this->height() - 1);
-    painter.drawLine(0, this->height() - 1, this->width() - 1, this->height() - 1);
+//    QPainter painter(this);
+//    //绘制边框
+//    painter.setPen(QColor(139, 139, 139));
+//    painter.drawLine(0, 0, this->width() - 1, 0);
+//    painter.drawLine(0, 0, 0, this->height() - 1);
+//    painter.drawLine(this->width() - 1, 0, this->width() - 1, this->height() - 1);
+//    painter.drawLine(0, this->height() - 1, this->width() - 1, this->height() - 1);
 }
 
 void Widget::initPropertyTable()
@@ -224,9 +225,15 @@ void Widget::setBkColor(QColor BkColor)
 {
     m_BkColor = BkColor;
 
+    if (m_BkColor.alpha() == 0){
+       setStyleSheet("QWidget#Widget{background: transparent;}");
+    }
+
     QPalette palette(m_CentralWidget->palette());
     palette.setColor(QPalette::Window, BkColor);
     m_CentralWidget->setPalette(palette);
+
+    repaint();
 }
 
 QString Widget::getBkImage()
@@ -511,12 +518,15 @@ void BuildInfo::readCharList()
 }
 uint BuildInfo::QColorToEColor(QColor color)
 {
-    uint rgb = color.rgb();
-    //qDebug()<<QString::number(rgb, 16);
-    //互换rb颜色
-    rgb = ((rgb & 0x000000ff) << 16) | (rgb & 0x0000ff00) | ((rgb & 0x00ff0000) >> 16);
-    //qDebug()<<QString::number(rgb, 16);
-    return rgb;
+    uint rgba = color.rgba();
+    qDebug()<<QString::number(rgba, 16);
+    //r从FF->00
+    rgba = ((color.red() << 0) |
+            (color.green() << 8) |
+            (color.blue() << 16) |
+            ((0x000000FF - color.alpha()) << 24));
+    qDebug()<<QString::number(rgba, 16);
+    return rgba;
 }
 int BuildInfo::QAlignToEAlign(int align)
 {
@@ -581,10 +591,10 @@ char *BuildInfo::QStringToMultBytes(QString str)
 
 char *BuildInfo::QStringToLuaChar(QString str)
 {
-    int address = START_ADDR_SDRAM_LUA + luaBuf.pos;
-
+    int address = 0;
     int RealLen = str.toLocal8Bit().length();
-    if (RealLen>0){
+    if (RealLen > 0){
+        address = START_ADDR_SDRAM_LUA + luaBuf.pos;
         memcpy(&luaBuf.buf[luaBuf.pos], str.toLocal8Bit().data(), RealLen);
         luaBuf.pos += RealLen;
         luaBuf.buf[luaBuf.pos++] = '\n';
@@ -703,8 +713,13 @@ void BuildInfo::GraphToEgraph(Widget *w, GraphInfo *graphinfo)
     case Line:
         graphinfo->x = w->getLineStart().x();
         graphinfo->y = w->getLineStart().y();
-        graphinfo->width = w->getLineLength();
-        graphinfo->height = w->getLineLength();
+        if (w->getLineType() == 0){ //水平线
+            graphinfo->width = w->getLineLength();
+            graphinfo->height = 0;
+        }else{
+            graphinfo->width = 0;
+            graphinfo->height = w->getLineLength();
+        }
         graphinfo->radius = w->getLineLength();
         break;
     case Rect:
@@ -735,13 +750,11 @@ void BuildInfo::GraphToEgraph(Widget *w, GraphInfo *graphinfo)
 
 void BuildInfo::downLoadInfo()
 {
-//    if (com->OpenSerial()){
-//        downloadStep = 0;
-//        ResProgress_slt(101);
-//    }else{
-//        writeBufToTxt();
-//    }
-
+    imageBuf.pos = 0;
+    if (com->OpenSerial()){
+        downloadStep = 0;
+        ResProgress_slt(101);
+    }
     writeBufToTxt();
 }
 
@@ -827,42 +840,58 @@ void BuildInfo::ResProgress_slt(int pos, QString msg)
             //擦除20K，下载地址，下载窗体数据包
             erase = 0x5c;
             address = START_ADDR_FLASH_WIDGET;
-            byte.resize(widgetBuf.pos);
-            for(int i=0;i<widgetBuf.pos;i++) {
-                byte[i] = widgetBuf.buf[i];
+            if (widgetBuf.pos > 0){
+                byte.resize(widgetBuf.pos);
+                for(int i=0;i<widgetBuf.pos;i++) {
+                    byte[i] = widgetBuf.buf[i];
+                }
+                emit DownLoad_sig(erase, address, byte);
+                break;
+            }else{
+                downloadStep++;
             }
-            emit DownLoad_sig(erase, address, byte);
-            break;
         case 2:
             //擦除20K，下载地址，下载文本数据包
             erase = 0x5c;
             address = START_ADDR_FLASH_STRING;
-            byte.resize(stringBuf.pos+100);
-            for(int i=0;i<byte.count();i++) {
-                byte[i] = stringBuf.buf[i];
+            if (stringBuf.pos > 0){
+                byte.resize(stringBuf.pos+100);
+                for(int i=0;i<byte.count();i++) {
+                    byte[i] = stringBuf.buf[i];
+                }
+                emit DownLoad_sig(erase, address, byte);
+                break;
+            }else{
+                downloadStep++;
             }
-            emit DownLoad_sig(erase, address, byte);
-            break;
         case 3:
             //擦除20K，下载地址，下载文本数据包
             erase = 0x5c;
             address = START_ADDR_FLASH_LUA;
-            byte.resize(luaBuf.pos);
-            for(int i=0;i<luaBuf.pos;i++) {
-                byte[i] = luaBuf.buf[i];
+            if (luaBuf.pos > 0){
+                byte.resize(luaBuf.pos);
+                for(int i=0;i<luaBuf.pos;i++) {
+                    byte[i] = luaBuf.buf[i];
+                }
+                emit DownLoad_sig(erase, address, byte);
+                break;
+            }else{
+                downloadStep++;
             }
-            emit DownLoad_sig(erase, address, byte);
-            break;
         case 4:
             //擦除20K，下载地址，下载文本数据包
             erase = 0x5f;   //252K
             address = START_ADDR_FLASH_IMAGE;
-            byte.resize(imageBuf.pos);
-            for(int i=0;i<imageBuf.pos;i++) {
-                byte[i] = imageBuf.buf[i];
+            if (imageBuf.pos > 0){
+                byte.resize(imageBuf.pos);
+                for(int i=0;i<imageBuf.pos;i++) {
+                    byte[i] = imageBuf.buf[i];
+                }
+                emit DownLoad_sig(erase, address, byte);
+                break;
+            }else{
+                downloadStep++;
             }
-            emit DownLoad_sig(erase, address, byte);
-            break;
         default:
             break;
         }

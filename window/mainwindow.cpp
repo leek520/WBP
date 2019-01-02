@@ -417,7 +417,8 @@ bool MainWindow::saveProjectFile(QString &filename)
     for(int i=0;i<winList.count();i++){
         QDomElement winDom = widgetToDom(winList[i], root);
 
-        QWidgetList childList = winList[i]->getChildList(0);
+        //这里优先保存图形控件
+        QWidgetList childList = winList[i]->getChildList(2);
         for(int j=0;j<childList.count();j++){
             widgetToDom((Widget *)childList[j], winDom);
         }
@@ -425,7 +426,7 @@ bool MainWindow::saveProjectFile(QString &filename)
         for(int j=0;j<childList.count();j++){
             widgetToDom((Widget *)childList[j], winDom);
         }
-        childList = winList[i]->getChildList(2);
+        childList = winList[i]->getChildList(0);
         for(int j=0;j<childList.count();j++){
             widgetToDom((Widget *)childList[j], winDom);
         }
@@ -464,7 +465,6 @@ bool MainWindow::openProjectFile(QString &filename)
 
             childNode = childNode.nextSibling();
         }
-
         winNode = winNode.nextSibling();
     }
     return true;
@@ -771,6 +771,7 @@ void MainWindow::setTextInfo(Widget *w, TextPara *text)
 void MainWindow::build()
 {
     m_dockBottom->show();
+    m_bottomW->clear();
     m_bottomW->insertMessage(tr("Build init!"));
 
     buildInfo->initBuild();
