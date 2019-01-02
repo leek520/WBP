@@ -22,5 +22,7 @@
         <file alias="image">images/graph/image.png</file>
         <file alias="line">images/graph/line.png</file>
         <file alias="rect">images/graph/rect.png</file>
+        <file alias="textListAdd">images/dialog/add.png</file>
+        <file alias="textListRemove">images/dialog/remove.png</file>
     </qresource>
 </RCC>

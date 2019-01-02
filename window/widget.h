@@ -6,6 +6,8 @@
 #include <QPair>
 #include <QDate>
 #include <QRectF>
+#include <QAction>
+#include <QMessageBox>
 #include "common.h"
 #include "comobject.h"
 
@@ -56,10 +58,17 @@ class Widget : public QWidget
     Q_PROPERTY(QColor BkColor READ getBkColor WRITE setBkColor)
     Q_PROPERTY(QColor BkPressColor READ getBkPressColor WRITE setBkPressColor)
     Q_PROPERTY(QColor BkDisableColor READ getBkDisableColor WRITE setBkDisableColor)
-    Q_PROPERTY(QString String READ getString WRITE setString)
+    Q_PROPERTY(QString String READ getTextString WRITE setTextString)
     Q_PROPERTY(QColor TextColor READ getTextColor WRITE setTextColor)
     Q_PROPERTY(int AlignH READ getAlignH WRITE setAlignH)
     Q_PROPERTY(int AlignV READ getAlignV WRITE setAlignV)
+    Q_PROPERTY(int TextType READ getTextType WRITE setTextType)
+    Q_PROPERTY(int TextMaxLen READ getTextMaxLen WRITE setTextMaxLen)
+    Q_PROPERTY(int TextRegAddress READ getTextRegAddress WRITE setTextRegAddress)
+    Q_PROPERTY(int TextDotBef READ getTextDotBef WRITE setTextDotBef)
+    Q_PROPERTY(int TextDotAft READ getTextDotAft WRITE setTextDotAft)
+    Q_PROPERTY(QStringList TextStringList READ getTextStringList WRITE setTextStringList)
+
 
     Q_PROPERTY(QString BkImage READ getBkImage WRITE setBkImage)
     Q_PROPERTY(QPoint ImagePos READ getImagePos WRITE setImagePos)
@@ -81,8 +90,10 @@ class Widget : public QWidget
     Q_PROPERTY(QVariant BkColor1 READ getBkColor1 WRITE setBkColor1)
 public:
     explicit Widget(QWidget *parent = 0);
+    ~Widget();
     QList<QPair<QVariant::Type, QString> > getPropertyTable();
     void setPosProperty();
+    void addContexMenuAction(QAction *action);
 private:
     int assignId();
 
@@ -96,16 +107,19 @@ protected:
     void virtual initPropertyTable();
     void virtual initCenterWidget();
     void virtual initParament();
+    void virtual createContexMenu();
 signals:
-    void MouseButtonDblClick(QWidget *w);
+    void MouseButtonDblClick(Widget *w);
     void currentItemChanged(Widget *w);
+
 private:
     QPoint dragPosition;   //鼠标拖动的位置
     static QMap<int, int> m_IdPool;
-
 protected:
     QList<QPair<QVariant::Type, QString> > m_propTable;
     QLabel *m_CentralWidget;
+    QMenu *m_ContextMenu;
+
 public:
     int getId();
     void setId(int Id);
@@ -161,8 +175,8 @@ public:
     QColor getBkDisableColor();
     void setBkDisableColor(QColor BkColor);
 
-    QString getString();
-    void setString(QString String);
+    QString getTextString();
+    void setTextString(QString String);
 
     QColor getTextColor();
     void setTextColor(QColor TextColor);
@@ -172,6 +186,24 @@ public:
 
     int getAlignV();
     void setAlignV(int Align);
+
+    int getTextType();
+    void setTextType(int value);
+
+    int getTextMaxLen();
+    void setTextMaxLen(int value);
+
+    int getTextRegAddress();
+    void setTextRegAddress(int value);
+
+    int getTextDotBef();
+    void setTextDotBef(int value);
+
+    int getTextDotAft();
+    void setTextDotAft(int value);
+
+    QStringList getTextStringList();
+    void setTextStringList(QStringList String);
 
     QVariant getBkColor1();
     void virtual setBkColor1(QVariant bkColor);
@@ -190,7 +222,14 @@ protected:
     int m_AlignH;
     int m_AlignV;
     QColor m_TextColor;
-    QString m_String;
+    int m_TextType      ;
+    int m_TextMaxLen    ;
+    int m_TextRegAddress;
+    int m_TextDotBef    ;
+    int m_TextDotAft    ;
+    QString m_TextString;
+    QStringList m_TextStringList;
+
     QString m_LudCmd;
 
     int m_LineType;
@@ -232,6 +271,7 @@ public:
     uint QColorToEColor(QColor color);
     int QAlignToEAlign(int align);
     char *QStringToMultBytes(QString str);
+    char *QStringListToMultBytes(QStringList strList, int maxLen);
     char *QStringToLuaChar(QString str);
     void QImageToEImage(QString filename, QPoint leftTop, ImageInfo *imageinfo);
     void GraphToEgraph(Widget *w, GraphInfo *graphinfo);

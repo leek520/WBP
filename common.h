@@ -90,7 +90,7 @@ typedef enum _eWidgetType
 typedef enum _eTextType
 {
     String,
-    Number,
+    RegVaule,
     StringList,
 }TextType;
 
@@ -109,6 +109,11 @@ typedef struct _tBasePara
 /*********ÎÄ±¾ÐÅÏ¢½á¹¹************/
 typedef struct _tTextPara
 {
+    ushort type;
+    ushort maxLen;
+    ushort regAdress;
+    uchar dotBef;
+    uchar dotAft;
     int alignment;
     int color;
     char *string;

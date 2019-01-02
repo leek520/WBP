@@ -1,4 +1,4 @@
-#include "imagewidget.h"
+﻿#include "imagewidget.h"
 
 ImageWidget::ImageWidget(QWidget *parent) :
     Widget(parent)

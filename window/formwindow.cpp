@@ -227,7 +227,9 @@ void WindowWidget::focusChanged(QWidget *old, QWidget *now)
         if (Window == rw->getType()){
             m_curWin = (WindowWidget *)now;
         }else{
-            if (m_childList.indexOf(now) > -1){
+            if ((m_childList.indexOf(now) > -1) ||
+                (m_imageList.indexOf(now) > -1) ||
+                (m_graphList.indexOf(now) > -1)){
                 m_curWin = this;
                 now->raise();
             }

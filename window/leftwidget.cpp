@@ -18,6 +18,12 @@ LeftWidget::LeftWidget(QWidget *parent) :
             this, SLOT(currentItemChanged(QTreeWidgetItem*,QTreeWidgetItem*)));
 }
 
+void LeftWidget::setInit()
+{
+    m_objectTree->expandAll();
+    //m_objectTree->collapse();
+}
+
 void LeftWidget::addWidget(Widget *w)
 {
     //添加

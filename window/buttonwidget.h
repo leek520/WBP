@@ -1,4 +1,4 @@
-#ifndef BUTTONWIDGET_H
+﻿#ifndef BUTTONWIDGET_H
 #define BUTTONWIDGET_H
 
 #include "widget.h"
@@ -12,7 +12,7 @@ protected:
     void initPropertyTable();
     void initCenterWidget();
     void initParament();
-private:
+signals:
 };
 
 #endif // BUTTONWIDGET_H

@@ -1,16 +1,25 @@
 ﻿#include "widget.h"
 QMap<int, int> Widget::m_IdPool;
 Widget::Widget(QWidget *parent) :
-    QWidget(parent)
+    QWidget(parent),
+    m_ContextMenu(new QMenu())
 {
     setObjectName("Widget");
     setMinimumSize(0, 0);
     setMouseTracking(true); //开启鼠标追踪
     setFocusPolicy(Qt::StrongFocus);    //可获得焦点
     setAutoFillBackground(true);
+    setContextMenuPolicy(Qt::DefaultContextMenu);
     setLayout(new QGridLayout);
     layout()->setMargin(1);
-    layout()->setSpacing(0); 
+    layout()->setSpacing(0);
+
+}
+
+Widget::~Widget()
+{
+    delete m_CentralWidget;
+    delete m_ContextMenu;
 }
 
 
@@ -41,6 +50,7 @@ int Widget::assignId()
         id += GUI_ID_EDIT;
         break;
     default:
+        id = 0;
         break;
     }
     return id;
@@ -97,6 +107,11 @@ void Widget::setPosProperty()
     m_ImagePos = QPoint(rect.left(), rect.top());
 }
 
+void Widget::addContexMenuAction(QAction *action)
+{
+    m_ContextMenu->addAction(action);
+}
+
 bool Widget::eventFilter(QObject *watched, QEvent *event)
 {
     //处理鼠标事件
@@ -126,6 +141,9 @@ bool Widget::eventFilter(QObject *watched, QEvent *event)
              setFocus();
         }
         break;
+    case QEvent::ContextMenu:
+        m_ContextMenu->exec(QCursor::pos());
+        break;
     default:
         return QWidget::eventFilter(watched, event);
         break;
@@ -150,7 +168,7 @@ void Widget::initPropertyTable()
 
 void Widget::initCenterWidget()
 {
-    m_CentralWidget = new QLabel(this);
+    m_CentralWidget = new QLabel();
     m_CentralWidget->setFont(QFont("Times", 26, QFont::Normal));
     m_CentralWidget->setMinimumSize(0,0);
     m_CentralWidget->installEventFilter(this);
@@ -164,10 +182,15 @@ void Widget::initParament()
     m_Id = assignId();
     m_BkColor = m_CentralWidget->palette().color(QPalette::Window);
     m_BkPressColor = m_BkDisableColor = m_BkColor;
-    m_String = m_CentralWidget->text();
+    m_TextString = m_CentralWidget->text();
     m_TextColor = m_CentralWidget->palette().color(QPalette::WindowText);
     m_AlignH = (m_CentralWidget->alignment() & 0x0f) >> 1;
     m_AlignV = (m_CentralWidget->alignment() & 0xff) >> 6;
+
+}
+
+void Widget::createContexMenu()
+{
 
 }
 
@@ -396,17 +419,17 @@ void Widget::setBkDisableColor(QColor BkColor)
     m_BkDisableColor = BkColor;
 }
 
-QString Widget::getString()
+QString Widget::getTextString()
 {
-    return m_String;
+    return m_TextString;
 
 }
 
-void Widget::setString(QString String)
+void Widget::setTextString(QString String)
 {
-    m_String = String;
+    m_TextString = String;
 
-    m_CentralWidget->setText(m_String);
+    m_CentralWidget->setText(m_TextString);
 }
 
 QColor Widget::getTextColor()
@@ -447,6 +470,61 @@ void Widget::setAlignV(int Align)
     m_CentralWidget->setAlignment(Qt::Alignment((m_AlignV << 6) | (m_AlignH << 1)));
 }
 
+int Widget::getTextType()
+{
+    return m_TextType;
+}
+
+void Widget::setTextType(int value)
+{
+    m_TextType = value;
+}
+int Widget::getTextMaxLen()
+{
+    return m_TextMaxLen;
+}
+
+void Widget::setTextMaxLen(int value)
+{
+    m_TextMaxLen = value;
+}
+int Widget::getTextRegAddress()
+{
+    return m_TextRegAddress;
+}
+
+void Widget::setTextRegAddress(int value)
+{
+    m_TextRegAddress = value;
+}
+int Widget::getTextDotBef()
+{
+    return m_TextDotBef;
+}
+
+void Widget::setTextDotBef(int value)
+{
+    m_TextDotBef = value;
+}
+int Widget::getTextDotAft()
+{
+    return m_TextDotAft;
+}
+
+void Widget::setTextDotAft(int value)
+{
+    m_TextDotAft = value;
+}
+
+QStringList Widget::getTextStringList()
+{
+    return m_TextStringList;
+}
+
+void Widget::setTextStringList(QStringList String)
+{
+    m_TextStringList = String;
+}
 QString Widget::getLuaCmd()
 {
     return m_LudCmd;
@@ -565,7 +643,14 @@ char *BuildInfo::QStringToMultBytes(QString str)
                 qtmp = str.at(i);
                 num = qtmp.unicode();
             }else{
-                num = CHAR_START_UNICODE + m_charList.indexOf(str.at(i));
+                int charIdx = m_charList.indexOf(str.at(i));
+                if (charIdx > -1){
+                    num = CHAR_START_UNICODE + charIdx;
+                }else{
+                    QMessageBox::critical(0, tr("错误"), QString("字库不包含字符:%1.").arg(str.at(i)), QMessageBox::Yes, QMessageBox::Yes);
+                    return NULL;
+                }
+
             }
         }else{
             qtmp =(QChar)*q++;
@@ -586,6 +671,69 @@ char *BuildInfo::QStringToMultBytes(QString str)
     stringBuf.buf[stringBuf.pos++] = 0x00;
     stringBuf.buf[stringBuf.pos++] = 0x00;
 
+    return (char *)address;
+}
+
+char *BuildInfo::QStringListToMultBytes(QStringList strList, int maxLen)
+{
+    int address = START_ADDR_SDRAM_STRING + stringBuf.pos;
+
+    int i = 0;
+    QByteArray data;
+    const QChar *q = NULL;
+    QChar qtmp;
+    int num;
+    for(int k=0;k<strList.count();k++){
+        QString str = strList[k];
+        q = str.unicode();
+        int len = str.count();
+        if (len > 42){      //128/3
+            len = 42;
+        }
+        for(i=0;i<maxLen;i++)
+        {
+            if (i < len){
+                //第一步：先转unicode
+                QString Dstr = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+                if (1){   //全汉字字库的菜单
+                    if (Dstr.indexOf(str.at(i)) >= 0){  //如果为数字或者字母，则用原始的unicode码
+                        qtmp = str.at(i);
+                        num = qtmp.unicode();
+                    }else{
+                        int charIdx = m_charList.indexOf(str.at(i));
+                        if (charIdx > -1){
+                            num = CHAR_START_UNICODE + charIdx;
+                        }else{
+                            QMessageBox::critical(0, tr("错误"), QString("字库不包含字符:%1.").arg(str.at(i)), QMessageBox::Yes, QMessageBox::Yes);
+                            return NULL;
+                        }
+
+                    }
+                }else{
+                    qtmp =(QChar)*q++;
+                    num= qtmp.unicode();
+                }
+                quint8 hi = (quint8)(num >> 8);
+                quint8 lo = (quint8)(num);
+                data.append (hi);
+
+                data.append (lo);
+                //第二步：unicode转3字节码
+                stringBuf.buf[stringBuf.pos++] = 0xe0 | ((num >> 12) & 0xf);
+                stringBuf.buf[stringBuf.pos++] = 0x80 | ((num >> 6) & 0x3f);
+                stringBuf.buf[stringBuf.pos++] = 0x80 | ((num >> 0) & 0x3f);
+            }else{
+                //添加字符串结束标识符
+                stringBuf.buf[stringBuf.pos++] = 0x00;
+                stringBuf.buf[stringBuf.pos++] = 0x00;
+                stringBuf.buf[stringBuf.pos++] = 0x00;
+            }
+        }
+        //添加字符串结束标识符
+        stringBuf.buf[stringBuf.pos++] = 0x00;
+        stringBuf.buf[stringBuf.pos++] = 0x00;
+        stringBuf.buf[stringBuf.pos++] = 0x00;
+    }
     return (char *)address;
 }
 

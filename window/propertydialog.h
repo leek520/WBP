@@ -1,8 +1,9 @@
-#ifndef PROPERTYDIALOG_H
+﻿#ifndef PROPERTYDIALOG_H
 #define PROPERTYDIALOG_H
 
 #include <QDialog>
-
+#include <QColorDialog>
+#include "widget.h"
 namespace Ui {
 class PropertyDialog;
 }
@@ -14,9 +15,35 @@ class PropertyDialog : public QDialog
 public:
     explicit PropertyDialog(QWidget *parent = 0);
     ~PropertyDialog();
+    void showDialog(Widget *w);
+private slots:
+    void on_buttonBox_accepted();
 
+    void on_textType_currentIndexChanged(int index);
+
+    void on_textListAdd_clicked();
+
+    void on_textListRemove_clicked();
+
+    void on_textUp_clicked();
+
+    void on_textDown_clicked();
+
+    void on_textColor_clicked();
+
+    void on_textAlignH_currentIndexChanged(int index);
+
+    void on_textAlignV_currentIndexChanged(int index);
+
+    void on_textEdit_textChanged();
+private:
+    void initDialog();
+    void getStringList();
+    void setStringList();
 private:
     Ui::PropertyDialog *ui;
+    Widget *m_widget;
+    QString m_title;
 };
 
 #endif // PROPERTYDIALOG_H

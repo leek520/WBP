@@ -3,7 +3,8 @@
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     buildInfo(new BuildInfo()),
-    m_progressBar(new ProgressBar())
+    m_progressBar(new ProgressBar()),
+    m_propD(new PropertyDialog)
 {
     setWindowTitle(tr("WBP"));//设置窗口标题
     setWindowIcon(QIcon(":/mamtool.ico"));
@@ -467,6 +468,7 @@ bool MainWindow::openProjectFile(QString &filename)
         }
         winNode = winNode.nextSibling();
     }
+    //m_leftW->
     return true;
 }
 
@@ -762,9 +764,29 @@ void MainWindow::setBaseInfo(Widget *w, BasePara *base)
 
 void MainWindow::setTextInfo(Widget *w, TextPara *text)
 {
+    text->type = w->getTextType();
+    text->maxLen = w->getTextMaxLen();
+    text->regAdress = w->getTextRegAddress();
+    text->dotBef = w->getTextDotBef();
+    text->dotAft = w->getTextDotAft();
+
     text->color = buildInfo->QColorToEColor(w->getTextColor());
     text->alignment = buildInfo->QAlignToEAlign((w->getAlignH() << 1) | (w->getAlignV() << 6));
-    text->string = buildInfo->QStringToMultBytes(w->getString());
+
+    switch (text->type) {
+    case String:
+        text->string = buildInfo->QStringToMultBytes(w->getTextString());
+        break;
+    case RegVaule:
+        text->string = NULL;
+        break;
+    case StringList:
+        text->string = buildInfo->QStringListToMultBytes(w->getTextStringList(), w->getTextMaxLen());
+        break;
+    default:
+        break;
+    }
+
 
 }
 
@@ -889,10 +911,9 @@ void MainWindow::ResProgress_slt(int step, int pos, QString msg)
     }
 }
 
-void MainWindow::MouseButtonDblClick(QWidget *w)
+void MainWindow::MouseButtonDblClick(Widget *w)
 {
-    m_propD = new PropertyDialog(this);
-    m_propD->show();
+    m_propD->showDialog(w);
 }
 
 void MainWindow::addWidget()
@@ -923,8 +944,8 @@ Widget* MainWindow::addWidget(WidgetType type)
                 m_leftW, SLOT(removeWidgetSlt(Widget*)));
         connect(win, SIGNAL(currentItemChanged(Widget*)),
                 m_leftW, SLOT(currentItemChanged(Widget*)));
-        connect(win, SIGNAL(MouseButtonDblClick(QWidget*)),
-                this, SLOT(MouseButtonDblClick(QWidget*)));
+        connect(win, SIGNAL(MouseButtonDblClick(Widget*)),
+                this, SLOT(MouseButtonDblClick(Widget*)));
         connect(win, SIGNAL(addWidgetSgn(WidgetType,QPoint)),
                 this, SLOT(addWidgetSlt(WidgetType,QPoint)));
 
@@ -945,6 +966,7 @@ Widget* MainWindow::addWidget(WidgetType type)
     case Button:
         create = new ButtonWidget(WindowWidget::m_curWin);
         create->resize(WidgetWidth, WidgetHeight);
+        //create->addContexMenuAction(removeAct);
         break;
     case Text:
         create = new TextWidget(WindowWidget::m_curWin);
@@ -980,8 +1002,8 @@ Widget* MainWindow::addWidget(WidgetType type)
             m_propW, SLOT(currentItemChanged(Widget*)));
     connect(create, SIGNAL(currentItemChanged(Widget*)),
             m_leftW, SLOT(currentItemChanged(Widget*)));
-    connect(create, SIGNAL(MouseButtonDblClick(QWidget*)),
-            this, SLOT(MouseButtonDblClick(QWidget*)));
+    connect(create, SIGNAL(MouseButtonDblClick(Widget*)),
+            this, SLOT(MouseButtonDblClick(Widget*)));
     m_leftW->addWidget(create);
     return create;
 

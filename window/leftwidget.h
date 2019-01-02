@@ -13,6 +13,7 @@ public:
     QSize sizeHint() const {
         return QSize(250, 200);
     }
+    void setInit();
 signals:
 
 private:

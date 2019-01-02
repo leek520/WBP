@@ -62,7 +62,7 @@ private slots:
     void setCom();
 
     void ResProgress_slt(int step, int pos, QString msg="");
-    void MouseButtonDblClick(QWidget *w);
+    void MouseButtonDblClick(Widget *w);
     void addWidget();
     void addWidgetSlt(WidgetType type, QPoint pos);
     Widget* addWidget(WidgetType type);

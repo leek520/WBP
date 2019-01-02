@@ -1,4 +1,4 @@
-#include "buttonwidget.h"
+﻿#include "buttonwidget.h"
 
 ButtonWidget::ButtonWidget(QWidget *parent) :
     Widget(parent)
@@ -6,6 +6,7 @@ ButtonWidget::ButtonWidget(QWidget *parent) :
     initPropertyTable();
     initCenterWidget();
     initParament();
+    createContexMenu();
 }
 
 void ButtonWidget::initPropertyTable()
@@ -40,4 +41,5 @@ void ButtonWidget::initParament()
     m_Type = Button;
     Widget::initParament();
 }
+
 
