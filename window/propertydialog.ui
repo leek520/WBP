@@ -184,7 +184,7 @@
          <item row="1" column="0">
           <widget class="QLabel" name="label">
            <property name="text">
-            <string>字体类型</string>
+            <string>字体大小</string>
            </property>
           </widget>
          </item>
@@ -192,22 +192,22 @@
           <widget class="QComboBox" name="textFont">
            <item>
             <property name="text">
-             <string>宋体_32</string>
+             <string>32</string>
             </property>
            </item>
            <item>
             <property name="text">
-             <string>宋体_24</string>
+             <string>24</string>
             </property>
            </item>
            <item>
             <property name="text">
-             <string>宋体_16</string>
+             <string>16</string>
             </property>
            </item>
            <item>
             <property name="text">
-             <string>宋体_8</string>
+             <string>8</string>
             </property>
            </item>
           </widget>

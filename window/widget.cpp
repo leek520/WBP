@@ -1,5 +1,6 @@
 ﻿#include "widget.h"
 QMap<int, int> Widget::m_IdPool;
+int Widget::m_curLan = 0;
 Widget::Widget(QWidget *parent) :
     QWidget(parent),
     m_ContextMenu(new QMenu())
@@ -199,11 +200,39 @@ void Widget::initParament()
     m_TextDotAft = 0;
     m_TextDotAft = 0;
     m_TextMaxLen = 128;
+
+    for(int i=0;i<LAN_NUM;i++){
+        m_TextString.append("");
+        m_TextStringList.append(QStringList());
+    }
 }
 
 void Widget::createContexMenu()
 {
 
+}
+
+void Widget::refresh()
+{
+    switch (m_TextType) {
+    case 0:
+        setTextString(m_TextString[Widget::m_curLan]);
+        break;
+    case 1:
+        setTextString("0000");
+        break;
+    case 2:
+        if (m_TextStringList[Widget::m_curLan].count() == 0){
+           setTextString("");
+        }else{
+            setTextString(m_TextStringList[Widget::m_curLan].first());
+        }
+        break;
+    default:
+        break;
+    }
+
+    update();
 }
 
 void Widget::keyPressEvent(QKeyEvent *event)
@@ -434,15 +463,15 @@ void Widget::setBkDisableColor(QColor BkColor)
 
 QString Widget::getTextString()
 {
-    return m_TextString;
+    return m_TextString[Widget::m_curLan];
 
 }
 
 void Widget::setTextString(QString String)
 {
-    m_TextString = String;
+    m_TextString[Widget::m_curLan] = String;
 
-    m_CentralWidget->setText(m_TextString);
+    m_CentralWidget->setText(String);
 }
 
 QColor Widget::getTextColor()
@@ -491,6 +520,7 @@ int Widget::getTextType()
 void Widget::setTextType(int value)
 {
     m_TextType = value;
+    refresh();
 }
 
 int Widget::getTextFont()
@@ -541,12 +571,12 @@ void Widget::setTextDotAft(int value)
 
 QStringList Widget::getTextStringList()
 {
-    return m_TextStringList;
+    return m_TextStringList[Widget::m_curLan];
 }
 
 void Widget::setTextStringList(QStringList String)
 {
-    m_TextStringList = String;
+    m_TextStringList[Widget::m_curLan] = String;
 }
 QString Widget::getLuaCmd()
 {
@@ -605,6 +635,7 @@ void BuildInfo::initBuild()
     memset(imageBuf.buf, 0, ImageLen);
     imageBuf.pos = 0;
 
+    m_CharRecord = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 }
 
 void BuildInfo::setEnumProperty(QMap<QString, QStringList> *enumMap)
@@ -626,6 +657,7 @@ void BuildInfo::readCharList()
     }
     QTextStream input(&file);
     m_charList = input.readAll();
+
     file.close();
 }
 uint BuildInfo::QColorToEColor(QColor color)
@@ -764,10 +796,6 @@ char *BuildInfo::QStringListToMultBytes(QStringList strList, int maxLen)
                 stringBuf.buf[stringBuf.pos++] = 0x00;
             }
         }
-        //添加字符串结束标识符
-        stringBuf.buf[stringBuf.pos++] = 0x00;
-        stringBuf.buf[stringBuf.pos++] = 0x00;
-        stringBuf.buf[stringBuf.pos++] = 0x00;
     }
     return (char *)address;
 }
@@ -946,17 +974,13 @@ bool BuildInfo::compareUnicode(QChar &a, QChar &b)
 void BuildInfo::SortRecordChar()
 {
     qSort(m_CharRecord.begin(), m_CharRecord.end(), compareUnicode);
-    m_CharRecord = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
-                  + m_CharRecord;
-
-
 }
 void BuildInfo::FontToChar(int fontType)
 {
 
-    QStringList fontStr = propertyEnum->value(QString("TextFont"))[fontType].split("_");;
-    if (fontStr.count()!=2) return;
-    int fontSize = fontStr[1].toInt();
+    QString fontStr = propertyEnum->value(QString("TextFont"))[fontType];
+
+    int fontSize = fontStr.toInt();
     //GUI_FONT_PROP结构体信息
     int startAddr = START_ADDR_SDRAM_CHAR + charBuf.pos;
     GUI_FONT_PROP *fontProp = (GUI_FONT_PROP *)(charBuf.buf + charBuf.pos);
@@ -990,7 +1014,6 @@ void BuildInfo::FontToChar(int fontType)
 
     QFont font;
     font.setPixelSize(fontSize);
-    font.setFamily(fontStr[0]);
     QFontMetrics fm(font);
     int charWidth;
     int charHeight = fm.height();;
@@ -1027,12 +1050,14 @@ void BuildInfo::FontToChar(int fontType)
         painter.setPen(pen);
         painter.setFont(font);
 
+        //防止锯齿
+        painter.setRenderHint(QPainter::TextAntialiasing, true);
         painter.drawText(image.rect(), Qt::AlignCenter, m_CharRecord.at(i));
         //image.save("123.bmp");
 
         QColor color;
         int value = 0;
-        qDebug()<<charWidth<<charHeight;
+        //qDebug()<<charWidth<<charHeight;
         for(int j=0;j<charHeight;j++){
             for(int t=0;t<charWidth-7;t=t+8){
                 value = 0;

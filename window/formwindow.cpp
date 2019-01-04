@@ -104,7 +104,26 @@ void WindowWidget::removeWidget(QWidget *w)
         }
         delete w;
         resetCurrentWidget();
-    } 
+    }
+}
+
+void WindowWidget::refreshAll()
+{
+    for(int i=0;i<m_windowList.count();i++){
+        QWidgetList childList = m_windowList[i]->getChildList(2);
+        for(int j=0;j<childList.count();j++){
+            ((Widget *)childList[j])->refresh();
+        }
+        childList = m_windowList[i]->getChildList(1);
+        for(int j=0;j<childList.count();j++){
+            ((Widget *)childList[j])->refresh();
+        }
+        childList = m_windowList[i]->getChildList(0);
+        for(int j=0;j<childList.count();j++){
+            ((Widget *)childList[j])->refresh();
+        }
+        m_windowList[i]->repaint();
+    }
 }
 
 void WindowWidget::resetCurrentWidget()
@@ -280,7 +299,7 @@ void ProgressBar::setValue(int step, int pos)
     }else{
        show();
     }
-
+    if (pos>100) pos = 100;
     m_progress->setFormat(QString("%1%").arg(pos));
     m_progress->setValue(pos);
     m_progresstext->setText(QString("%1/%2").arg(step).arg(m_maxStep));

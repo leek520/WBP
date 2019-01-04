@@ -27,8 +27,9 @@ void TextWidget::initPropertyTable()
 
 void TextWidget::initParament()
 {
+
+    Widget::initParament();
     m_Type = Text;
     setTextString("text");
-    Widget::initParament();
 }
 

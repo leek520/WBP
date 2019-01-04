@@ -17,8 +17,8 @@ void ImageWidget::initPropertyTable()
 
 void ImageWidget::initParament()
 {
-    m_Type = Image;
     Widget::initParament();
+    m_Type = Image;
 }
 
 void ImageWidget::paintEvent(QPaintEvent *event)
@@ -64,6 +64,7 @@ void LineWidget::initPropertyTable()
 
 void LineWidget::initParament()
 {
+    Widget::initParament();
     m_Type = Line;
     m_LineType = 0;
     QRect rect = this->frameGeometry();
@@ -105,6 +106,7 @@ void RectWidget::initPropertyTable()
 
 void RectWidget::initParament()
 {
+    Widget::initParament();
     m_Type = Rect;
     m_Rectangle = this->frameGeometry();
     m_Radius = 0;
@@ -147,6 +149,7 @@ void CircleWidget::initPropertyTable()
 
 void CircleWidget::initParament()
 {
+    Widget::initParament();
     m_Type = Circle;
     QRect rect = this->frameGeometry();
     m_Center = rect.center();

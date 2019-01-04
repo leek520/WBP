@@ -97,6 +97,7 @@ public:
     QList<QPair<QVariant::Type, QString> > getPropertyTable();
     void setPosProperty();
     void addContexMenuAction(QAction *action);
+    void refresh();
 private:
     int assignId();
 
@@ -111,18 +112,20 @@ protected:
     void virtual initCenterWidget();
     void virtual initParament();
     void virtual createContexMenu();
+
 signals:
     void MouseButtonDblClick(Widget *w);
     void currentItemChanged(Widget *w);
 
 private:
     QPoint dragPosition;   //鼠标拖动的位置
-    static QMap<int, int> m_IdPool;
+    static QMap<int, int> m_IdPool;   
 protected:
     QList<QPair<QVariant::Type, QString> > m_propTable;
     QLabel *m_CentralWidget;
     QMenu *m_ContextMenu;
-
+public:
+    static int m_curLan;
 public:
     int getId();
     void setId(int Id);
@@ -234,8 +237,8 @@ protected:
     int m_TextRegAddress;
     int m_TextDotBef    ;
     int m_TextDotAft    ;
-    QString m_TextString;
-    QStringList m_TextStringList;
+    QStringList m_TextString;
+    QList<QStringList> m_TextStringList;
 
     QString m_LudCmd;
 

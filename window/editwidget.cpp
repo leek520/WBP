@@ -43,7 +43,8 @@ void EditWidget::initCenterWidget()
 }
 void EditWidget::initParament()
 {
-    m_Type = Edit;
-    m_TextString = "";
+
     Widget::initParament();
+    m_Type = Edit;
+    setTextString("0000");
 }

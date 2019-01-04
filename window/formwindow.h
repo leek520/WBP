@@ -15,7 +15,7 @@ public:
     explicit WindowWidget(QWidget *parent = 0);
     void addWidget(QWidget *w);
     void removeWidget(QWidget *w);
-
+    static void refreshAll();
     QWidgetList getChildList(int type=0);
     static QList<WindowWidget *> getWindowList();
 signals:

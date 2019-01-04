@@ -35,7 +35,9 @@ void ButtonWidget::initCenterWidget()
     m_CentralWidget = new QLabel(this);
     m_CentralWidget->setLineWidth(1);
     m_CentralWidget->setFrameStyle(QFrame::WinPanel | QFrame::Raised);
-    m_CentralWidget->setFont(QFont("Times", 26, QFont::Normal));
+    QFont font;
+    font.setPixelSize(32);
+    m_CentralWidget->setFont(font);
     m_CentralWidget->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
     m_CentralWidget->installEventFilter(this);
     m_CentralWidget->setAutoFillBackground(true);
@@ -45,10 +47,9 @@ void ButtonWidget::initCenterWidget()
 
 void ButtonWidget::initParament()
 {
+    Widget::initParament();
     m_Type = Button;
     setTextString("button");
-
-    Widget::initParament();
 }
 
 

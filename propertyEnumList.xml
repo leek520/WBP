@@ -16,9 +16,9 @@
 		<enum2 value="StringList"/>
 	</TextType>
 	<TextFont>
-		<enum0 value="宋体_32"/>
-		<enum1 value="宋体_24"/>
-		<enum2 value="宋体_16"/>
-		<enum2 value="宋体_8"/>
+		<enum0 value="32"/>
+		<enum1 value="24"/>
+		<enum2 value="16"/>
+		<enum2 value="8"/>
 	</TextFont>
 </Property>

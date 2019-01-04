@@ -126,7 +126,7 @@ void MainWindow::createActions()
     connect(removeAct, SIGNAL(triggered()), this, SLOT(remove()));
 
     /****set****/
-    setComAct = new QAction(QIcon(":/images/about.png"), tr("&SetCom"), this);
+    setComAct = new QAction(QIcon(":/set"), tr("&SetCom"), this);
     setComAct->setStatusTip(tr(""));
     connect(setComAct, SIGNAL(triggered()), this, SLOT(setCom()));
 
@@ -136,14 +136,30 @@ void MainWindow::createActions()
     connect(aboutAct, SIGNAL(triggered()), this, SLOT(about()));
 
     /****build****/
-    buildAct = new QAction(QIcon(":/images/build.png"), tr("&Build"), this);
+    buildAct = new QAction(QIcon(":/build"), tr("&Build"), this);
     buildAct->setStatusTip(tr("Build"));
     connect(buildAct, SIGNAL(triggered()), this, SLOT(build()));
 
-    downAct = new QAction(QIcon(":/images/download.png"), tr("&Download"), this);
-    downAct->setStatusTip(tr("Download"));
-    connect(downAct, SIGNAL(triggered()), this, SLOT(download()));
+    downloadAct = new QAction(QIcon(":/download"), tr("&Download"), this);
+    downloadAct->setStatusTip(tr("Download"));
+    connect(downloadAct, SIGNAL(triggered()), this, SLOT(download()));
 
+    simstartAct = new QAction(QIcon(":/simstart"), tr("&simstart"), this);
+    simstartAct->setStatusTip(tr("simstart"));
+    connect(simstartAct, SIGNAL(triggered()), this, SLOT(simStart()));
+
+    simstopAct = new QAction(QIcon(":/simstop"), tr("&simstop"), this);
+    simstopAct->setStatusTip(tr("simstop"));
+    connect(simstopAct, SIGNAL(triggered()), this, SLOT(simStop()));
+
+    //tools
+    lan_nextAct = new QAction(QIcon(":/lan_next"), tr("&lan_next"), this);
+    lan_nextAct->setStatusTip(tr("lan_next"));
+    connect(lan_nextAct, SIGNAL(triggered()), this, SLOT(lanNext()));
+
+    lan_prevAct = new QAction(QIcon(":/lan_prev"), tr("&lan_prev"), this);
+    lan_prevAct->setStatusTip(tr("lan_prev"));
+    connect(lan_prevAct, SIGNAL(triggered()), this, SLOT(lanPrev()));
 
     /****widget****/
     QAction *act = new QAction(QIcon(":/window"), tr("window"), this);
@@ -211,12 +227,18 @@ void MainWindow::createMenus()
     editMenu->addAction(pasteAct);
     editMenu->addAction(removeAct);
 
-    setMenu = menuBar()->addMenu(tr("&Set"));
-    setMenu->addAction(setComAct);
+    settingMenu = menuBar()->addMenu(tr("&Setting"));
+    settingMenu->addAction(setComAct);
+
+    settingMenu = menuBar()->addMenu(tr("&Setting"));
+    settingMenu->addAction(setComAct);
+
 
     buildMenu = menuBar()->addMenu(tr("&Build"));
     buildMenu->addAction(buildAct);
-    buildMenu->addAction(downAct);
+    buildMenu->addAction(downloadAct);
+    buildMenu->addAction(simstartAct);
+    buildMenu->addAction(simstopAct);
 
     menuBar()->addSeparator();
 
@@ -239,10 +261,16 @@ void MainWindow::createToolBars()
     editToolBar->addAction(pasteAct);
     editToolBar->addAction(removeAct);
 
+    settingToolBar = addToolBar(tr("Setting"));
+    settingToolBar->addAction(setComAct);
+    settingToolBar->addAction(lan_prevAct);
+    settingToolBar->addAction(lan_nextAct);
 
     buildToolBar = addToolBar(tr("Build"));
     buildToolBar->addAction(buildAct);
-    buildToolBar->addAction(downAct);
+    buildToolBar->addAction(downloadAct);
+    buildToolBar->addAction(simstartAct);
+    buildToolBar->addAction(simstopAct);
 
     addToolBarBreak(Qt::TopToolBarArea);
 
@@ -810,28 +838,32 @@ void MainWindow::setTextInfo(Widget *w, TextPara *text)
 {
     text->type = w->getTextType();
     text->font = w->getTextFont();
-    text->maxLen = w->getTextMaxLen();
-    text->regAdress = w->getTextRegAddress();
-    text->dotBef = w->getTextDotBef();
-    text->dotAft = w->getTextDotAft();
-
     text->color = m_buildInfo->QColorToEColor(w->getTextColor());
     text->alignment = m_buildInfo->QAlignToEAlign((w->getAlignH() << 1) | (w->getAlignV() << 6));
 
-    switch (text->type) {
-    case String:
-        text->string = m_buildInfo->QStringToMultBytes(w->getTextString());
-        break;
-    case RegVaule:
-        text->string = NULL;
-        break;
-    case StringList:
-        text->string = m_buildInfo->QStringListToMultBytes(w->getTextStringList(), w->getTextMaxLen());
-        break;
-    default:
-        break;
-    }
+    text->maxLen = w->getTextMaxLen();
+    text->regAdress = w->getTextRegAddress();
+    text->dot.bef = w->getTextDotBef();
+    text->dot.aft = w->getTextDotAft();
 
+    int curLan = Widget::m_curLan;
+    for(int i=0;i<LAN_NUM;i++){
+        Widget::m_curLan = i;
+        switch (text->type) {
+        case String:
+            text->string[i] = m_buildInfo->QStringToMultBytes(w->getTextString());
+            break;
+        case RegVaule:
+            text->string[i] = NULL;
+            break;
+        case StringList:
+            text->string[i] = m_buildInfo->QStringListToMultBytes(w->getTextStringList(), text->maxLen);
+            break;
+        default:
+            break;
+        }
+    }
+    Widget::m_curLan = curLan;
 
 }
 
@@ -857,6 +889,9 @@ void MainWindow::recordUsedChar()
 }
 void MainWindow::build()
 {
+    QList<WindowWidget *> winList = WindowWidget::getWindowList();
+    if (winList.isEmpty()) return;
+
     m_dockBottom->show();
     m_bottomW->clear();
     m_bottomW->insertMessage(tr("Build init!"));
@@ -876,7 +911,7 @@ void MainWindow::build()
 
     widgetBuf->pos += sizeof(struct list_head);
 
-    QList<WindowWidget *> winList = WindowWidget::getWindowList();
+
     for(int i=0;i<winList.count();i++){
         WindowWidget *win = winList[i];
 
@@ -950,12 +985,36 @@ void MainWindow::build()
 void MainWindow::download()
 {
     m_buildInfo->downLoadInfo();
+
+    m_bottomW->insertMessage(tr("Download sucess!"));
 }
 
 void MainWindow::setCom()
 {
     m_comD = new ComDialog(this);
     m_comD->show();
+}
+
+void MainWindow::simStart()
+{
+
+}
+
+void MainWindow::simStop()
+{
+
+}
+
+void MainWindow::lanNext()
+{
+    Widget::m_curLan = (Widget::m_curLan == (LAN_NUM-1)) ? (0):(Widget::m_curLan+1);
+    WindowWidget::refreshAll();
+}
+
+void MainWindow::lanPrev()
+{
+    Widget::m_curLan = (Widget::m_curLan == 0) ? (LAN_NUM-1):(Widget::m_curLan-1);
+    WindowWidget::refreshAll();
 }
 
 void MainWindow::switchTabWindow(Widget *w)

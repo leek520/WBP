@@ -54,6 +54,7 @@ void PropertyDialog::on_buttonBox_accepted()
     setStringList();
 
     m_widget->setLuaCmd(ui->LuaEditor->toPlainText());
+    m_widget->refresh();
     emit m_widget->currentItemChanged(m_widget);
 }
 
@@ -156,7 +157,7 @@ void PropertyDialog::on_textEdit_textChanged()
 void PropertyDialog::initDialog()
 {
     ui->textColor->setStyleSheet(QString("background-color: #%1;")
-                                .arg(QString::number(m_widget->getBkColor().rgba(), 16)));
+                                .arg(QString::number(m_widget->getTextColor().rgba(), 16)));
 
     ui->textType->setCurrentIndex(m_widget->getTextType());
     ui->textRegAddress->setValue(m_widget->getTextRegAddress());
@@ -198,7 +199,7 @@ void PropertyDialog::setStringList()
                 maxLen = str.count();
             }
         }
-        m_widget->setTextMaxLen(maxLen);
+        m_widget->setTextMaxLen(maxLen+1);  //这里+1是要加入结束符
         m_widget->setTextStringList(strList);
     }
 }

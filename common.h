@@ -63,7 +63,7 @@
 #define START_ADDR_SDRAM_FONT  0xa057D000
 #define START_ADDR_FLASH_FONT  0x37D000
 
-
+#define LAN_NUM         2
 #define VAR_BUF_LEN		128
 
 #define INVALID_COLOR 0x80000000
@@ -133,15 +133,19 @@ typedef struct _tBasePara
 /*********ÎÄ±¾ÐÅÏ¢½á¹¹************/
 typedef struct _tTextPara
 {
-    ushort type;
+    uchar type;
     uchar font;
-    uchar maxLen;
-    ushort regAdress;
-    uchar dotBef;
-    uchar dotAft;
-    int alignment;
+    ushort alignment;
     int color;
-    char *string;
+
+    char *string[LAN_NUM];
+    uchar maxLen;
+    struct dot_feild
+    {
+        char bef:4;
+        char aft:4;
+    }dot;
+    ushort regAdress;
 }TextPara;
 
 typedef struct {
@@ -174,10 +178,10 @@ typedef struct {
     ushort y;
     ushort width;
     ushort height;
-    ushort radius;
-    ushort isFill;
-    ushort lineType;
-    ushort lineWidth;
+    uchar radius;
+    uchar isFill;
+    uchar lineType;
+    uchar lineWidth;
 }GraphInfo;
 
 /*********´°ÌåÐÅÏ¢½á¹¹************/

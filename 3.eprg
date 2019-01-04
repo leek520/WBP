@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PLT date="2019-01-04 星期五 18:36">
+    <Window Id="0" geometry="[(0,0)],800×480" BkColor="#f0f0f0">
+        <Rect Rectangle="[(0,0)],800×375" FillColor="#5baed3" FillEnable="true" Radius="0" LineColor="#000000" LineWidth="1"/>
+        <Rect Rectangle="[(0,0)],398×380" FillColor="#84c225" FillEnable="true" Radius="0" LineColor="#000000" LineWidth="1"/>
+        <Rect Rectangle="[(0,376)],800×104" FillColor="#82c699" FillEnable="true" Radius="0" LineColor="#000000" LineWidth="1"/>
+        <Rect Rectangle="[(400,14)],273×54" FillColor="#b6ddc7" FillEnable="true" Radius="0" LineColor="#000000" LineWidth="1"/>
+        <Rect Rectangle="[(400,86)],273×54" FillColor="#b6ddc7" FillEnable="true" Radius="0" LineColor="#000000" LineWidth="1"/>
+        <Rect Rectangle="[(400,158)],273×54" FillColor="#b6ddc7" FillEnable="true" Radius="0" LineColor="#000000" LineWidth="1"/>
+        <Rect Rectangle="[(400,230)],273×54" FillColor="#b6ddc7" FillEnable="true" Radius="0" LineColor="#000000" LineWidth="1"/>
+        <Rect Rectangle="[(400,302)],273×54" FillColor="#b6ddc7" FillEnable="true" Radius="0" LineColor="#000000" LineWidth="1"/>
+        <Image BkImage="D:\2-Work\leek.project\WBP\123.bmp" ImagePos="(0,5)"/>
+        <Button BkPressColor="#f0f0f0" AlignV="2" BkDisableColor="#f0f0f0" TextDotAft="0" AlignH="2" Id="1000" TextString="菜单" TextFont="0" TextType="0" geometry="[(686,14)],100×52" TextRegAddress="0" BkColor="#ffff7f" TextDotBef="0" LuaCmd="switchWindow(1)" TextColor="#000000"/>
+        <Button BkPressColor="#f0f0f0" AlignV="2" BkDisableColor="#f0f0f0" TextDotAft="0" AlignH="2" Id="1001" TextString="复位" TextFont="0" TextType="0" geometry="[(686,86)],100×52" TextRegAddress="0" BkColor="#ffff7f" TextDotBef="0" LuaCmd="" TextColor="#000000"/>
+        <Button BkPressColor="#f0f0f0" AlignV="2" BkDisableColor="#f0f0f0" TextDotAft="0" AlignH="2" Id="1002" TextString="启动" TextFont="0" TextType="0" geometry="[(686,230)],100×52" TextRegAddress="0" BkColor="#00ff00" TextDotBef="0" LuaCmd="" TextColor="#000000"/>
+        <Button BkPressColor="#f0f0f0" AlignV="2" BkDisableColor="#f0f0f0" TextDotAft="0" AlignH="2" Id="1003" TextString="加载" TextFont="0" TextType="0" geometry="[(686,158)],100×52" TextRegAddress="0" BkColor="#ffff7f" TextDotBef="0" LuaCmd="" TextColor="#000000"/>
+        <Button BkPressColor="#f0f0f0" AlignV="2" BkDisableColor="#f0f0f0" TextDotAft="0" AlignH="2" Id="1004" TextString="停机" TextFont="0" TextType="0" geometry="[(686,302)],100×52" TextRegAddress="0" BkColor="#ff0000" TextDotBef="0" LuaCmd="" TextColor="#000000"/>
+        <Text AlignV="2" TextDotAft="0" AlignH="0" Id="2000" TextString="压力:0000 Bar" TextFont="0" TextType="0" geometry="[(411,21)],250×38" TextRegAddress="0" BkColor="#00f0f0f0" TextDotBef="0" TextColor="#000000"/>
+        <Text AlignV="2" TextDotAft="0" AlignH="0" Id="2001" TextString="温度:0368 ℃" TextFont="0" TextType="0" geometry="[(412,95)],250×38" TextRegAddress="0" BkColor="#00f0f0f0" TextDotBef="0" TextColor="#000000"/>
+        <Text AlignV="2" TextDotAft="0" AlignH="0" Id="2002" TextString="频率:0000 Hz" TextFont="0" TextType="0" geometry="[(412,164)],250×38" TextRegAddress="0" BkColor="#00f0f0f0" TextDotBef="0" TextColor="#000000"/>
+        <Text AlignV="2" TextDotAft="0" AlignH="0" Id="2003" TextString="功率:0000 KW" TextFont="0" TextType="0" geometry="[(412,236)],250×38" TextRegAddress="0" BkColor="#00f0f0f0" TextDotBef="0" TextColor="#000000"/>
+        <Text AlignV="2" TextDotAft="0" AlignH="0" Id="2004" TextString="风机停止" TextFont="0" TextType="0" geometry="[(412,308)],250×38" TextRegAddress="0" BkColor="#00f0f0f0" TextDotBef="0" TextColor="#000000"/>
+        <Text AlignV="2" TextDotAft="0" AlignH="0" Id="2013" TextString="运行状态:" TextFont="0" TextType="0" geometry="[(10,385)],160×38" TextRegAddress="0" BkColor="#00f0f0f0" TextDotBef="0" TextColor="#000000"/>
+        <Text AlignV="2" TextDotAft="0" AlignH="0" Id="2014" TextString="电压过高" TextFont="0" TextType="0" geometry="[(170,385)],500×38" TextRegAddress="0" BkColor="#ff0000" TextDotBef="0" TextColor="#000000"/>
+        <Text AlignV="2" TextDotAft="0" AlignH="0" Id="2015" TextString="0001V" TextFont="0" TextType="0" geometry="[(690,385)],100×38" TextRegAddress="0" BkColor="#00f0f0f0" TextDotBef="0" TextColor="#000000"/>
+        <Text AlignV="2" TextDotAft="0" AlignH="0" Id="2017" TextString="运行总时间:000010:01:25" TextFont="0" TextType="0" geometry="[(10,432)],420×38" TextRegAddress="0" BkColor="#00f0f0f0" TextDotBef="0" TextColor="#000000"/>
+        <Text AlignV="2" TextDotAft="0" AlignH="0" Id="2017" TextString="排气温度高" TextFont="0" TextType="0" geometry="[(438,432)],362×38" TextRegAddress="0" BkColor="#ffff00" TextDotBef="0" TextColor="#000000"/>
+    </Window>
+    <Window Id="1" geometry="[(0,0)],800×480" BkColor="#5aaed5">
+        <Rect Rectangle="[(12,8)],783×397" FillColor="#ffffff" FillEnable="false" Radius="10" LineColor="#ffffff" LineWidth="2"/>
+        <Rect Rectangle="[(8,410)],787×62" FillColor="#ffffff" FillEnable="true" Radius="10" LineColor="#000000" LineWidth="2"/>
+        <Text AlignV="2" TextDotAft="0" AlignH="0" Id="2005" TextString="供气加载压力(BAR):" TextFont="0" TextType="0" geometry="[(18,10)],350×50" TextRegAddress="0" BkColor="#00f0f0f0" TextDotBef="0" TextColor="#000000"/>
+        <Text AlignV="2" TextDotAft="0" AlignH="0" Id="2006" TextString="供气卸载压力(BAR):" TextFont="0" TextType="0" geometry="[(18,60)],350×50" TextRegAddress="0" BkColor="#00f0f0f0" TextDotBef="0" TextColor="#000000"/>
+        <Text AlignV="2" TextDotAft="0" AlignH="0" Id="2007" TextString="风机启温度(℃):" TextFont="0" TextType="0" geometry="[(18,110)],350×50" TextRegAddress="0" BkColor="#00f0f0f0" TextDotBef="0" TextColor="#000000"/>
+        <Text AlignV="2" TextDotAft="0" AlignH="0" Id="2008" TextString="风机停温度(℃):" TextFont="0" TextType="0" geometry="[(18,160)],350×50" TextRegAddress="0" BkColor="#00f0f0f0" TextDotBef="0" TextColor="#000000"/>
+        <Text AlignV="2" TextDotAft="0" AlignH="0" Id="2009" TextString="主机启动延时(秒):" TextFont="0" TextType="0" geometry="[(18,210)],350×50" TextRegAddress="0" BkColor="#00f0f0f0" TextDotBef="0" TextColor="#000000"/>
+        <Text AlignV="2" TextDotAft="0" AlignH="0" Id="2010" TextString="风机启动延时(秒):" TextFont="0" TextType="0" geometry="[(18,260)],350×50" TextRegAddress="0" BkColor="#00f0f0f0" TextDotBef="0" TextColor="#000000"/>
+        <Text AlignV="2" TextDotAft="0" AlignH="0" Id="2011" TextString="星角延时(秒):" TextFont="0" TextType="0" geometry="[(18,310)],350×50" TextRegAddress="0" BkColor="#00f0f0f0" TextDotBef="0" TextColor="#000000"/>
+        <Text AlignV="2" TextDotAft="0" AlignH="0" Id="2012" TextString="加载延时(秒):" TextFont="0" TextType="0" geometry="[(18,360)],350×50" TextRegAddress="0" BkColor="#00f0f0f0" TextDotBef="0" TextColor="#000000"/>
+        <Edit AlignV="2" BkDisableColor="#000000" TextDotAft="0" AlignH="2" Id="3000" TextString="0.500" TextFont="0" TextType="0" geometry="[(400,60)],120×35" TextRegAddress="0" BkColor="#f0f0f0" TextDotBef="0" TextColor="#000000"/>
+        <Edit AlignV="2" BkDisableColor="#000000" TextDotAft="2" AlignH="2" Id="3001" TextString="0080" TextFont="0" TextType="1" geometry="[(400,110)],120×35" TextRegAddress="10" BkColor="#f0f0f0" TextDotBef="2" TextColor="#5500ff"/>
+        <Edit AlignV="2" BkDisableColor="#000000" TextDotAft="0" AlignH="2" Id="3002" TextString="0010" TextFont="0" TextType="0" geometry="[(400,210)],120×35" TextRegAddress="0" BkColor="#f0f0f0" TextDotBef="0" TextColor="#000000"/>
+        <Edit AlignV="2" BkDisableColor="#000000" TextDotAft="0" AlignH="2" Id="3003" TextString="0010" TextFont="0" TextType="0" geometry="[(400,360)],120×35" TextRegAddress="0" BkColor="#f0f0f0" TextDotBef="0" TextColor="#000000"/>
+        <Edit AlignV="2" BkDisableColor="#000000" TextDotAft="0" AlignH="2" Id="3004" TextString="0006" TextFont="0" TextType="0" geometry="[(400,310)],120×35" TextRegAddress="0" BkColor="#f0f0f0" TextDotBef="0" TextColor="#000000"/>
+        <Edit AlignV="2" BkDisableColor="#000000" TextDotAft="0" AlignH="2" Id="3005" TextString="0070" TextFont="0" TextType="0" geometry="[(400,160)],120×35" TextRegAddress="0" BkColor="#f0f0f0" TextDotBef="0" TextColor="#000000"/>
+        <Edit AlignV="2" BkDisableColor="#000000" TextDotAft="0" AlignH="2" Id="3006" TextString="0008" TextFont="0" TextType="0" geometry="[(400,260)],120×35" TextRegAddress="0" BkColor="#f0f0f0" TextDotBef="0" TextColor="#000000"/>
+        <Edit AlignV="2" BkDisableColor="#000000" TextDotAft="0" AlignH="2" Id="3007" TextString="0499" TextFont="0" TextType="0" geometry="[(400,10)],120×35" TextRegAddress="0" BkColor="#f0f0f0" TextDotBef="0" TextColor="#000000"/>
+        <Button BkPressColor="#f0f0f0" AlignV="2" BkDisableColor="#f0f0f0" TextDotAft="0" AlignH="2" Id="1005" TextString="上一页" TextFont="0" TextType="0" geometry="[(50,415)],150×50" TextRegAddress="0" BkColor="#f0f0f0" TextDotBef="0" LuaCmd="a=getData(10)&#xa;a=a-1&#xa;setData(10,a)" TextColor="#000000"/>
+        <Button BkPressColor="#f0f0f0" AlignV="2" BkDisableColor="#f0f0f0" TextDotAft="0" AlignH="2" Id="1006" TextString="下一页" TextFont="0" TextType="0" geometry="[(325,415)],150×50" TextRegAddress="0" BkColor="#f0f0f0" TextDotBef="0" LuaCmd="a=getData(10)&#xa;a=a+1&#xa;setData(10,a)&#xa;" TextColor="#000000"/>
+        <Button BkPressColor="#f0f0f0" AlignV="2" BkDisableColor="#f0f0f0" TextDotAft="0" AlignH="2" Id="1007" TextString="返回" TextFont="0" TextType="0" geometry="[(600,415)],150×50" TextRegAddress="0" BkColor="#f0f0f0" TextDotBef="0" LuaCmd="switchWindow(0)" TextColor="#000000"/>
+    </Window>
+</PLT>

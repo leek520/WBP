@@ -11,8 +11,6 @@
         <file>images/save.png</file>
         <file>images/splash.png</file>
         <file>images/undo.png</file>
-        <file>images/build.png</file>
-        <file>images/download.png</file>
         <file>char3000.txt</file>
         <file alias="button">images/widget/button.PNG</file>
         <file alias="edit">images/widget/edit.PNG</file>
@@ -26,5 +24,12 @@
         <file alias="textListRemove">images/dialog/remove.png</file>
         <file>win_style.qss</file>
         <file>propertyEnumList.xml</file>
+        <file alias="build">images/tools/build.png</file>
+        <file alias="download">images/tools/download.png</file>
+        <file alias="lan_next">images/tools/lan_next.png</file>
+        <file alias="lan_prev">images/tools/lan_prev.png</file>
+        <file alias="set">images/tools/set.png</file>
+        <file alias="simstart">images/tools/start.png</file>
+        <file alias="simstop">images/tools/stop.png</file>
     </qresource>
 </RCC>

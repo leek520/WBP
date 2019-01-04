@@ -60,6 +60,12 @@ private slots:
 
     void setCom();
 
+    void simStart();
+    void simStop();
+
+    void lanNext();
+    void lanPrev();
+
     void switchTabWindow(Widget *w);
     void ResProgress_slt(int step, int pos, QString msg="");
     void MouseButtonDblClick(Widget *w);
@@ -75,7 +81,7 @@ private:
     QMenu *helpMenu;
     QMenu *buildMenu;
     QMenu *viewMenu;
-    QMenu *setMenu;
+    QMenu *settingMenu;
     QMenu *windowMenu;
 
 
@@ -83,7 +89,7 @@ private:
     QToolBar *editToolBar;
     QToolBar *viewToolBar;
     QToolBar *buildToolBar;
-    QToolBar *windowToolBar;
+    QToolBar *settingToolBar;
 
     ToolBar *graphToolBar;
     ToolBar *widgetToolBar;
@@ -107,7 +113,12 @@ private:
     QAction *setComAct;
 
     QAction *buildAct;
-    QAction *downAct;
+    QAction *downloadAct;
+    QAction *simstartAct;
+    QAction *simstopAct;
+
+    QAction *lan_nextAct;
+    QAction *lan_prevAct;
 
     QPoint dragPosition;
 
