@@ -258,7 +258,7 @@ ProgressBar::ProgressBar(QWidget *parent) : QWidget(parent)
     m_progress->setFormat(QString("%1%").arg(0));
 
     QLabel *pLabel = new QLabel("请稍候...");
-    m_progresstext = new QLabel(QString("%1/%2").arg(0).arg(4));
+    m_progresstext = new QLabel(QString("%1/%2").arg(0).arg(0));
     QPushButton *cancel = new QPushButton("取消");
     cancel->setFixedHeight(30);
     connect(cancel, SIGNAL(clicked()), this, SLOT(cancel_slt()));

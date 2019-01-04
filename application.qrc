@@ -24,5 +24,7 @@
         <file alias="rect">images/graph/rect.png</file>
         <file alias="textListAdd">images/dialog/add.png</file>
         <file alias="textListRemove">images/dialog/remove.png</file>
+        <file>win_style.qss</file>
+        <file>propertyEnumList.xml</file>
     </qresource>
 </RCC>

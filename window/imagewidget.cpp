@@ -6,6 +6,7 @@ ImageWidget::ImageWidget(QWidget *parent) :
     initPropertyTable();
     initCenterWidget();
     initParament();
+    layout()->setMargin(1);
 }
 
 void ImageWidget::initPropertyTable()
@@ -18,6 +19,27 @@ void ImageWidget::initParament()
 {
     m_Type = Image;
     Widget::initParament();
+}
+
+void ImageWidget::paintEvent(QPaintEvent *event)
+{
+    QFileInfo file(m_BkImage);
+    QString suffix = file.suffix().toLower();
+    if (QFile::exists(m_BkImage) &&
+        file.isFile() &&
+        (suffix.contains("bmp") ||
+         suffix.contains("png") ||
+         suffix.contains("jpg"))){
+    }else{
+        QPainter painter(this);
+        //绘制边框
+        painter.setPen(QColor(139, 139, 139));
+        painter.drawLine(0, 0, this->width() - 1, 0);
+        painter.drawLine(0, 0, 0, this->height() - 1);
+        painter.drawLine(this->width() - 1, 0, this->width() - 1, this->height() - 1);
+        painter.drawLine(0, this->height() - 1, this->width() - 1, this->height() - 1);
+
+    }
 }
 
 LineWidget::LineWidget(QWidget *parent) :
@@ -44,7 +66,6 @@ void LineWidget::initParament()
 {
     m_Type = Line;
     m_LineType = 0;
-    layout()->setMargin(0);
     QRect rect = this->frameGeometry();
     m_LineStart = QPoint(rect.left(), (rect.top()+rect.bottom())/2);
     m_LineLength = rect.right() - rect.left() + 1;

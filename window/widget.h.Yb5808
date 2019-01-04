@@ -19,7 +19,6 @@
 #define WidgetLen   10240
 #define StringLen   10240
 #define LuaLen      10240
-#define CharLen     10240
 #define FontLen      512000
 #define ImageLen    512000  //500k
 
@@ -60,11 +59,10 @@ class Widget : public QWidget
     Q_PROPERTY(QColor BkColor READ getBkColor WRITE setBkColor)
     Q_PROPERTY(QColor BkPressColor READ getBkPressColor WRITE setBkPressColor)
     Q_PROPERTY(QColor BkDisableColor READ getBkDisableColor WRITE setBkDisableColor)
-    Q_PROPERTY(QString TextString READ getTextString WRITE setTextString)
+    Q_PROPERTY(QString String READ getTextString WRITE setTextString)
     Q_PROPERTY(QColor TextColor READ getTextColor WRITE setTextColor)
     Q_PROPERTY(int AlignH READ getAlignH WRITE setAlignH)
     Q_PROPERTY(int AlignV READ getAlignV WRITE setAlignV)
-    Q_PROPERTY(int TextFont READ getTextFont WRITE setTextFont)
     Q_PROPERTY(int TextType READ getTextType WRITE setTextType)
     Q_PROPERTY(int TextMaxLen READ getTextMaxLen WRITE setTextMaxLen)
     Q_PROPERTY(int TextRegAddress READ getTextRegAddress WRITE setTextRegAddress)
@@ -193,9 +191,6 @@ public:
     int getTextType();
     void setTextType(int value);
 
-    int getTextFont();
-    void setTextFont(int value);
-
     int getTextMaxLen();
     void setTextMaxLen(int value);
 
@@ -229,7 +224,6 @@ protected:
     int m_AlignV;
     QColor m_TextColor;
     int m_TextType      ;
-    int m_TextFont      ;
     int m_TextMaxLen    ;
     int m_TextRegAddress;
     int m_TextDotBef    ;
@@ -271,10 +265,6 @@ public:
        int pos;
        char buf[FontLen];
     };
-    struct CharBuf{
-       int pos;
-       char buf[CharLen];
-    };
     struct ImageBuf{
        int pos;
        char buf[ImageLen];
@@ -282,7 +272,6 @@ public:
 public:
     explicit BuildInfo();
     void initBuild();
-    void setEnumProperty(QMap<QString, QStringList> *enumMap);
     WidgetBuf *getWidgetBuf();
     uint QColorToEColor(QColor color);
     int QAlignToEAlign(int align);
@@ -292,10 +281,7 @@ public:
     void QImageToEImage(QString filename, QPoint leftTop, ImageInfo *imageinfo);
     void GraphToEgraph(Widget *w, GraphInfo *graphinfo);
 
-    void FontToChar(int fontType);
-    void RecordChar(QString &string);
-    static bool compareUnicode(QChar &a, QChar &b);
-    void SortRecordChar();
+    void FontToChar(const QString &string, int size, QString family);
     void downLoadInfo();
     void cancel();
 private slots:
@@ -309,14 +295,11 @@ signals:
 private:
     ComDriver *com;
     QString m_charList;
-    QMap<QString, QStringList> *propertyEnum;
-    QString m_CharRecord;
 
     struct WidgetBuf widgetBuf;
     struct StringBuf stringBuf;
     struct LuaBuf luaBuf;
     struct FontBuf fontBuf;
-    struct CharBuf charBuf;
     struct ImageBuf imageBuf;
     int downloadStep;
 };

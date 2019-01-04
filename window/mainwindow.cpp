@@ -1,10 +1,12 @@
 ﻿#include "mainwindow.h"
-
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
-    buildInfo(new BuildInfo()),
+    m_buildInfo(new BuildInfo()),
     m_progressBar(new ProgressBar()),
-    m_propD(new PropertyDialog)
+    m_propD(new PropertyDialog),
+    m_propW(new PropertyWidget()),
+    m_leftW(new LeftWidget()),
+    m_bottomW(new BottomWidget())
 {
     setWindowTitle(tr("WBP"));//设置窗口标题
     setWindowIcon(QIcon(":/mamtool.ico"));
@@ -15,8 +17,9 @@ MainWindow::MainWindow(QWidget *parent) :
     createStatusBar();
 
     setupUi();
+    initEnumProperty();
 
-    connect(buildInfo, SIGNAL(ResProgress_sig(int,int,QString)),
+    connect(m_buildInfo, SIGNAL(ResProgress_sig(int,int,QString)),
             this, SLOT(ResProgress_slt(int,int,QString)));
 }
 
@@ -285,14 +288,13 @@ void MainWindow::setupUi()
 {
     setWindowState(Qt::WindowMaximized);
 
-    m_mdiArea = new QMdiArea(this);
+    m_mdiArea = new TabWidget(this);
     m_mdiArea->setTabsClosable(true);
-    m_mdiArea->setViewMode(QMdiArea::TabbedView);//设为标签栏显示模式
     setCentralWidget(m_mdiArea);
 
     m_sel = new Selection(m_mdiArea);
 
-    m_leftW = new LeftWidget();
+
     QDockWidget *m_dockLeft = new QDockWidget(tr("window"), this);
     m_dockLeft->setFeatures(QDockWidget::DockWidgetMovable | QDockWidget::DockWidgetClosable);//可移动
     m_dockLeft->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
@@ -301,20 +303,54 @@ void MainWindow::setupUi()
     connect(m_leftW, SIGNAL(switchTabWindow(Widget*)),
             this, SLOT(switchTabWindow(Widget*)));
 
-    m_propW = new PropertyWidget();
+
     QDockWidget *m_dockRight = new QDockWidget(tr("Property"), this);
     m_dockRight->setFeatures(QDockWidget::DockWidgetMovable | QDockWidget::DockWidgetClosable);//可移动
     m_dockRight->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
     m_dockRight->setWidget(m_propW);
     this->addDockWidget(Qt::RightDockWidgetArea, m_dockRight);//初始位置
 
-    m_bottomW = new BottomWidget();
+
     m_dockBottom = new QDockWidget(tr("Out Window"), this);
     m_dockBottom->setFeatures(QDockWidget::DockWidgetMovable | QDockWidget::DockWidgetClosable);//可移动
     m_dockBottom->setAllowedAreas(Qt::BottomDockWidgetArea);
     m_dockBottom->setWidget(m_bottomW);
     this->addDockWidget(Qt::BottomDockWidgetArea, m_dockBottom);//初始位置
     m_dockBottom->close();
+}
+
+void MainWindow::initEnumProperty()
+{
+    QFile file(":/propertyEnumList.xml");
+    if(!file.open(QIODevice::ReadOnly)){
+        return;
+    }
+
+    QDomDocument doc;
+    doc.setContent(&file,true);
+    file.close();
+
+    QDomElement root = doc.documentElement();
+    QDomNode Node = root.firstChild();
+    while (!Node.isNull())
+    {
+        QDomElement wDom = Node.toElement();
+        QString type = wDom.tagName();
+        propertyEnum.insert(type, QStringList());
+
+        QDomNode childNode = Node.firstChild();
+        while (!childNode.isNull())
+        {
+            QDomElement childDom = childNode.toElement();
+            QString value = childDom.attribute("value");
+            propertyEnum[type].append(value);
+
+            childNode = childNode.nextSibling();
+        }
+        Node = Node.nextSibling();
+    }
+    m_buildInfo->setEnumProperty(&propertyEnum);
+    m_propW->setEnumProperty(&propertyEnum);
 }
 
 
@@ -441,6 +477,8 @@ bool MainWindow::saveProjectFile(QString &filename)
 
 bool MainWindow::openProjectFile(QString &filename)
 {
+    setCursor(Qt::WaitCursor);
+    qApp->processEvents();
     // 先读取xml文件
     if (!docXmlRead(filename))
     {
@@ -471,6 +509,8 @@ bool MainWindow::openProjectFile(QString &filename)
         winNode = winNode.nextSibling();
     }
     m_leftW->setInit();
+
+    setCursor(Qt::ArrowCursor);
     return true;
 }
 
@@ -526,6 +566,7 @@ void MainWindow::DomToWidget(QDomElement root, Widget *w)
             w->setProperty(propTable[i].second.toLocal8Bit(), (attrVaue=="true"?true:false));
             break;
         case QVariant::Int:
+        case QVariant::TextFormat:
             w->setProperty(propTable[i].second.toLocal8Bit(), attrVaue.toInt());
             break;
         case QVariant::Double:
@@ -579,7 +620,7 @@ void MainWindow::DomToWidget(QDomElement root, Widget *w)
 
 void MainWindow::newFile()
 {
-
+    //buildInfo->FontToChar();
 }
 
 bool MainWindow::open()
@@ -675,7 +716,7 @@ WindowInfo *MainWindow::setWidgetInfo(Widget *w, struct list_head *head, int *po
         WindowInfo *winInfo = (WindowInfo*)(start + curPos);
         ret = winInfo;
         init_list_head(&winInfo->childList);
-        winInfo->BkColor[0] = buildInfo->QColorToEColor(w->getBkColor());
+        winInfo->BkColor[0] = m_buildInfo->QColorToEColor(w->getBkColor());
 
         base = &winInfo->base;
         *pos = curPos + sizeof(WindowInfo);
@@ -687,10 +728,10 @@ WindowInfo *MainWindow::setWidgetInfo(Widget *w, struct list_head *head, int *po
     case Button:
     {
         ButtonInfo *btnInfo = (ButtonInfo*)(start + curPos);
-        btnInfo->BkColor[0] = buildInfo->QColorToEColor(w->getBkColor());
-        btnInfo->BkColor[1] = buildInfo->QColorToEColor(w->getBkPressColor());
-        btnInfo->BkColor[2] = buildInfo->QColorToEColor(w->getBkDisableColor());
-        btnInfo->cmd = buildInfo->QStringToLuaChar(w->getLuaCmd());
+        btnInfo->BkColor[0] = m_buildInfo->QColorToEColor(w->getBkColor());
+        btnInfo->BkColor[1] = m_buildInfo->QColorToEColor(w->getBkPressColor());
+        btnInfo->BkColor[2] = m_buildInfo->QColorToEColor(w->getBkDisableColor());
+        btnInfo->cmd = m_buildInfo->QStringToLuaChar(w->getLuaCmd());
         setTextInfo(w, &btnInfo->text);
         base = &btnInfo->base;
         *pos = curPos + sizeof(ButtonInfo);
@@ -702,7 +743,7 @@ WindowInfo *MainWindow::setWidgetInfo(Widget *w, struct list_head *head, int *po
     case Text:
     {
         TextInfo *textInfo = (TextInfo*)(start + curPos);
-        textInfo->BkColor[0] = buildInfo->QColorToEColor(w->getBkColor());
+        textInfo->BkColor[0] = m_buildInfo->QColorToEColor(w->getBkColor());
         setTextInfo(w, &textInfo->text);
         base = &textInfo->base;
         *pos = curPos + sizeof(TextInfo);
@@ -714,8 +755,8 @@ WindowInfo *MainWindow::setWidgetInfo(Widget *w, struct list_head *head, int *po
     case Edit:
     {
         EditInfo *editInfo = (EditInfo*)(start + curPos);
-        editInfo->BkColor[0] = buildInfo->QColorToEColor(w->getBkColor());
-        editInfo->BkColor[1] = buildInfo->QColorToEColor(w->getBkDisableColor());
+        editInfo->BkColor[0] = m_buildInfo->QColorToEColor(w->getBkColor());
+        editInfo->BkColor[1] = m_buildInfo->QColorToEColor(w->getBkDisableColor());
         editInfo->maxLen = 100;
         setTextInfo(w, &editInfo->text);
         base = &editInfo->base;
@@ -728,7 +769,7 @@ WindowInfo *MainWindow::setWidgetInfo(Widget *w, struct list_head *head, int *po
     case Image:
     {
         ImageInfo *imageInfo = (ImageInfo*)(start + curPos);
-        buildInfo->QImageToEImage(w->getBkImage(), w->getImagePos(), imageInfo);
+        m_buildInfo->QImageToEImage(w->getBkImage(), w->getImagePos(), imageInfo);
         *pos = curPos + sizeof(ImageInfo);
 
         list_add_tail(&imageInfo->list, head);
@@ -739,7 +780,7 @@ WindowInfo *MainWindow::setWidgetInfo(Widget *w, struct list_head *head, int *po
     case Circle:
     {
         GraphInfo *graphInfo = (GraphInfo*)(start + curPos);
-        buildInfo->GraphToEgraph(w, graphInfo);
+        m_buildInfo->GraphToEgraph(w, graphInfo);
         *pos = curPos + sizeof(GraphInfo);
 
         list_add_tail(&graphInfo->list, head);
@@ -768,23 +809,24 @@ void MainWindow::setBaseInfo(Widget *w, BasePara *base)
 void MainWindow::setTextInfo(Widget *w, TextPara *text)
 {
     text->type = w->getTextType();
+    text->font = w->getTextFont();
     text->maxLen = w->getTextMaxLen();
     text->regAdress = w->getTextRegAddress();
     text->dotBef = w->getTextDotBef();
     text->dotAft = w->getTextDotAft();
 
-    text->color = buildInfo->QColorToEColor(w->getTextColor());
-    text->alignment = buildInfo->QAlignToEAlign((w->getAlignH() << 1) | (w->getAlignV() << 6));
+    text->color = m_buildInfo->QColorToEColor(w->getTextColor());
+    text->alignment = m_buildInfo->QAlignToEAlign((w->getAlignH() << 1) | (w->getAlignV() << 6));
 
     switch (text->type) {
     case String:
-        text->string = buildInfo->QStringToMultBytes(w->getTextString());
+        text->string = m_buildInfo->QStringToMultBytes(w->getTextString());
         break;
     case RegVaule:
         text->string = NULL;
         break;
     case StringList:
-        text->string = buildInfo->QStringListToMultBytes(w->getTextStringList(), w->getTextMaxLen());
+        text->string = m_buildInfo->QStringListToMultBytes(w->getTextStringList(), w->getTextMaxLen());
         break;
     default:
         break;
@@ -793,15 +835,40 @@ void MainWindow::setTextInfo(Widget *w, TextPara *text)
 
 }
 
+void MainWindow::recordUsedChar()
+{
+    QList<WindowWidget *> winList = WindowWidget::getWindowList();
+    for(int i=0;i<winList.count();i++){
+        WindowWidget *win = winList[i];
+        QWidgetList childList = win->getChildList(0);
+        for(int j=0;j<childList.count();j++){
+            Widget *child = (Widget *)childList[j];
+            if (child->getTextType() == String){
+                QString str = child->getTextString();
+                m_buildInfo->RecordChar(str);
+            }else if (child->getTextType() == StringList){
+                QStringList strList = child->getTextStringList();
+                for(int k=0;k<strList.count();k++){
+                    m_buildInfo->RecordChar(strList[k]);
+                }
+            }
+        }
+    }
+}
 void MainWindow::build()
 {
     m_dockBottom->show();
     m_bottomW->clear();
     m_bottomW->insertMessage(tr("Build init!"));
 
-    buildInfo->initBuild();
+    m_buildInfo->initBuild();
 
-    BuildInfo::WidgetBuf *widgetBuf = buildInfo->getWidgetBuf();
+    recordUsedChar();
+    m_buildInfo->SortRecordChar();
+    m_buildInfo->FontToChar(0);
+
+
+    BuildInfo::WidgetBuf *widgetBuf = m_buildInfo->getWidgetBuf();
     int startAddress = (int)(&widgetBuf->buf);
     struct list_head *winHead = ConvListAdd(startAddress, 0);
 
@@ -882,7 +949,7 @@ void MainWindow::build()
 
 void MainWindow::download()
 {
-    buildInfo->downLoadInfo();
+    m_buildInfo->downLoadInfo();
 }
 
 void MainWindow::setCom()
@@ -893,38 +960,40 @@ void MainWindow::setCom()
 
 void MainWindow::switchTabWindow(Widget *w)
 {
-    QMdiSubWindow *findSubWin = NULL;
-    foreach (QMdiSubWindow *subWin, m_mdiArea->subWindowList()) {
-        if(subWin->widget() == w->parentWidget()){
-            findSubWin = subWin;
-            break;
+    QWidget *curTab = NULL;
+    for(int i=0;i<m_mdiArea->count();i++){
+        if (m_mdiArea->widget(i) == w->parentWidget()){
+            curTab = m_mdiArea->widget(i);
         }
     }
-    if (findSubWin){
-        m_mdiArea->setActiveSubWindow(findSubWin);
+    if (curTab){
+        m_mdiArea->setCurrentWidget(curTab);
     }else{
-        m_mdiArea->addSubWindow(w->parentWidget());
+        curTab = w->parentWidget();
+        m_mdiArea->addTab(curTab, QString("Window-%1").arg(w->getId()));
+        m_mdiArea->setCurrentWidget(curTab);
     }
 }
 
 void MainWindow::ResProgress_slt(int step, int pos, QString msg)
 {
+    int maxStep = 6;
     if (step == 0){
         connect(m_progressBar, SIGNAL(cancel_sig(int,int)),
                 this, SLOT(ResProgress_slt(int,int)));
-        m_progressBar->setMaxStep(4);
+        m_progressBar->setMaxStep(maxStep);
         m_progressBar->setValue(0, 0);
         stateBar->addWidget(m_progressBar);
     }else{
         m_progressBar->setValue(step, pos);
-        if (step > 4){
+        if (step > maxStep){
             stateBar->removeWidget(m_progressBar);
             disconnect(m_progressBar, SIGNAL(cancel_sig(int,int)),
                     this, SLOT(ResProgress_slt(int,int)));
-            if ((pos >= 100) && (step < 6)){
+            if ((pos >= 100) && (step < (maxStep+1))){
                 QMessageBox::information(this, tr("提示"), tr("下载完成！"));
             }else{
-                buildInfo->cancel();
+                m_buildInfo->cancel();
             }
         }
     }
@@ -956,14 +1025,11 @@ void MainWindow::addWidgetSlt(WidgetType type, QPoint pos)
 Widget* MainWindow::addWidget(WidgetType type)
 {
     if (type == Window){
-        m_scollArea = new ScrollArea(this);
-        connect(m_scollArea, SIGNAL(addWidgetSgn(WidgetType,QPoint)),
+        ScrollArea *scollArea = new ScrollArea(m_mdiArea);
+        connect(scollArea, SIGNAL(addWidgetSgn(WidgetType,QPoint)),
                 this, SLOT(addWidgetSlt(WidgetType,QPoint)));
-        m_scollArea->setObjectName("m_mdiArea");
-        m_scollArea->setStyleSheet("QScrollArea#m_mdiArea{background-color:gray;}");
 
-
-        WindowWidget *win = new WindowWidget(m_scollArea);
+        WindowWidget *win = new WindowWidget(scollArea);
         connect(win, SIGNAL(currentItemChanged(Widget*)),
                 m_propW, SLOT(currentItemChanged(Widget*)));
         connect(win, SIGNAL(removeWidgetSgn(Widget*)),
@@ -980,9 +1046,8 @@ Widget* MainWindow::addWidget(WidgetType type)
         WindowWidget::m_curWin = win;
         m_leftW->addWidget(win);
 
-        m_scollArea->setWidget(win);
-        m_scollArea->setWindowTitle(QString("Window-%1").arg(win->getId()));
-        m_mdiArea->addSubWindow(m_scollArea);
+        m_mdiArea->addTab(scollArea, QString("Window-%1").arg(win->getId()));
+        m_mdiArea->setCurrentWidget(scollArea);
         return win;
     }else{
         if (!WindowWidget::m_curWin){

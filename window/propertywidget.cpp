@@ -1,5 +1,4 @@
 ﻿#include "propertywidget.h"
-
 PropertyWidget::PropertyWidget(QWidget *parent) : QWidget(parent)
 {
     setLayout(new QVBoxLayout(this));
@@ -11,6 +10,12 @@ PropertyWidget::PropertyWidget(QWidget *parent) : QWidget(parent)
     propertyEditor->setFactoryForManager(variantManager, variantFactory);
     layout()->addWidget(propertyEditor);
 }
+
+void PropertyWidget::setEnumProperty(QMap<QString, QStringList> *enumMap)
+{
+    propertyEnum = enumMap;
+}
+
 
 void PropertyWidget::currentItemChanged(Widget *w)
 {
@@ -37,12 +42,16 @@ void PropertyWidget::currentItemChanged(Widget *w)
         case QVariant::TextFormat:
         {
             property = variantManager->addProperty(QtVariantPropertyManager::enumTypeId(), propTable[i].second);
-            QStringList enumNames;
-            if (propTable[i].second == "AlignH"){
-                enumNames << "AlignLeft"  << "AlignRight" << "AlignHCenter";
-            }else{
-                enumNames << "AlignTop" << "AlignBottom" << "AlignVCenter";
-            }
+            QStringList enumNames = propertyEnum->value(propTable[i].second);
+//            if (propTable[i].second == "AlignH"){
+//                enumNames << "AlignLeft"  << "AlignRight" << "AlignHCenter";
+//            }else if(propTable[i].second == "AlignV"){
+//                enumNames << "AlignTop" << "AlignBottom" << "AlignVCenter";
+//            }else if(propTable[i].second == "TextType"){
+//                enumNames << "String" << "RegValue" << "StringList";
+//            }else if(propTable[i].second == "TextFont"){
+//                enumNames << "宋体_32" << "宋体_24" << "宋体_16" << "宋体_8";
+//            }
             property->setAttribute(QLatin1String("enumNames"), enumNames);
             property->setValue(value);
             break;

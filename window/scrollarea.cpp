@@ -1,7 +1,7 @@
-#include "scrollarea.h"
+﻿#include "scrollarea.h"
 
 ScrollArea::ScrollArea(QWidget *parent) :
-    QScrollArea(parent)
+    QWidget(parent)
 {
     setAcceptDrops(true);   //设置接收拖拽
 }
@@ -47,4 +47,25 @@ void ScrollArea::dropEvent(QDropEvent *event)
         return;
     }
     QWidget::dropEvent(event);
+}
+
+TabWidget::TabWidget(QWidget *parent) : QTabWidget(parent)
+{
+    setObjectName("mdiArea");
+    connect(this, SIGNAL(tabCloseRequested(int)), this, SLOT(closeTab(int)), Qt::UniqueConnection);
+}
+
+void TabWidget::closeTab(int index)
+{
+    SEL->hide(this->widget(index)->findChild<WindowWidget *>());
+    removeTab(index);
+    if (count() == 0) return;
+    if (index == 0){    //如果移除的是第一个
+        (this->widget(index)->findChild<WindowWidget *>())->setFocus();
+    }else if (index == count()){    //如果移除的是最后一个
+        (this->widget(index-1)->findChild<WindowWidget *>())->setFocus();
+    }else{      //其他位置
+        (this->widget(index)->findChild<WindowWidget *>())->setFocus();
+    }
+
 }

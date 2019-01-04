@@ -1,4 +1,4 @@
-#ifndef IMAGEWIDGET_H
+﻿#ifndef IMAGEWIDGET_H
 #define IMAGEWIDGET_H
 
 #include "widget.h"
@@ -11,6 +11,7 @@ public:
 protected:
     void initPropertyTable();
     void initParament();
+    void paintEvent(QPaintEvent *event);
 };
 class LineWidget : public Widget
 {

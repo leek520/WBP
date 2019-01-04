@@ -57,6 +57,12 @@
 #define START_ADDR_SDRAM_IMAGE  0xa047E000
 #define START_ADDR_FLASH_IMAGE  0x27E000
 
+#define START_ADDR_SDRAM_CHAR  0xa04BD000
+#define START_ADDR_FLASH_CHAR  0x2BD000
+
+#define START_ADDR_SDRAM_FONT  0xa057D000
+#define START_ADDR_FLASH_FONT  0x37D000
+
 
 #define VAR_BUF_LEN		128
 
@@ -93,7 +99,25 @@ typedef enum _eTextType
     RegVaule,
     StringList,
 }TextType;
-
+typedef enum _eFontType
+{
+    Song_32,
+    Song_24,
+    Song_16,
+    Song_8,
+}FontType;
+typedef struct {
+  uchar XSize;
+  uchar XDist;
+  uchar BytesPerLine;
+  uchar *pData;
+}GUI_CHARINFO;
+typedef struct GUI_FONT_PROP {
+  ushort First;                                              /* First character               */
+  ushort Last;                                               /* Last character                */
+  GUI_CHARINFO *paCharInfo;     /* Address of first character    */
+  struct GUI_FONT_PROP *pNext;          /* Pointer to next               */
+} GUI_FONT_PROP;
 /*********»ù´¡ÐÅÏ¢½á¹¹************/
 typedef struct _tBasePara
 {
@@ -110,7 +134,8 @@ typedef struct _tBasePara
 typedef struct _tTextPara
 {
     ushort type;
-    ushort maxLen;
+    uchar font;
+    uchar maxLen;
     ushort regAdress;
     uchar dotBef;
     uchar dotAft;

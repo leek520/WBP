@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Property>
+	<AlignH>
+		<enum0 value="AlignLeft"/>
+		<enum1 value="AlignRight"/>
+		<enum2 value="AlignHCenter"/>
+	</AlignH>
+	<AlignV>
+		<enum0 value="AlignTop"/>
+		<enum1 value="AlignBottom"/>
+		<enum2 value="AlignVCenter"/>
+	</AlignV>
+	<TextType>
+		<enum0 value="String"/>
+		<enum1 value="RegValue"/>
+		<enum2 value="StringList"/>
+	</TextType>
+	<TextFont>
+		<enum0 value="宋体_32"/>
+		<enum1 value="宋体_24"/>
+		<enum2 value="宋体_16"/>
+		<enum2 value="宋体_8"/>
+	</TextFont>
+</Property>

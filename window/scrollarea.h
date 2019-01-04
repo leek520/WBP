@@ -1,11 +1,12 @@
-#ifndef SCROLLAREA_H
+﻿#ifndef SCROLLAREA_H
 #define SCROLLAREA_H
 
 #include <QObject>
 #include <QScrollArea>
 #include "common.h"
 #include "widget.h"
-class ScrollArea : public QScrollArea
+#include "formwindow.h"
+class ScrollArea : public QWidget
 {
     Q_OBJECT
 public:
@@ -21,5 +22,12 @@ private:
     int m_dragMode;
     QWidget *m_centarWiget;
 };
-
+class TabWidget : public QTabWidget
+{
+    Q_OBJECT
+public:
+    TabWidget(QWidget *parent = 0);
+private slots:
+    void closeTab(int index);
+};
 #endif // SCROLLAREA_H

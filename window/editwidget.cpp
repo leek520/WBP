@@ -1,4 +1,4 @@
-#include "editwidget.h"
+﻿#include "editwidget.h"
 
 EditWidget::EditWidget(QWidget *parent) :
     Widget(parent)
@@ -17,10 +17,15 @@ void EditWidget::initPropertyTable()
 
     m_propTable << qMakePair(QVariant::Color, QString("BkDisableColor"));
 
-    m_propTable << qMakePair(QVariant::String, QString("String"));
+    m_propTable << qMakePair(QVariant::TextFormat, QString("TextType"));
+    m_propTable << qMakePair(QVariant::Int, QString("TextRegAddress"));
+    m_propTable << qMakePair(QVariant::Int, QString("TextDotBef"));
+    m_propTable << qMakePair(QVariant::Int, QString("TextDotAft"));
+    m_propTable << qMakePair(QVariant::String, QString("TextString"));
     m_propTable << qMakePair(QVariant::Color, QString("TextColor"));
     m_propTable << qMakePair(QVariant::TextFormat, QString("AlignH"));
     m_propTable << qMakePair(QVariant::TextFormat, QString("AlignV"));
+    m_propTable << qMakePair(QVariant::TextFormat, QString("TextFont"));
 }
 
 void EditWidget::initCenterWidget()

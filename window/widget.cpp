@@ -11,7 +11,7 @@ Widget::Widget(QWidget *parent) :
     setAutoFillBackground(true);
     setContextMenuPolicy(Qt::DefaultContextMenu);
     setLayout(new QGridLayout);
-    layout()->setMargin(1);
+    layout()->setMargin(0);
     layout()->setSpacing(0);
 
 }
@@ -124,6 +124,11 @@ bool Widget::eventFilter(QObject *watched, QEvent *event)
            setPosProperty();
            emit currentItemChanged(this);
         }
+//        if (((Widget *)watched->parent())->getType() == Window){
+//            setCursor(Qt::ArrowCursor);
+//        }else{
+//            setCursor(Qt::CrossCursor);
+//        }
         break;
     case QEvent::MouseButtonPress:
         me->ignore();
@@ -169,6 +174,7 @@ void Widget::initPropertyTable()
 void Widget::initCenterWidget()
 {
     m_CentralWidget = new QLabel();
+    m_CentralWidget->setMouseTracking(true); //开启鼠标追踪
     m_CentralWidget->setFont(QFont("Times", 26, QFont::Normal));
     m_CentralWidget->setMinimumSize(0,0);
     m_CentralWidget->installEventFilter(this);
@@ -187,6 +193,12 @@ void Widget::initParament()
     m_AlignH = (m_CentralWidget->alignment() & 0x0f) >> 1;
     m_AlignV = (m_CentralWidget->alignment() & 0xff) >> 6;
 
+    m_TextType = String;
+    m_TextFont = 0;
+    m_TextRegAddress = 0;
+    m_TextDotAft = 0;
+    m_TextDotAft = 0;
+    m_TextMaxLen = 128;
 }
 
 void Widget::createContexMenu()
@@ -256,6 +268,7 @@ void Widget::setBkColor(QColor BkColor)
     palette.setColor(QPalette::Window, BkColor);
     m_CentralWidget->setPalette(palette);
 
+    qDebug()<<m_CentralWidget->font().family();
     repaint();
 }
 
@@ -479,6 +492,16 @@ void Widget::setTextType(int value)
 {
     m_TextType = value;
 }
+
+int Widget::getTextFont()
+{
+    return m_TextFont;
+}
+
+void Widget::setTextFont(int value)
+{
+    m_TextFont = value;
+}
 int Widget::getTextMaxLen()
 {
     return m_TextMaxLen;
@@ -573,9 +596,20 @@ void BuildInfo::initBuild()
     memset(luaBuf.buf, 0, LuaLen);
     luaBuf.pos = 0;
 
+    memset(fontBuf.buf, 0, FontLen);
+    fontBuf.pos = 0;
+
+    memset(charBuf.buf, 0, CharLen);
+    charBuf.pos = 0;
+
     memset(imageBuf.buf, 0, ImageLen);
     imageBuf.pos = 0;
 
+}
+
+void BuildInfo::setEnumProperty(QMap<QString, QStringList> *enumMap)
+{
+    propertyEnum = enumMap;
 }
 
 BuildInfo::WidgetBuf *BuildInfo::getWidgetBuf()
@@ -643,14 +677,14 @@ char *BuildInfo::QStringToMultBytes(QString str)
                 qtmp = str.at(i);
                 num = qtmp.unicode();
             }else{
-                int charIdx = m_charList.indexOf(str.at(i));
+                //int charIdx = m_charList.indexOf(str.at(i));
+                int charIdx = m_CharRecord.indexOf(str.at(i));
                 if (charIdx > -1){
                     num = CHAR_START_UNICODE + charIdx;
                 }else{
                     QMessageBox::critical(0, tr("错误"), QString("字库不包含字符:%1.").arg(str.at(i)), QMessageBox::Yes, QMessageBox::Yes);
                     return NULL;
                 }
-
             }
         }else{
             qtmp =(QChar)*q++;
@@ -700,7 +734,8 @@ char *BuildInfo::QStringListToMultBytes(QStringList strList, int maxLen)
                         qtmp = str.at(i);
                         num = qtmp.unicode();
                     }else{
-                        int charIdx = m_charList.indexOf(str.at(i));
+                        //int charIdx = m_charList.indexOf(str.at(i));
+                        int charIdx = m_CharRecord.indexOf(str.at(i));
                         if (charIdx > -1){
                             num = CHAR_START_UNICODE + charIdx;
                         }else{
@@ -894,7 +929,127 @@ void BuildInfo::GraphToEgraph(Widget *w, GraphInfo *graphinfo)
     graphinfo->lineColor = QColorToEColor(w->getLineColor());
     graphinfo->fillColor = QColorToEColor(w->getFillColor());
 }
+void BuildInfo::RecordChar(QString &string)
+{
+    for(int i=0;i<string.count();i++){
+        QChar ch = string.at(i);
+        if (!m_CharRecord.contains(ch)){
+            m_CharRecord.append(ch);
+        }
+    }
+}
+bool BuildInfo::compareUnicode(QChar &a, QChar &b)
+{
+    return (a.unicode() < b.unicode());
+}
 
+void BuildInfo::SortRecordChar()
+{
+    qSort(m_CharRecord.begin(), m_CharRecord.end(), compareUnicode);
+    m_CharRecord = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
+                  + m_CharRecord;
+
+
+}
+void BuildInfo::FontToChar(int fontType)
+{
+
+    QStringList fontStr = propertyEnum->value(QString("TextFont"))[fontType].split("_");;
+    if (fontStr.count()!=2) return;
+    int fontSize = fontStr[1].toInt();
+    //GUI_FONT_PROP结构体信息
+    int startAddr = START_ADDR_SDRAM_CHAR + charBuf.pos;
+    GUI_FONT_PROP *fontProp = (GUI_FONT_PROP *)(charBuf.buf + charBuf.pos);
+    charBuf.pos += sizeof(GUI_FONT_PROP);
+    fontProp->First = 0X0030;
+    fontProp->Last = 0x0039;
+    fontProp->paCharInfo = (GUI_CHARINFO *)(startAddr + 4*sizeof(GUI_FONT_PROP) + 0);
+    fontProp->pNext = (GUI_FONT_PROP *)(startAddr + 1*sizeof(GUI_FONT_PROP));
+
+    fontProp = (GUI_FONT_PROP *)(charBuf.buf + charBuf.pos);
+    charBuf.pos += sizeof(GUI_FONT_PROP);
+    fontProp->First = 0X0041;
+    fontProp->Last = 0x005A;
+    fontProp->paCharInfo = (GUI_CHARINFO *)(startAddr + 4*sizeof(GUI_FONT_PROP) + 10 * 8);
+    fontProp->pNext = (GUI_FONT_PROP *)(startAddr + 2*sizeof(GUI_FONT_PROP));
+
+    fontProp = (GUI_FONT_PROP *)(charBuf.buf + charBuf.pos);
+    charBuf.pos += sizeof(GUI_FONT_PROP);
+    fontProp->First = 0X0061;
+    fontProp->Last = 0x007A;
+    fontProp->paCharInfo = (GUI_CHARINFO *)(startAddr + 4*sizeof(GUI_FONT_PROP) + 36 * 8);
+    fontProp->pNext = (GUI_FONT_PROP *)(startAddr + 3*sizeof(GUI_FONT_PROP));
+
+    fontProp = (GUI_FONT_PROP *)(charBuf.buf + charBuf.pos);
+    charBuf.pos += sizeof(GUI_FONT_PROP);
+    fontProp->First = CHAR_START_UNICODE + 52;
+    fontProp->Last = CHAR_START_UNICODE + m_CharRecord.count();
+    fontProp->paCharInfo = (GUI_CHARINFO *)(startAddr + 4*sizeof(GUI_FONT_PROP) + 52 * 8);
+    fontProp->pNext = NULL;
+
+
+    QFont font;
+    font.setPixelSize(fontSize);
+    font.setFamily(fontStr[0]);
+    QFontMetrics fm(font);
+    int charWidth;
+    int charHeight = fm.height();;
+    GUI_CHARINFO *charInfo;
+    for(int i=0;i<m_CharRecord.count();i++){
+        charWidth = fm.width(m_CharRecord.at(i));
+        //字体数组信息buf
+        charInfo = (GUI_CHARINFO *)(charBuf.buf + charBuf.pos);
+        charBuf.pos += sizeof(GUI_CHARINFO);
+        charInfo->XSize = charWidth;
+        charInfo->XDist = charWidth;
+        charInfo->BytesPerLine = charWidth / 8;
+        charInfo->pData = (uchar *)(START_ADDR_SDRAM_FONT + fontBuf.pos);
+
+
+        charWidth = fm.width(m_CharRecord.at(i));
+        //指定图片大小为字体的大小
+        QSize size(charWidth, charHeight);
+        //以ARGB32格式构造一个QImage
+        QImage image(size, QImage::Format_ARGB32);
+        //填充图片背景,120/250为透明度
+        image.fill(qRgba(255, 255, 255, 0));
+
+        //为这个QImage构造一个QPainter
+        QPainter painter(&image);
+        //设置画刷的组合模式CompositionMode_SourceOut这个模式为目标图像在上。
+        //改变组合模式和上面的填充方式可以画出透明的图片。
+        painter.setCompositionMode(QPainter::CompositionMode_DestinationOver);
+
+        //改变画笔和字体
+        QPen pen = painter.pen();
+        pen.setColor(qRgba(0, 0, 0, 255));
+
+        painter.setPen(pen);
+        painter.setFont(font);
+
+        painter.drawText(image.rect(), Qt::AlignCenter, m_CharRecord.at(i));
+        //image.save("123.bmp");
+
+        QColor color;
+        int value = 0;
+        qDebug()<<charWidth<<charHeight;
+        for(int j=0;j<charHeight;j++){
+            for(int t=0;t<charWidth-7;t=t+8){
+                value = 0;
+                for(int k=0;k<8;k++){
+                    color = image.pixelColor(t+k, j);
+                    if ((color.red()==0) && (color.blue()==0) && (color.green()==0)){
+                        value = value | (1<<(7-k));
+                    }
+                }
+                fontBuf.buf[fontBuf.pos++] = value & 0xff;
+                //QString strings = QString::number(value & 0xff, 16);
+            }
+        }
+    }
+
+
+}
 
 void BuildInfo::downLoadInfo()
 {
@@ -1034,6 +1189,34 @@ void BuildInfo::ResProgress_slt(int pos, QString msg)
                 byte.resize(imageBuf.pos);
                 for(int i=0;i<imageBuf.pos;i++) {
                     byte[i] = imageBuf.buf[i];
+                }
+                emit DownLoad_sig(erase, address, byte);
+                break;
+            }else{
+                downloadStep++;
+            }
+        case 5:
+            //擦除20K，下载地址，下载文本数据包
+            erase = 0x5c;
+            address = START_ADDR_FLASH_CHAR;
+            if (charBuf.pos > 0){
+                byte.resize(charBuf.pos);
+                for(int i=0;i<charBuf.pos;i++) {
+                    byte[i] = charBuf.buf[i];
+                }
+                emit DownLoad_sig(erase, address, byte);
+                break;
+            }else{
+                downloadStep++;
+            }
+        case 6:
+            //擦除20K，下载地址，下载文本数据包
+            erase = 0x5f;   //252K
+            address = START_ADDR_FLASH_FONT;
+            if (fontBuf.pos > 0){
+                byte.resize(fontBuf.pos);
+                for(int i=0;i<fontBuf.pos;i++) {
+                    byte[i] = fontBuf.buf[i];
                 }
                 emit DownLoad_sig(erase, address, byte);
                 break;

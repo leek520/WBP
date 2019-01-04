@@ -41,6 +41,7 @@ void PropertyDialog::showDialog(Widget *w)
     initDialog();
 
     this->setWindowTitle(QString("%1-[%2]").arg(m_title).arg(name));
+    this->setModal(true);
     this->show();
 }
 
@@ -132,7 +133,7 @@ void PropertyDialog::on_textColor_clicked()
 
     ui->textColor->setStyleSheet(QString("background-color: #%1;")
                                 .arg(QString::number(color.rgba(), 16)));
-    m_widget->setBkColor(color);
+    m_widget->setTextColor(color);
 }
 
 void PropertyDialog::on_textAlignH_currentIndexChanged(int index)

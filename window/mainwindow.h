@@ -28,6 +28,7 @@ private:
     void createStatusBar();
     void setupUi();
 
+    void initEnumProperty();
     bool docXmlRead(QString &filename);
     bool docXmlCreate(QString &filename);
     bool docXmlWrite(QString &filename);
@@ -36,12 +37,10 @@ private:
     QDomElement widgetToDom(Widget *w, QDomElement root);
     void DomToWidget(QDomElement root, Widget *w);
 
-    char *QStringToMultBytes(QString str);
-
     WindowInfo *setWidgetInfo(Widget *w, struct list_head *head, int *pos, int start);
     void setBaseInfo(Widget *w, BasePara *base);
     void setTextInfo(Widget *w, TextPara *text);
-
+    void recordUsedChar();
 private slots:
     void newFile();
     bool open();
@@ -116,8 +115,7 @@ private:
     QList <QAction *>m_graphActList;
 
     Selection *m_sel;
-    ScrollArea *m_scollArea;
-    QMdiArea *m_mdiArea;
+    TabWidget *m_mdiArea;
     QDomDocument doc;
     LeftWidget *m_leftW;
     PropertyWidget *m_propW;
@@ -127,7 +125,20 @@ private:
     ProgressBar *m_progressBar;
     QDockWidget *m_dockBottom;
 
-    BuildInfo *buildInfo;
-};
+    BuildInfo *m_buildInfo;
 
+    QMap<QString, QStringList> propertyEnum;
+};
+/*************加载qss文件的函数*************/
+class CommonHelper
+{
+public:
+    static void setStyle(const QString &style)
+    {
+        QFile qss(style);
+        qss.open(QFile::ReadOnly);
+        qApp->setStyleSheet(qss.readAll());
+        qss.close();
+    }
+};
 #endif // MAINWINDOW_H

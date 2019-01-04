@@ -1,0 +1,6 @@
+﻿/**********中心容器页签项**********/
+QTabWidget#mdiArea::pane {
+        border: none;
+        background: gray;
+}
+
