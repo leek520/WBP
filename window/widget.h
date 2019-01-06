@@ -97,6 +97,10 @@ public:
     QList<QPair<QVariant::Type, QString> > getPropertyTable();
     void setPosProperty();
     void addContexMenuAction(QAction *action);
+    QString getLanString(int lan);
+    void setLanString(int lan, QString str);
+    QStringList getLanStringList(int lan);
+    void setLanStringList(int lan, QStringList list);
     void refresh();
 private:
     int assignId();
@@ -126,6 +130,7 @@ protected:
     QMenu *m_ContextMenu;
 public:
     static int m_curLan;
+    static bool m_sim;
 public:
     int getId();
     void setId(int Id);

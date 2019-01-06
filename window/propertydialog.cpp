@@ -7,6 +7,10 @@ PropertyDialog::PropertyDialog(QWidget *parent) :
 {
     ui->setupUi(this);
     m_title = this->windowTitle();
+
+    //设置表头
+    ui->textList->horizontalHeader()->setVisible(true);
+    ui->textList->setColumnCount(LAN_NUM);
 }
 
 PropertyDialog::~PropertyDialog()
@@ -90,10 +94,13 @@ void PropertyDialog::on_textType_currentIndexChanged(int index)
 void PropertyDialog::on_textListAdd_clicked()
 {
     int curIdx = ui->textList->currentRow()+1;
-    QTableWidgetItem *item = new QTableWidgetItem();
+    QTableWidgetItem *item;
     ui->textList->insertRow(curIdx);
-    ui->textList->setItem(curIdx, 0, item);
-    ui->textList->setCurrentItem(item);
+    for(int i=0;i<LAN_NUM;i++){
+        item = new QTableWidgetItem();
+       ui->textList->setItem(curIdx, i, item);
+    }
+    ui->textList->setCurrentCell(curIdx, 0);
 }
 
 void PropertyDialog::on_textListRemove_clicked()
@@ -179,27 +186,33 @@ void PropertyDialog::initDialog()
 
 void PropertyDialog::getStringList()
 {
-    QStringList strList = m_widget->getTextStringList();
-    for(int i=0;i<strList.count();i++){
-        on_textListAdd_clicked();
-        ui->textList->item(i, 0)->setText(strList[i]);
+    for(int j=0;j<LAN_NUM;j++){
+        QStringList strList = m_widget->getLanStringList(j);
+        for(int i=0;i<strList.count();i++){
+            if (j==0)
+                on_textListAdd_clicked();
+            ui->textList->item(i, j)->setText(strList[i]);
+        }
     }
 }
 
 void PropertyDialog::setStringList()
 {
-    QStringList strList;
+
     QString str;
     int maxLen = 0;
     if (ui->textType->currentIndex() == StringList){
-        for(int i=0;i<ui->textList->rowCount();i++){
-            str = ui->textList->item(i, 0)->text();
-            strList.append(str);
-            if (str.count() > maxLen){
-                maxLen = str.count();
+        for (int k=0;k<LAN_NUM;k++){
+            QStringList strList;
+            for(int i=0;i<ui->textList->rowCount();i++){
+                str = ui->textList->item(i, k)->text();
+                strList.append(str);
+                if (str.count() > maxLen){
+                    maxLen = str.count();
+                }
             }
+            m_widget->setLanStringList(k, strList);
         }
         m_widget->setTextMaxLen(maxLen+1);  //这里+1是要加入结束符
-        m_widget->setTextStringList(strList);
     }
 }

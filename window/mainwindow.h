@@ -75,6 +75,7 @@ private slots:
 signals:
 
 private:
+    QWidget *parent;
     QStatusBar *stateBar;
     QMenu *fileMenu;
     QMenu *editMenu;

@@ -24,7 +24,7 @@
         <Text AlignV="2" TextDotAft="0" AlignH="0" Id="2014" TextString="电压过高" TextFont="0" TextType="0" geometry="[(170,385)],500×38" TextRegAddress="0" BkColor="#ff0000" TextDotBef="0" TextColor="#000000"/>
         <Text AlignV="2" TextDotAft="0" AlignH="0" Id="2015" TextString="0001V" TextFont="0" TextType="0" geometry="[(690,385)],100×38" TextRegAddress="0" BkColor="#00f0f0f0" TextDotBef="0" TextColor="#000000"/>
         <Text AlignV="2" TextDotAft="0" AlignH="0" Id="2017" TextString="运行总时间:000010:01:25" TextFont="0" TextType="0" geometry="[(10,432)],420×38" TextRegAddress="0" BkColor="#00f0f0f0" TextDotBef="0" TextColor="#000000"/>
-        <Text AlignV="2" TextDotAft="0" AlignH="0" Id="2017" TextString="排气温度高" TextFont="0" TextType="0" geometry="[(438,432)],362×38" TextRegAddress="0" BkColor="#ffff00" TextDotBef="0" TextColor="#000000"/>
+        <Text AlignV="2" TextDotAft="0" AlignH="0" Id="2016" TextString="排气温度高" TextFont="0" TextType="0" geometry="[(438,432)],362×38" TextRegAddress="0" BkColor="#ffff00" TextDotBef="0" TextColor="#000000"/>
     </Window>
     <Window Id="1" geometry="[(0,0)],800×480" BkColor="#5aaed5">
         <Rect Rectangle="[(12,8)],783×397" FillColor="#ffffff" FillEnable="false" Radius="10" LineColor="#ffffff" LineWidth="2"/>

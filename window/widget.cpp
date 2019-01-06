@@ -1,6 +1,7 @@
 ﻿#include "widget.h"
 QMap<int, int> Widget::m_IdPool;
 int Widget::m_curLan = 0;
+bool Widget::m_sim = false;
 Widget::Widget(QWidget *parent) :
     QWidget(parent),
     m_ContextMenu(new QMenu())
@@ -81,7 +82,7 @@ void Widget::setImage()
         m_CentralWidget->setPixmap(QPixmap());
         move(m_ImagePos);
     }
-    repaint();
+    //repaint();
 }
 
 void Widget::setPosProperty()
@@ -112,9 +113,28 @@ void Widget::addContexMenuAction(QAction *action)
 {
     m_ContextMenu->addAction(action);
 }
+QStringList Widget::getLanStringList(int lan)
+{
+    return m_TextStringList[lan];
+}
+
+void Widget::setLanStringList(int lan, QStringList list)
+{
+    m_TextStringList[lan] = list;
+}
+QString Widget::getLanString(int lan)
+{
+    return m_TextString[lan];
+}
+
+void Widget::setLanString(int lan, QString str)
+{
+    m_TextString[lan] = str;
+}
 
 bool Widget::eventFilter(QObject *watched, QEvent *event)
 {
+    if (Widget::m_sim) return QWidget::eventFilter(watched, event);
     //处理鼠标事件
     QMouseEvent *me = (QMouseEvent *)event;
     switch (event->type()) {
@@ -231,7 +251,8 @@ void Widget::refresh()
     default:
         break;
     }
-
+    setBkColor(m_BkColor);
+    setTextColor(m_TextColor);
     update();
 }
 
@@ -297,8 +318,8 @@ void Widget::setBkColor(QColor BkColor)
     palette.setColor(QPalette::Window, BkColor);
     m_CentralWidget->setPalette(palette);
 
-    qDebug()<<m_CentralWidget->font().family();
-    repaint();
+    //qDebug()<<m_CentralWidget->font().family();
+    //repaint();
 }
 
 QString Widget::getBkImage()

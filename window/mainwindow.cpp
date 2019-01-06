@@ -59,151 +59,119 @@ void MainWindow::mouseMoveEvent(QMouseEvent *event)
         ToolBar::pressAct = NULL;
     }
 }
-
 void MainWindow::createActions()
 {
     /****file****/
     newAct = new QAction(QIcon(":/images/new.png"), tr("&New"), this);
     newAct->setShortcuts(QKeySequence::New);
-    newAct->setStatusTip(tr("Create a new file"));
     connect(newAct, SIGNAL(triggered()), this, SLOT(newFile()));
 
     openAct = new QAction(QIcon(":/images/open.png"), tr("&Open..."), this);
     openAct->setShortcuts(QKeySequence::Open);
-    openAct->setStatusTip(tr("Open an existing file"));
     connect(openAct, SIGNAL(triggered()), this, SLOT(open()));
 
     saveAct = new QAction(QIcon(":/images/save.png"), tr("&Save"), this);
     saveAct->setShortcuts(QKeySequence::Save);
-    saveAct->setStatusTip(tr("Save the document to disk"));
     connect(saveAct, SIGNAL(triggered()), this, SLOT(save()));
 
     saveAsAct = new QAction(tr("Save &As..."), this);
     saveAsAct->setShortcuts(QKeySequence::SaveAs);
-    saveAsAct->setStatusTip(tr("Save the document under a new name"));
     connect(saveAsAct, SIGNAL(triggered()), this, SLOT(saveAs()));
 
     exitAct = new QAction(tr("E&xit"), this);
     exitAct->setShortcuts(QKeySequence::Quit);
-
-    exitAct->setStatusTip(tr("Exit the application"));
     connect(exitAct, SIGNAL(triggered()), this, SLOT(close()));
 
     /****edit****/
     undoAct = new QAction(QIcon(":/images/undo.png"), tr("&Undo"), this);
     undoAct->setShortcuts(QKeySequence::Undo);
-    undoAct->setStatusTip(tr("撤销(Ctrl+Z)"));
     undoAct->setEnabled(false);
     connect(undoAct, SIGNAL(triggered()), this, SLOT(undo()));
 
     redoAct = new QAction(QIcon(":/images/redo.png"), tr("&Redo"), this);
     redoAct->setShortcuts(QKeySequence::Redo);
-    redoAct->setStatusTip(tr("恢复(Ctrl+Y)"));
     redoAct->setEnabled(false);
     connect(redoAct, SIGNAL(triggered()), this, SLOT(redo()));
 
     cutAct = new QAction(QIcon(":/images/cut.png"), tr("Cu&t"), this);
     cutAct->setShortcuts(QKeySequence::Cut);
-    cutAct->setStatusTip(tr("Cut the current selection's contents to the "
-                            "clipboard"));
     connect(cutAct, SIGNAL(triggered()), this, SLOT(cut()));
 
     copyAct = new QAction(QIcon(":/images/copy.png"), tr("&Copy"), this);
     copyAct->setShortcuts(QKeySequence::Copy);
-    copyAct->setStatusTip(tr("Copy the current selection's contents to the "
-                             "clipboard"));
     connect(copyAct, SIGNAL(triggered()), this, SLOT(copy()));
 
     pasteAct = new QAction(QIcon(":/images/paste.png"), tr("&Paste"), this);
     pasteAct->setShortcuts(QKeySequence::Paste);
-    pasteAct->setStatusTip(tr("Paste the clipboard's contents into the current "
-                              "selection"));
     connect(pasteAct, SIGNAL(triggered()), this, SLOT(paste()));
 
     removeAct = new QAction(QIcon(":/images/remove.png"), tr("&Remove"), this);
     removeAct->setShortcuts(QKeySequence::Delete);
-    removeAct->setStatusTip(tr("Remove the current selection"));
     connect(removeAct, SIGNAL(triggered()), this, SLOT(remove()));
 
     /****set****/
     setComAct = new QAction(QIcon(":/set"), tr("&SetCom"), this);
-    setComAct->setStatusTip(tr(""));
     connect(setComAct, SIGNAL(triggered()), this, SLOT(setCom()));
 
     /****about****/
     aboutAct = new QAction(QIcon(":/images/about.png"), tr("&About"), this);
-    aboutAct->setStatusTip(tr("Show the application's About box"));
     connect(aboutAct, SIGNAL(triggered()), this, SLOT(about()));
 
     /****build****/
     buildAct = new QAction(QIcon(":/build"), tr("&Build"), this);
-    buildAct->setStatusTip(tr("Build"));
     connect(buildAct, SIGNAL(triggered()), this, SLOT(build()));
 
     downloadAct = new QAction(QIcon(":/download"), tr("&Download"), this);
-    downloadAct->setStatusTip(tr("Download"));
     connect(downloadAct, SIGNAL(triggered()), this, SLOT(download()));
 
     simstartAct = new QAction(QIcon(":/simstart"), tr("&simstart"), this);
-    simstartAct->setStatusTip(tr("simstart"));
     connect(simstartAct, SIGNAL(triggered()), this, SLOT(simStart()));
 
     simstopAct = new QAction(QIcon(":/simstop"), tr("&simstop"), this);
-    simstopAct->setStatusTip(tr("simstop"));
     connect(simstopAct, SIGNAL(triggered()), this, SLOT(simStop()));
 
     //tools
     lan_nextAct = new QAction(QIcon(":/lan_next"), tr("&lan_next"), this);
-    lan_nextAct->setStatusTip(tr("lan_next"));
     connect(lan_nextAct, SIGNAL(triggered()), this, SLOT(lanNext()));
 
     lan_prevAct = new QAction(QIcon(":/lan_prev"), tr("&lan_prev"), this);
-    lan_prevAct->setStatusTip(tr("lan_prev"));
     connect(lan_prevAct, SIGNAL(triggered()), this, SLOT(lanPrev()));
 
     /****widget****/
     QAction *act = new QAction(QIcon(":/window"), tr("window"), this);
-    act->setStatusTip(tr("Window"));
     act->setShortcut(Qt::Key_F3);
     connect(act, SIGNAL(triggered()), this, SLOT(addWidget()));
     m_widgetActList.append(act);
 
     act = new QAction(QIcon(":/button"), tr("button"), this);
-    act->setStatusTip(tr("Button"));
     act->setShortcut(Qt::Key_F4);
     connect(act, SIGNAL(triggered()), this, SLOT(addWidget()));
     m_widgetActList.append(act);
 
     act = new QAction(QIcon(":/text"), tr("text"), this);
-    act->setStatusTip(tr("Text"));
     act->setShortcut(Qt::Key_F5);
     connect(act, SIGNAL(triggered()), this, SLOT(addWidget()));
     m_widgetActList.append(act);
 
     act = new QAction(QIcon(":/edit"), tr("edit"), this);
-    act->setStatusTip(tr("Edit"));
     act->setShortcut(Qt::Key_F6);
     connect(act, SIGNAL(triggered()), this, SLOT(addWidget()));
     m_widgetActList.append(act);
 
     /****graph****/
     act = new QAction(QIcon(":/image"), tr("image"), this);
-    act->setStatusTip(tr("image"));
     connect(act, SIGNAL(triggered()), this, SLOT(addWidget()));
     m_graphActList.append(act);
 
     act = new QAction(QIcon(":/line"), tr("line"), this);
-    act->setStatusTip(tr("line"));
     connect(act, SIGNAL(triggered()), this, SLOT(addWidget()));
     m_graphActList.append(act);
 
     act = new QAction(QIcon(":/rect"), tr("rect"), this);
-    act->setStatusTip(tr("rect"));
     connect(act, SIGNAL(triggered()), this, SLOT(addWidget()));
     m_graphActList.append(act);
 
     act = new QAction(QIcon(":/circle"), tr("circle"), this);
-    act->setStatusTip(tr("circle"));
     connect(act, SIGNAL(triggered()), this, SLOT(addWidget()));
     m_graphActList.append(act);
 }
@@ -551,6 +519,37 @@ QDomElement MainWindow::widgetToDom(Widget *w, QDomElement root)
     for(int k=0;k<propTable.count();k++){
         QDomAttr propNode = doc.createAttribute(propTable[k].second);
         QVariant value = w->property(propTable[k].second.toLocal8Bit());
+
+        //填充stringlist属性
+        if (propTable[k].second == QString("TextString")){
+            QDomElement textDom, lanDom;
+            QDomAttr lanAttr;
+            if (w->getTextType() == StringList){
+                for(int i=0;i<LAN_NUM;i++){
+                    QStringList strList = w->getLanStringList(i);
+                    lanDom = doc.createElement(QString("LAN%1").arg(i));
+                    for(int j=0;j<strList.count();j++){
+                        textDom = doc.createElement(QString("String%1").arg(j));
+                        lanAttr = doc.createAttribute("value");
+                        lanAttr.setValue(strList[j]);
+                        textDom.setAttributeNode(lanAttr);
+                        lanDom.appendChild(textDom);
+                    }
+                    childDom.appendChild(textDom);
+                }
+            }else{
+                for(int i=0;i<LAN_NUM;i++){
+                    lanDom = doc.createElement(QString("LAN%1").arg(i));
+                    textDom = doc.createElement("String");
+                    lanAttr = doc.createAttribute("value");
+                    lanAttr.setValue(w->getLanString(i));
+                    textDom.setAttributeNode(lanAttr);
+                    lanDom.appendChild(textDom);
+                    childDom.appendChild(lanDom);
+                }    
+            }
+            continue;
+        }
         switch (propTable[k].first) {
         case QVariant::Rect:
         {
@@ -587,6 +586,39 @@ void MainWindow::DomToWidget(QDomElement root, Widget *w)
     QList<QPair<QVariant::Type, QString> > propTable;
     propTable = w->getPropertyTable();
     for(int i=0;i<propTable.count();i++){
+        if (propTable[i].second == QString("TextString")){
+            QDomNode textNode, lanNode;
+            QDomElement textDom, lanDom;
+            QString attrVaue;
+            if (w->getTextType() == StringList){
+                lanNode = root.firstChild();
+                for(int i=0;i<LAN_NUM;i++){
+                    lanDom = lanNode.toElement();
+                    textNode = lanDom.firstChild();
+                    QStringList strList;
+                    while(!textNode.isNull()){
+                        textDom = textNode.toElement();
+                        attrVaue = textDom.attribute("value");
+                        strList << attrVaue;
+                        textNode = textNode.nextSibling();
+                    }
+                    w->setLanStringList(i, strList);
+                    lanNode = lanNode.nextSibling();
+                }
+            }else{
+                lanNode = root.firstChild();
+                for(int i=0;i<LAN_NUM;i++){
+                    lanDom = lanNode.toElement();
+                    textNode = lanDom.firstChild();
+                    textDom = textNode.toElement();
+                    attrVaue = textDom.attribute("value");
+                    w->setLanString(i, attrVaue);
+                    lanNode = lanNode.nextSibling();
+                }
+            }
+            continue;
+        }
+
         QString attrVaue = root.attribute(propTable[i].second);
         QVariant value;
         switch (propTable[i].first){
@@ -643,6 +675,7 @@ void MainWindow::DomToWidget(QDomElement root, Widget *w)
 
     }
     w->setUpdatesEnabled(true);
+    w->refresh();
 }
 
 
@@ -997,12 +1030,24 @@ void MainWindow::setCom()
 
 void MainWindow::simStart()
 {
+    Widget::m_sim = true;
 
+    WindowWidget *win = WindowWidget::m_curWin;
+    win->setMouseTracking(false);
+    parent = (QWidget *)win->parent();
+    win->setParent(0);
+    win->move(100,100);
+    win->show();
 }
 
 void MainWindow::simStop()
 {
-
+    Widget::m_sim = false;
+    WindowWidget::m_curWin->setParent(parent);
+    WindowWidget::m_curWin->move(0,0);
+    WindowWidget::m_curWin->show();
+    WindowWidget::m_curWin->refresh();
+    WindowWidget::m_curWin->repaint();
 }
 
 void MainWindow::lanNext()
