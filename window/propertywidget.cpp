@@ -11,12 +11,6 @@ PropertyWidget::PropertyWidget(QWidget *parent) : QWidget(parent)
     layout()->addWidget(propertyEditor);
 }
 
-void PropertyWidget::setEnumProperty(QMap<QString, QStringList> *enumMap)
-{
-    propertyEnum = enumMap;
-}
-
-
 void PropertyWidget::currentItemChanged(Widget *w)
 {
     updateExpandState();
@@ -41,20 +35,15 @@ void PropertyWidget::currentItemChanged(Widget *w)
         switch (propTable[i].first) {
         case QVariant::TextFormat:
         {
-            property = variantManager->addProperty(QtVariantPropertyManager::enumTypeId(), propTable[i].second);
-            QStringList enumNames = propertyEnum->value(propTable[i].second);
-//            if (propTable[i].second == "AlignH"){
-//                enumNames << "AlignLeft"  << "AlignRight" << "AlignHCenter";
-//            }else if(propTable[i].second == "AlignV"){
-//                enumNames << "AlignTop" << "AlignBottom" << "AlignVCenter";
-//            }else if(propTable[i].second == "TextType"){
-//                enumNames << "String" << "RegValue" << "StringList";
-//            }else if(propTable[i].second == "TextFont"){
-//                enumNames << "宋体_32" << "宋体_24" << "宋体_16" << "宋体_8";
-//            }
-            property->setAttribute(QLatin1String("enumNames"), enumNames);
-            property->setValue(value);
-            break;
+            if (propTable[i].second == QString("TextMaxLen")){
+                continue;
+            }else{
+                property = variantManager->addProperty(QtVariantPropertyManager::enumTypeId(), propTable[i].second);
+                QStringList enumNames = PV->getEnumProperty(propTable[i].second);
+                property->setAttribute(QLatin1String("enumNames"), enumNames);
+                property->setValue(value);
+                break;
+            }
         }
         case QVariant::Line:
         {
@@ -100,6 +89,7 @@ void PropertyWidget::addProperty(QtVariantProperty *property, const QString &id)
 }
 void PropertyWidget::valueChanged(QtProperty *property, const QVariant &value)
 {
+    QVariant pvalue = value;
     if (!propertyToId.contains(property))
         return;
 
@@ -107,5 +97,5 @@ void PropertyWidget::valueChanged(QtProperty *property, const QVariant &value)
         return;
 
     QString id = propertyToId[property];
-    m_curW->setProperty(id.toLocal8Bit(), value);
+    m_curW->setProperty(id.toLocal8Bit(), pvalue);
 }

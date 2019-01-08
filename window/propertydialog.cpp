@@ -45,16 +45,17 @@ void PropertyDialog::showDialog(Widget *w)
     initDialog();
 
     this->setWindowTitle(QString("%1-[%2]").arg(m_title).arg(name));
-    this->setModal(true);
     this->show();
+    this->raise();
 }
 
 
 void PropertyDialog::on_buttonBox_accepted()
 {
+    m_widget->setTextFont(ui->textFont->currentIndex());
     m_widget->setTextRegAddress(ui->textRegAddress->value());
-    m_widget->setTextDotBef(ui->textDotBef->value());
-    m_widget->setTextDotAft(ui->textDotAft->value());
+    m_widget->setTextTotLen(ui->textDotBef->value());
+    m_widget->setTextDotLen(ui->textDotAft->value());
     setStringList();
 
     m_widget->setLuaCmd(ui->LuaEditor->toPlainText());
@@ -137,7 +138,7 @@ void PropertyDialog::on_textDown_clicked()
 
 void PropertyDialog::on_textColor_clicked()
 {
-    QColor color = QColorDialog::getColor(m_widget->getBkColor(), this);
+    QColor color = QColorDialog::getColor(m_widget->getTextColor(), this);
 
     ui->textColor->setStyleSheet(QString("background-color: #%1;")
                                 .arg(QString::number(color.rgba(), 16)));
@@ -163,13 +164,17 @@ void PropertyDialog::on_textEdit_textChanged()
 
 void PropertyDialog::initDialog()
 {
+    ui->baseId->setValue(m_widget->getId());
+    ui->baseBkColor->setStyleSheet(QString("background-color: #%1;")
+                                   .arg(QString::number(m_widget->getBkColor().rgba(), 16)));
+
     ui->textColor->setStyleSheet(QString("background-color: #%1;")
                                 .arg(QString::number(m_widget->getTextColor().rgba(), 16)));
 
     ui->textType->setCurrentIndex(m_widget->getTextType());
     ui->textRegAddress->setValue(m_widget->getTextRegAddress());
-    ui->textDotBef->setValue(m_widget->getTextDotBef());
-    ui->textDotAft->setValue(m_widget->getTextDotAft());
+    ui->textDotBef->setValue(m_widget->getTextTotLen());
+    ui->textDotAft->setValue(m_widget->getTextDotLen());
 
     on_textType_currentIndexChanged(m_widget->getTextType());
     on_textAlignH_currentIndexChanged(m_widget->getAlignH());
@@ -215,4 +220,24 @@ void PropertyDialog::setStringList()
         }
         m_widget->setTextMaxLen(maxLen+1);  //这里+1是要加入结束符
     }
+}
+
+
+void PropertyDialog::on_textFont_currentIndexChanged(int index)
+{
+    m_widget->setTextFont(index);
+}
+
+void PropertyDialog::on_baseId_valueChanged(int arg1)
+{
+    m_widget->setId(arg1);
+}
+
+void PropertyDialog::on_baseBkColor_clicked()
+{
+    QColor color = QColorDialog::getColor(m_widget->getBkColor(), this);
+
+    ui->baseBkColor->setStyleSheet(QString("background-color: #%1;")
+                                .arg(QString::number(color.rgba(), 16)));
+    m_widget->setBkColor(color);
 }

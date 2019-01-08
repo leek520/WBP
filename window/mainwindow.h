@@ -12,6 +12,9 @@
 #include "toolbar.h"
 #include "scrollarea.h"
 #include "bottomwidget.h"
+#include "buildinfo.h"
+#include "editorwidget.h"
+
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -65,6 +68,8 @@ private slots:
 
     void lanNext();
     void lanPrev();
+
+    void editor();
 
     void switchTabWindow(Widget *w);
     void ResProgress_slt(int step, int pos, QString msg="");
@@ -120,6 +125,8 @@ private:
 
     QAction *lan_nextAct;
     QAction *lan_prevAct;
+    QAction *editorAct;
+
 
     QPoint dragPosition;
 
@@ -141,16 +148,5 @@ private:
 
     QMap<QString, QStringList> propertyEnum;
 };
-/*************加载qss文件的函数*************/
-class CommonHelper
-{
-public:
-    static void setStyle(const QString &style)
-    {
-        QFile qss(style);
-        qss.open(QFile::ReadOnly);
-        qApp->setStyleSheet(qss.readAll());
-        qss.close();
-    }
-};
+
 #endif // MAINWINDOW_H

@@ -3,7 +3,7 @@
  <class>PropertyDialog</class>
  <widget class="QDialog" name="PropertyDialog">
   <property name="windowModality">
-   <enum>Qt::WindowModal</enum>
+   <enum>Qt::NonModal</enum>
   </property>
   <property name="geometry">
    <rect>
@@ -25,13 +25,38 @@
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>1</number>
+      <number>2</number>
      </property>
      <widget class="QWidget" name="tab_1">
       <attribute name="title">
        <string>控件属性</string>
       </attribute>
-      <layout class="QGridLayout" name="gridLayout"/>
+      <layout class="QGridLayout" name="gridLayout">
+       <item row="0" column="0">
+        <widget class="QLabel" name="label_2">
+         <property name="text">
+          <string>控件Id</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <widget class="QSpinBox" name="baseId"/>
+       </item>
+       <item row="1" column="0">
+        <widget class="QLabel" name="label_3">
+         <property name="text">
+          <string>背景颜色</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <widget class="QPushButton" name="baseBkColor">
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+      </layout>
      </widget>
      <widget class="QWidget" name="tab_2">
       <attribute name="title">
@@ -40,6 +65,12 @@
       <layout class="QHBoxLayout" name="horizontalLayout_3">
        <item>
         <layout class="QFormLayout" name="formLayout">
+         <property name="horizontalSpacing">
+          <number>6</number>
+         </property>
+         <property name="verticalSpacing">
+          <number>10</number>
+         </property>
          <item row="0" column="0">
           <widget class="QLabel" name="Label">
            <property name="text">
@@ -139,35 +170,35 @@
            </property>
           </widget>
          </item>
-         <item row="7" column="0">
+         <item row="8" column="0">
           <widget class="QLabel" name="Label_6">
            <property name="text">
             <string>显示格式</string>
            </property>
           </widget>
          </item>
-         <item row="8" column="0">
+         <item row="9" column="0">
           <widget class="QLabel" name="Label_7">
            <property name="text">
-            <string>小数点前位数</string>
+            <string>总位数</string>
            </property>
           </widget>
          </item>
-         <item row="8" column="1">
+         <item row="9" column="1">
           <widget class="QSpinBox" name="textDotBef">
            <property name="enabled">
             <bool>false</bool>
            </property>
           </widget>
          </item>
-         <item row="9" column="0">
+         <item row="10" column="0">
           <widget class="QLabel" name="Label_8">
            <property name="text">
             <string>小数点后位数</string>
            </property>
           </widget>
          </item>
-         <item row="9" column="1">
+         <item row="10" column="1">
           <widget class="QSpinBox" name="textDotAft">
            <property name="enabled">
             <bool>false</bool>
@@ -190,9 +221,12 @@
          </item>
          <item row="1" column="1">
           <widget class="QComboBox" name="textFont">
+           <property name="currentIndex">
+            <number>2</number>
+           </property>
            <item>
             <property name="text">
-             <string>32</string>
+             <string>16</string>
             </property>
            </item>
            <item>
@@ -202,15 +236,20 @@
            </item>
            <item>
             <property name="text">
-             <string>16</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>8</string>
+             <string>32</string>
             </property>
            </item>
           </widget>
+         </item>
+         <item row="7" column="0">
+          <widget class="QLabel" name="Label_9">
+           <property name="text">
+            <string>寄存器类型</string>
+           </property>
+          </widget>
+         </item>
+         <item row="7" column="1">
+          <widget class="QComboBox" name="comboBox"/>
          </item>
         </layout>
        </item>

@@ -16,9 +16,8 @@
 		<enum2 value="StringList"/>
 	</TextType>
 	<TextFont>
-		<enum0 value="32"/>
+		<enum0 value="16"/>
 		<enum1 value="24"/>
-		<enum2 value="16"/>
-		<enum2 value="8"/>
+		<enum2 value="32"/>
 	</TextFont>
 </Property>

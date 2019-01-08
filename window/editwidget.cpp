@@ -3,6 +3,7 @@
 EditWidget::EditWidget(QWidget *parent) :
     Widget(parent)
 {
+    m_Type = Edit;
     initPropertyTable();
     initCenterWidget();
     initParament();
@@ -19,13 +20,14 @@ void EditWidget::initPropertyTable()
 
     m_propTable << qMakePair(QVariant::TextFormat, QString("TextType"));
     m_propTable << qMakePair(QVariant::Int, QString("TextRegAddress"));
-    m_propTable << qMakePair(QVariant::Int, QString("TextDotBef"));
-    m_propTable << qMakePair(QVariant::Int, QString("TextDotAft"));
+    m_propTable << qMakePair(QVariant::Int, QString("TextTotLen"));
+    m_propTable << qMakePair(QVariant::Int, QString("TextDotLen"));
     m_propTable << qMakePair(QVariant::String, QString("TextString"));
     m_propTable << qMakePair(QVariant::Color, QString("TextColor"));
     m_propTable << qMakePair(QVariant::TextFormat, QString("AlignH"));
     m_propTable << qMakePair(QVariant::TextFormat, QString("AlignV"));
     m_propTable << qMakePair(QVariant::TextFormat, QString("TextFont"));
+    m_propTable << qMakePair(QVariant::TextFormat, QString("TextMaxLen"));
 }
 
 void EditWidget::initCenterWidget()
@@ -45,6 +47,6 @@ void EditWidget::initParament()
 {
 
     Widget::initParament();
-    m_Type = Edit;
+
     setTextString("0000");
 }

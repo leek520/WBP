@@ -31,5 +31,6 @@
         <file alias="set">images/tools/set.png</file>
         <file alias="simstart">images/tools/start.png</file>
         <file alias="simstop">images/tools/stop.png</file>
+        <file alias="editor">images/tools/editor.png</file>
     </qresource>
 </RCC>

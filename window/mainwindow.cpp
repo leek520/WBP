@@ -131,6 +131,10 @@ void MainWindow::createActions()
     connect(simstopAct, SIGNAL(triggered()), this, SLOT(simStop()));
 
     //tools
+    editorAct = new QAction(QIcon(":/editor"), tr("&editor"), this);
+    connect(editorAct, SIGNAL(triggered()), this, SLOT(editor()));
+
+
     lan_nextAct = new QAction(QIcon(":/lan_next"), tr("&lan_next"), this);
     connect(lan_nextAct, SIGNAL(triggered()), this, SLOT(lanNext()));
 
@@ -198,10 +202,6 @@ void MainWindow::createMenus()
     settingMenu = menuBar()->addMenu(tr("&Setting"));
     settingMenu->addAction(setComAct);
 
-    settingMenu = menuBar()->addMenu(tr("&Setting"));
-    settingMenu->addAction(setComAct);
-
-
     buildMenu = menuBar()->addMenu(tr("&Build"));
     buildMenu->addAction(buildAct);
     buildMenu->addAction(downloadAct);
@@ -230,6 +230,8 @@ void MainWindow::createToolBars()
     editToolBar->addAction(removeAct);
 
     settingToolBar = addToolBar(tr("Setting"));
+    settingToolBar->addAction(editorAct);
+
     settingToolBar->addAction(setComAct);
     settingToolBar->addAction(lan_prevAct);
     settingToolBar->addAction(lan_nextAct);
@@ -345,8 +347,7 @@ void MainWindow::initEnumProperty()
         }
         Node = Node.nextSibling();
     }
-    m_buildInfo->setEnumProperty(&propertyEnum);
-    m_propW->setEnumProperty(&propertyEnum);
+    PV->setEnumProperty(&propertyEnum);
 }
 
 
@@ -535,7 +536,7 @@ QDomElement MainWindow::widgetToDom(Widget *w, QDomElement root)
                         textDom.setAttributeNode(lanAttr);
                         lanDom.appendChild(textDom);
                     }
-                    childDom.appendChild(textDom);
+                    childDom.appendChild(lanDom);
                 }
             }else{
                 for(int i=0;i<LAN_NUM;i++){
@@ -778,7 +779,8 @@ WindowInfo *MainWindow::setWidgetInfo(Widget *w, struct list_head *head, int *po
         ret = winInfo;
         init_list_head(&winInfo->childList);
         winInfo->BkColor[0] = m_buildInfo->QColorToEColor(w->getBkColor());
-
+        winInfo->timer.Id = 100;
+        winInfo->timer.time = 100;
         base = &winInfo->base;
         *pos = curPos + sizeof(WindowInfo);
 
@@ -870,14 +872,14 @@ void MainWindow::setBaseInfo(Widget *w, BasePara *base)
 void MainWindow::setTextInfo(Widget *w, TextPara *text)
 {
     text->type = w->getTextType();
-    text->font = w->getTextFont();
+    text->font = (GUI_FONT *)m_buildInfo->GetFontHeadAddress(w->getTextFont());
     text->color = m_buildInfo->QColorToEColor(w->getTextColor());
     text->alignment = m_buildInfo->QAlignToEAlign((w->getAlignH() << 1) | (w->getAlignV() << 6));
-
+    text->maxNum = w->getTextStringList().count();
     text->maxLen = w->getTextMaxLen();
     text->regAdress = w->getTextRegAddress();
-    text->dot.bef = w->getTextDotBef();
-    text->dot.aft = w->getTextDotAft();
+    text->totLen = w->getTextTotLen();
+    text->dotLen = w->getTextDotLen();
 
     int curLan = Widget::m_curLan;
     for(int i=0;i<LAN_NUM;i++){
@@ -933,7 +935,10 @@ void MainWindow::build()
 
     recordUsedChar();
     m_buildInfo->SortRecordChar();
-    m_buildInfo->FontToChar(0);
+    QStringList fontList = PV->getEnumProperty("TextFont");
+    for(int i=0;i<fontList.count();i++){
+        m_buildInfo->FontToChar(fontList[i].toInt());
+    }
 
 
     BuildInfo::WidgetBuf *widgetBuf = m_buildInfo->getWidgetBuf();
@@ -1060,6 +1065,12 @@ void MainWindow::lanPrev()
 {
     Widget::m_curLan = (Widget::m_curLan == 0) ? (LAN_NUM-1):(Widget::m_curLan-1);
     WindowWidget::refreshAll();
+}
+
+void MainWindow::editor()
+{
+    EditorWidget *ce = new EditorWidget();
+    ce->show();
 }
 
 void MainWindow::switchTabWindow(Widget *w)

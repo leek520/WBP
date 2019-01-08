@@ -99,13 +99,7 @@ typedef enum _eTextType
     RegVaule,
     StringList,
 }TextType;
-typedef enum _eFontType
-{
-    Song_32,
-    Song_24,
-    Song_16,
-    Song_8,
-}FontType;
+
 typedef struct {
   uchar XSize;
   uchar XDist;
@@ -118,6 +112,27 @@ typedef struct GUI_FONT_PROP {
   GUI_CHARINFO *paCharInfo;     /* Address of first character    */
   struct GUI_FONT_PROP *pNext;          /* Pointer to next               */
 } GUI_FONT_PROP;
+struct GUI_FONT {
+  void * pfDispChar;
+  void * pfGetCharDistX;
+  void * pfGetFontInfo;
+  void * pfIsInFont;
+  void * pfGetCharInfo;
+  void * pafEncode;
+  uchar YSize;
+  uchar YDist;
+  uchar XMag;
+  uchar YMag;
+  union {
+    void * pFontData;
+    void * pMono;
+    void * pProp;
+    void * pPropExt;
+  } p;
+  uchar Baseline;
+  uchar LHeight;     /* Height of a small lower case character (a,x) */
+  uchar CHeight;     /* Height of a small upper case character (A,X) */
+};
 /*********»ù´¡ÐÅÏ¢½á¹¹************/
 typedef struct _tBasePara
 {
@@ -134,17 +149,17 @@ typedef struct _tBasePara
 typedef struct _tTextPara
 {
     uchar type;
-    uchar font;
+    uchar resv;
     ushort alignment;
+    GUI_FONT *font;
     int color;
 
     char *string[LAN_NUM];
-    uchar maxLen;
-    struct dot_feild
-    {
-        char bef:4;
-        char aft:4;
-    }dot;
+    ushort maxNum;
+    ushort maxLen;
+
+    uchar totLen;
+    uchar dotLen;
     ushort regAdress;
 }TextPara;
 
@@ -183,12 +198,17 @@ typedef struct {
     uchar lineType;
     uchar lineWidth;
 }GraphInfo;
-
+typedef struct _tTimerPara
+{
+        ushort Id;
+        ushort time;	//ms
+}TimerPara;
 /*********´°ÌåÐÅÏ¢½á¹¹************/
 typedef struct _tWindowInfo
 {
     BasePara base;
     int BkColor[1];
+    TimerPara timer;
     struct list_head childList;
     struct list_head imageList;
     struct list_head graphList;

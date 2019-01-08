@@ -13,8 +13,9 @@ TARGET = WBP
 TEMPLATE = app
 
 INCLUDEPATH += \
-               ./com
-               ./window
+               ./com    \
+               ./window \
+               ./codeeditor
 include(./qtpropertybrowser/src/qtpropertybrowser.pri)
 
 SOURCES += main.cpp\
@@ -33,9 +34,13 @@ SOURCES += main.cpp\
     window/imagewidget.cpp \
     window/toolbar.cpp \
     window/scrollarea.cpp \
-    window/bottomwidget.cpp
+    window/bottomwidget.cpp \
+    window/buildinfo.cpp \
+    window/publicvar.cpp \
+    window/editorwidget.cpp
 
-HEADERS  += common.h \
+HEADERS  += \
+    common.h \
     ./window/mainwindow.h \
     ./window/leftwidget.h \
     ./window/widgetselection.h \
@@ -51,7 +56,11 @@ HEADERS  += common.h \
     window/imagewidget.h \
     window/toolbar.h \
     window/scrollarea.h \
-    window/bottomwidget.h
+    window/bottomwidget.h \
+    window/buildinfo.h \
+    window/publicvar.h \
+    window/editorwidget.h \
+
 
 
 RESOURCES += \

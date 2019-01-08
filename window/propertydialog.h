@@ -36,6 +36,14 @@ private slots:
     void on_textAlignV_currentIndexChanged(int index);
 
     void on_textEdit_textChanged();
+
+
+    void on_textFont_currentIndexChanged(int index);
+
+    void on_baseId_valueChanged(int arg1);
+
+    void on_baseBkColor_clicked();
+
 private:
     void initDialog();
     void getStringList();

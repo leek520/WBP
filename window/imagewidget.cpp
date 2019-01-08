@@ -3,6 +3,7 @@
 ImageWidget::ImageWidget(QWidget *parent) :
     Widget(parent)
 {
+    m_Type = Image;
     initPropertyTable();
     initCenterWidget();
     initParament();
@@ -18,7 +19,6 @@ void ImageWidget::initPropertyTable()
 void ImageWidget::initParament()
 {
     Widget::initParament();
-    m_Type = Image;
 }
 
 void ImageWidget::paintEvent(QPaintEvent *event)
@@ -45,6 +45,7 @@ void ImageWidget::paintEvent(QPaintEvent *event)
 LineWidget::LineWidget(QWidget *parent) :
     Widget(parent)
 {
+    m_Type = Line;
     initPropertyTable();
     initCenterWidget();
     initParament();
@@ -65,7 +66,7 @@ void LineWidget::initPropertyTable()
 void LineWidget::initParament()
 {
     Widget::initParament();
-    m_Type = Line;
+
     m_LineType = 0;
     QRect rect = this->frameGeometry();
     m_LineStart = QPoint(rect.left(), (rect.top()+rect.bottom())/2);
@@ -87,6 +88,7 @@ void LineWidget::paintEvent(QPaintEvent *event)
 RectWidget::RectWidget(QWidget *parent) :
     Widget(parent)
 {
+    m_Type = Rect;
     initPropertyTable();
     initCenterWidget();
     initParament();
@@ -107,7 +109,7 @@ void RectWidget::initPropertyTable()
 void RectWidget::initParament()
 {
     Widget::initParament();
-    m_Type = Rect;
+
     m_Rectangle = this->frameGeometry();
     m_Radius = 0;
     m_FillEnable = false;
@@ -130,6 +132,7 @@ void RectWidget::paintEvent(QPaintEvent *event)
 CircleWidget::CircleWidget(QWidget *parent) :
     Widget(parent)
 {
+    m_Type = Circle;
     initPropertyTable();
     initCenterWidget();
     initParament();
@@ -150,7 +153,7 @@ void CircleWidget::initPropertyTable()
 void CircleWidget::initParament()
 {
     Widget::initParament();
-    m_Type = Circle;
+
     QRect rect = this->frameGeometry();
     m_Center = rect.center();
     if (width()<height()){

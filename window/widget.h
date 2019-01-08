@@ -10,18 +10,12 @@
 #include <QMessageBox>
 #include "common.h"
 #include "comobject.h"
+#include "publicvar.h"
 
 #define WindowWidth     800
 #define WindowHeight    480
 #define WidgetWidth     120
 #define WidgetHeight    50
-
-#define WidgetLen   10240
-#define StringLen   10240
-#define LuaLen      10240
-#define CharLen     10240
-#define FontLen      512000
-#define ImageLen    512000  //500k
 
 #define WigetEntry(ptr, type) \
         ((type == Window) ? (QLabel *)ptr :\
@@ -68,8 +62,8 @@ class Widget : public QWidget
     Q_PROPERTY(int TextType READ getTextType WRITE setTextType)
     Q_PROPERTY(int TextMaxLen READ getTextMaxLen WRITE setTextMaxLen)
     Q_PROPERTY(int TextRegAddress READ getTextRegAddress WRITE setTextRegAddress)
-    Q_PROPERTY(int TextDotBef READ getTextDotBef WRITE setTextDotBef)
-    Q_PROPERTY(int TextDotAft READ getTextDotAft WRITE setTextDotAft)
+    Q_PROPERTY(int TextTotLen READ getTextTotLen WRITE setTextTotLen)
+    Q_PROPERTY(int TextDotLen READ getTextDotLen WRITE setTextDotLen)
     Q_PROPERTY(QStringList TextStringList READ getTextStringList WRITE setTextStringList)
 
 
@@ -122,8 +116,7 @@ signals:
     void currentItemChanged(Widget *w);
 
 private:
-    QPoint dragPosition;   //鼠标拖动的位置
-    static QMap<int, int> m_IdPool;   
+    QPoint dragPosition;   //鼠标拖动的位置  
 protected:
     QList<QPair<QVariant::Type, QString> > m_propTable;
     QLabel *m_CentralWidget;
@@ -210,11 +203,11 @@ public:
     int getTextRegAddress();
     void setTextRegAddress(int value);
 
-    int getTextDotBef();
-    void setTextDotBef(int value);
+    int getTextTotLen();
+    void setTextTotLen(int value);
 
-    int getTextDotAft();
-    void setTextDotAft(int value);
+    int getTextDotLen();
+    void setTextDotLen(int value);
 
     QStringList getTextStringList();
     void setTextStringList(QStringList String);
@@ -240,8 +233,8 @@ protected:
     int m_TextFont      ;
     int m_TextMaxLen    ;
     int m_TextRegAddress;
-    int m_TextDotBef    ;
-    int m_TextDotAft    ;
+    int m_TextTotLen    ;
+    int m_TextDotLen    ;
     QStringList m_TextString;
     QList<QStringList> m_TextStringList;
 
@@ -259,85 +252,5 @@ protected:
     QColor m_LineColor;
 };
 
-class BuildInfo : public QObject
-{
-    Q_OBJECT
-public:
-    struct WidgetBuf{
-       int pos;
-       char buf[WidgetLen];
-    };
-    struct StringBuf{
-       int pos;
-       char buf[StringLen];
-    };
-    struct LuaBuf{
-       int pos;
-       char buf[LuaLen];
-    };
-    struct FontBuf{
-       int pos;
-       char buf[FontLen];
-    };
-    struct CharBuf{
-       int pos;
-       char buf[CharLen];
-    };
-    struct ImageBuf{
-       int pos;
-       char buf[ImageLen];
-    };
-public:
-    explicit BuildInfo();
-    void initBuild();
-    void setEnumProperty(QMap<QString, QStringList> *enumMap);
-    WidgetBuf *getWidgetBuf();
-    uint QColorToEColor(QColor color);
-    int QAlignToEAlign(int align);
-    char *QStringToMultBytes(QString str);
-    char *QStringListToMultBytes(QStringList strList, int maxLen);
-    char *QStringToLuaChar(QString str);
-    void QImageToEImage(QString filename, QPoint leftTop, ImageInfo *imageinfo);
-    void GraphToEgraph(Widget *w, GraphInfo *graphinfo);
-
-    void FontToChar(int fontType);
-    void RecordChar(QString &string);
-    static bool compareUnicode(QChar &a, QChar &b);
-    void SortRecordChar();
-    void downLoadInfo();
-    void cancel();
-private slots:
-    void readCharList();
-    void ResProgress_slt(int pos, QString msg="");
-    void writeBufToTxt();
-    void writeBufToTxt(QTextStream &out, char *buf, int len);
-signals:
-    void DownLoad_sig(const int cmd, const int addr, const QByteArray data);
-    void ResProgress_sig(int step, int pos, QString msg="");
-private:
-    ComDriver *com;
-    QString m_charList;
-    QMap<QString, QStringList> *propertyEnum;
-    QString m_CharRecord;
-
-    struct WidgetBuf widgetBuf;
-    struct StringBuf stringBuf;
-    struct LuaBuf luaBuf;
-    struct FontBuf fontBuf;
-    struct CharBuf charBuf;
-    struct ImageBuf imageBuf;
-    int downloadStep;
-};
-
 #endif // WIDGET_H
-/*
-    QString EXE_PATH = QDir::currentPath() + "/BmpCvt.exe";
-    int type = (m_picType->currentIndex()==0)?8:12;
-    QString build_cmd = QString("start \"\" /min \"%1\" \"%2\" -saveas%3,1,%4 -exit")
-            .arg(EXE_PATH)
-            .arg(filename)
-            .arg(outname)
-            .arg(type);
-    system(build_cmd.toLocal8Bit());
-    qDebug()<<build_cmd;
-*/
+

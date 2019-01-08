@@ -5,6 +5,7 @@
 #include <QVBoxLayout>
 #include "common.h"
 #include "widget.h"
+#include "publicvar.h"
 #include "qtvariantproperty.h"
 #include "qttreepropertybrowser.h"
 #include "qtbuttonpropertybrowser.h"
@@ -16,7 +17,6 @@ public:
     QSize sizeHint() const {
         return QSize(250, 200);
     }
-    void setEnumProperty(QMap<QString, QStringList> *enumMap);
 private:
     void updateExpandState();
     void addProperty(QtVariantProperty *property, const QString &id);
