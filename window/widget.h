@@ -12,10 +12,10 @@
 #include "comobject.h"
 #include "publicvar.h"
 
-#define WindowWidth     800
-#define WindowHeight    480
-#define WidgetWidth     120
-#define WidgetHeight    50
+#define DefaultWindowWidth      800
+#define DefaultWindowHeight     480
+#define DefaultWidgetWidth      120
+#define DefaultWidgetHeight     50
 
 #define WigetEntry(ptr, type) \
         ((type == Window) ? (QLabel *)ptr :\

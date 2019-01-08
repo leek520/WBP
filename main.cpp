@@ -16,7 +16,7 @@ int main(int argc, char *argv[])
     a.setFont(font);
 
     // 加载QSS样式
-    CommonHelper::setStyle(":/win_style.qss");
+    CommonHelper::setStyle(":/win_style");
 
 
     MainWindow w;

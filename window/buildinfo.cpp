@@ -4,8 +4,6 @@
 BuildInfo::BuildInfo()
 {
     initBuild();
-    readCharList();
-
     //1、初始化串口线程
     QThread *com_thread = new QThread;
     com = new ComDriver();
@@ -51,18 +49,6 @@ BuildInfo::WidgetBuf *BuildInfo::getWidgetBuf()
     return (&widgetBuf);
 }
 
-void BuildInfo::readCharList()
-{
-    QFile file(":/char3000.txt");
-    if(!file.open(QIODevice::ReadOnly | QIODevice::Text))
-    {
-        return;
-    }
-    QTextStream input(&file);
-    m_charList = input.readAll();
-
-    file.close();
-}
 uint BuildInfo::QColorToEColor(QColor color)
 {
     uint rgba = color.rgba();

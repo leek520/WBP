@@ -60,7 +60,6 @@ public:
     void downLoadInfo();
     void cancel();
 private slots:
-    void readCharList();
     void ResProgress_slt(int pos, QString msg="");
     void writeBufToTxt();
     void writeBufToTxt(QTextStream &out, char *buf, int len);
@@ -69,7 +68,6 @@ signals:
     void ResProgress_sig(int step, int pos, QString msg="");
 private:
     ComDriver *com;
-    QString m_charList;
     QString m_CharRecord;
     QMap<int, int> m_fontList;
 

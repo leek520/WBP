@@ -62,19 +62,19 @@ void MainWindow::mouseMoveEvent(QMouseEvent *event)
 void MainWindow::createActions()
 {
     /****file****/
-    newAct = new QAction(QIcon(":/images/new.png"), tr("&New"), this);
+    newAct = new QAction(QIcon(":/new"), tr("&New"), this);
     newAct->setShortcuts(QKeySequence::New);
     connect(newAct, SIGNAL(triggered()), this, SLOT(newFile()));
 
-    openAct = new QAction(QIcon(":/images/open.png"), tr("&Open..."), this);
+    openAct = new QAction(QIcon(":/open"), tr("&Open..."), this);
     openAct->setShortcuts(QKeySequence::Open);
     connect(openAct, SIGNAL(triggered()), this, SLOT(open()));
 
-    saveAct = new QAction(QIcon(":/images/save.png"), tr("&Save"), this);
+    saveAct = new QAction(QIcon(":/save"), tr("&Save"), this);
     saveAct->setShortcuts(QKeySequence::Save);
     connect(saveAct, SIGNAL(triggered()), this, SLOT(save()));
 
-    saveAsAct = new QAction(tr("Save &As..."), this);
+    saveAsAct = new QAction(QIcon(":/asave"),tr("Save &As..."), this);
     saveAsAct->setShortcuts(QKeySequence::SaveAs);
     connect(saveAsAct, SIGNAL(triggered()), this, SLOT(saveAs()));
 
@@ -83,29 +83,29 @@ void MainWindow::createActions()
     connect(exitAct, SIGNAL(triggered()), this, SLOT(close()));
 
     /****edit****/
-    undoAct = new QAction(QIcon(":/images/undo.png"), tr("&Undo"), this);
+    undoAct = new QAction(QIcon(":/undo"), tr("&Undo"), this);
     undoAct->setShortcuts(QKeySequence::Undo);
     undoAct->setEnabled(false);
     connect(undoAct, SIGNAL(triggered()), this, SLOT(undo()));
 
-    redoAct = new QAction(QIcon(":/images/redo.png"), tr("&Redo"), this);
+    redoAct = new QAction(QIcon(":/redo"), tr("&Redo"), this);
     redoAct->setShortcuts(QKeySequence::Redo);
     redoAct->setEnabled(false);
     connect(redoAct, SIGNAL(triggered()), this, SLOT(redo()));
 
-    cutAct = new QAction(QIcon(":/images/cut.png"), tr("Cu&t"), this);
+    cutAct = new QAction(QIcon(":/cut"), tr("Cu&t"), this);
     cutAct->setShortcuts(QKeySequence::Cut);
     connect(cutAct, SIGNAL(triggered()), this, SLOT(cut()));
 
-    copyAct = new QAction(QIcon(":/images/copy.png"), tr("&Copy"), this);
+    copyAct = new QAction(QIcon(":/copy"), tr("&Copy"), this);
     copyAct->setShortcuts(QKeySequence::Copy);
     connect(copyAct, SIGNAL(triggered()), this, SLOT(copy()));
 
-    pasteAct = new QAction(QIcon(":/images/paste.png"), tr("&Paste"), this);
+    pasteAct = new QAction(QIcon(":/paste"), tr("&Paste"), this);
     pasteAct->setShortcuts(QKeySequence::Paste);
     connect(pasteAct, SIGNAL(triggered()), this, SLOT(paste()));
 
-    removeAct = new QAction(QIcon(":/images/remove.png"), tr("&Remove"), this);
+    removeAct = new QAction(QIcon(":/remove"), tr("&Remove"), this);
     removeAct->setShortcuts(QKeySequence::Delete);
     connect(removeAct, SIGNAL(triggered()), this, SLOT(remove()));
 
@@ -114,7 +114,7 @@ void MainWindow::createActions()
     connect(setComAct, SIGNAL(triggered()), this, SLOT(setCom()));
 
     /****about****/
-    aboutAct = new QAction(QIcon(":/images/about.png"), tr("&About"), this);
+    aboutAct = new QAction(QIcon(":/about"), tr("&About"), this);
     connect(aboutAct, SIGNAL(triggered()), this, SLOT(about()));
 
     /****build****/
@@ -319,7 +319,7 @@ void MainWindow::setupUi()
 
 void MainWindow::initEnumProperty()
 {
-    QFile file(":/propertyEnumList.xml");
+    QFile file(":/propertyEnumList");
     if(!file.open(QIODevice::ReadOnly)){
         return;
     }
@@ -1069,7 +1069,7 @@ void MainWindow::lanPrev()
 
 void MainWindow::editor()
 {
-    EditorWidget *ce = new EditorWidget();
+    TextEdit *ce = new TextEdit();
     ce->show();
 }
 
@@ -1156,7 +1156,7 @@ Widget* MainWindow::addWidget(WidgetType type)
         connect(win, SIGNAL(addWidgetSgn(WidgetType,QPoint)),
                 this, SLOT(addWidgetSlt(WidgetType,QPoint)));
 
-        win->resize(WindowWidth, WindowHeight);
+        win->resize(DefaultWindowWidth, DefaultWindowHeight);
         win->propertyChanged(win);
         WindowWidget::m_curWin = win;
         m_leftW->addWidget(win);
@@ -1175,33 +1175,33 @@ Widget* MainWindow::addWidget(WidgetType type)
     switch (type) {
     case Button:
         create = new ButtonWidget(WindowWidget::m_curWin);
-        create->resize(WidgetWidth, WidgetHeight);
+        create->resize(DefaultWidgetWidth, DefaultWidgetHeight);
         //create->addContexMenuAction(removeAct);
         break;
     case Text:
         create = new TextWidget(WindowWidget::m_curWin);
-        create->resize(WidgetWidth, WidgetHeight);
+        create->resize(DefaultWidgetWidth, DefaultWidgetHeight);
         break;
     case Edit:
         create = new EditWidget(WindowWidget::m_curWin);
-        create->resize(WidgetWidth, WidgetHeight);
+        create->resize(DefaultWidgetWidth, DefaultWidgetHeight);
         break;
 
     case Image:
         create = new ImageWidget(WindowWidget::m_curWin);
-        create->resize(WidgetWidth, WidgetHeight);
+        create->resize(DefaultWidgetWidth, DefaultWidgetHeight);
         break;
     case Line:
         create = new LineWidget(WindowWidget::m_curWin);
-        create->resize(WidgetWidth, 3);
+        create->resize(DefaultWidgetWidth, 3);
         break;
     case Rect:
         create = new RectWidget(WindowWidget::m_curWin);
-        create->resize(WidgetWidth, WidgetHeight);
+        create->resize(DefaultWidgetWidth, DefaultWidgetHeight);
         break;
     case Circle:
         create = new CircleWidget(WindowWidget::m_curWin);
-        create->resize(WidgetHeight+1, WidgetHeight+1);
+        create->resize(DefaultWidgetHeight+1, DefaultWidgetHeight+1);
         break;
     default:
         break;

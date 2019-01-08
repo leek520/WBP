@@ -241,13 +241,17 @@ typedef struct _tEditInfo
 
 /************双向循环链表*************/
 
+#define __compiler_offsetof(a,b)  __builtin_offsetof(a,b)
+
+#undef offsetof  //取消先前的任何定义，可以保证下面的定义生效
+#ifdef __compiler_offsetof
 //计算member在type中的位置
 #define offsetof(type, member)  (size_t)(&((type*)0)->member)
 //根据member的地址获取type的起始地址
 #define container_of(ptr, type, member) ({          \
          const typeof(((type *)0)->member)*__mptr = (ptr);    \
      (type *)((char *)__mptr - offsetof(type, member)); })
-
+#endif
 
 
 static inline void init_list_head(struct list_head *list)

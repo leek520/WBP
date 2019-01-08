@@ -14,9 +14,9 @@ TEMPLATE = app
 
 INCLUDEPATH += \
                ./com    \
-               ./window \
-               ./codeeditor
+               ./window
 include(./qtpropertybrowser/src/qtpropertybrowser.pri)
+include(./codeeditor/textedit.pri)
 
 SOURCES += main.cpp\
         ./window/mainwindow.cpp \
@@ -37,7 +37,6 @@ SOURCES += main.cpp\
     window/bottomwidget.cpp \
     window/buildinfo.cpp \
     window/publicvar.cpp \
-    window/editorwidget.cpp
 
 HEADERS  += \
     common.h \
@@ -59,15 +58,14 @@ HEADERS  += \
     window/bottomwidget.h \
     window/buildinfo.h \
     window/publicvar.h \
-    window/editorwidget.h \
 
 
 
 RESOURCES += \
     application.qrc
 
-RC_ICONS = images/wbp.ico
+RC_ICONS = resources/images/wbp.ico
 
 FORMS += \
     window/propertydialog.ui \
-    window/comdialog.ui
+    window/comdialog.ui \

@@ -1,36 +1,40 @@
 <RCC>
     <qresource prefix="/">
-        <file>images/about.png</file>
-        <file>images/copy.png</file>
-        <file>images/cut.png</file>
-        <file>images/new.png</file>
-        <file>images/open.png</file>
-        <file>images/paste.png</file>
-        <file>images/redo.png</file>
-        <file>images/remove.png</file>
-        <file>images/save.png</file>
-        <file>images/splash.png</file>
-        <file>images/undo.png</file>
-        <file>char3000.txt</file>
-        <file alias="button">images/widget/button.PNG</file>
-        <file alias="edit">images/widget/edit.PNG</file>
-        <file alias="text">images/widget/text.PNG</file>
-        <file alias="window">images/widget/window.PNG</file>
-        <file alias="circle">images/graph/circle.png</file>
-        <file alias="image">images/graph/image.png</file>
-        <file alias="line">images/graph/line.png</file>
-        <file alias="rect">images/graph/rect.png</file>
-        <file alias="textListAdd">images/dialog/add.png</file>
-        <file alias="textListRemove">images/dialog/remove.png</file>
-        <file>win_style.qss</file>
-        <file>propertyEnumList.xml</file>
-        <file alias="build">images/tools/build.png</file>
-        <file alias="download">images/tools/download.png</file>
-        <file alias="lan_next">images/tools/lan_next.png</file>
-        <file alias="lan_prev">images/tools/lan_prev.png</file>
-        <file alias="set">images/tools/set.png</file>
-        <file alias="simstart">images/tools/start.png</file>
-        <file alias="simstop">images/tools/stop.png</file>
-        <file alias="editor">images/tools/editor.png</file>
+        <file alias="win_style">resources/win_style.qss</file>
+        <file alias="propertyEnumList">resources/propertyEnumList.xml</file>
+        <file alias="about">resources/images/about.png</file>
+        <file alias="copy">resources/images/copy.png</file>
+        <file alias="cut">resources/images/cut.png</file>
+        <file alias="new">resources/images/new.png</file>
+        <file alias="open">resources/images/open.png</file>
+        <file alias="paste">resources/images/paste.png</file>
+        <file alias="redo">resources/images/redo.png</file>
+        <file alias="remove">resources/images/remove.png</file>
+        <file alias="save">resources/images/save.png</file>
+        <file alias="asave">resources/images/asave.png</file>
+        <file alias="splash">resources/images/splash.png</file>
+        <file alias="undo">resources/images/undo.png</file>
+        <file alias="textleft">resources/images/textleft.png</file>
+        <file alias="textcenter">resources/images/textcenter.png</file>
+        <file alias="textright">resources/images/textright.png</file>
+        <file alias="textjustify">resources/images/textjustify.png</file>
+        <file alias="button">resources/images/widget/button.PNG</file>
+        <file alias="edit">resources/images/widget/edit.PNG</file>
+        <file alias="text">resources/images/widget/text.PNG</file>
+        <file alias="window">resources/images/widget/window.PNG</file>
+        <file alias="circle">resources/images/graph/circle.png</file>
+        <file alias="image">resources/images/graph/image.png</file>
+        <file alias="line">resources/images/graph/line.png</file>
+        <file alias="rect">resources/images/graph/rect.png</file>
+        <file alias="textListAdd">resources/images/dialog/add.png</file>
+        <file alias="textListRemove">resources/images/dialog/remove.png</file>
+        <file alias="build">resources/images/tools/build.png</file>
+        <file alias="download">resources/images/tools/download.png</file>
+        <file alias="lan_next">resources/images/tools/lan_next.png</file>
+        <file alias="lan_prev">resources/images/tools/lan_prev.png</file>
+        <file alias="set">resources/images/tools/set.png</file>
+        <file alias="simstart">resources/images/tools/start.png</file>
+        <file alias="simstop">resources/images/tools/stop.png</file>
+        <file alias="editor">resources/images/tools/editor.png</file>
     </qresource>
 </RCC>

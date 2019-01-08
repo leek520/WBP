@@ -13,7 +13,7 @@
 #include "scrollarea.h"
 #include "bottomwidget.h"
 #include "buildinfo.h"
-#include "editorwidget.h"
+#include "textedit.h"
 
 class MainWindow : public QMainWindow
 {
