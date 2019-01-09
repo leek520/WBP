@@ -4,6 +4,7 @@
 #include <QDialog>
 #include <QColorDialog>
 #include "widget.h"
+#include "publicvar.h"
 namespace Ui {
 class PropertyDialog;
 }
@@ -44,8 +45,12 @@ private slots:
 
     void on_baseBkColor_clicked();
 
+    void on_imagePath_clicked();
+
+    void on_imageCompress_currentIndexChanged(int index);
+
 private:
-    void initDialog();
+    void setDialog();
     void getStringList();
     void setStringList();
 private:

@@ -14,6 +14,7 @@ void ImageWidget::initPropertyTable()
 {
     m_propTable << qMakePair(QVariant::String, QString("BkImage"));
     m_propTable << qMakePair(QVariant::Point, QString("ImagePos"));
+    m_propTable << qMakePair(QVariant::TextFormat, QString("ImageCompress"));
 }
 
 void ImageWidget::initParament()

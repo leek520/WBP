@@ -8,7 +8,7 @@
 #define StringLen   10240
 #define LuaLen      10240
 #define CharLen     10240
-#define FontLen      512000
+#define FontLen     512000
 #define ImageLen    512000  //500k
 
 class BuildInfo : public QObject
@@ -49,7 +49,7 @@ public:
     char *QStringToMultBytes(QString str);
     char *QStringListToMultBytes(QStringList strList, int maxLen);
     char *QStringToLuaChar(QString str);
-    void QImageToEImage(QString filename, QPoint leftTop, ImageInfo *imageinfo);
+    void QImageToEImage(QString filename, QPoint leftTop, int type, ImageInfo *imageinfo);
     void GraphToEgraph(Widget *w, GraphInfo *graphinfo);
 
     int GetFontHeadAddress(int index);

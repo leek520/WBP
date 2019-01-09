@@ -3,7 +3,8 @@
 
 PropertyDialog::PropertyDialog(QWidget *parent) :
     QDialog(parent),
-    ui(new Ui::PropertyDialog)
+    ui(new Ui::PropertyDialog),
+    m_widget(NULL)
 {
     ui->setupUi(this);
     m_title = this->windowTitle();
@@ -11,6 +12,12 @@ PropertyDialog::PropertyDialog(QWidget *parent) :
     //设置表头
     ui->textList->horizontalHeader()->setVisible(true);
     ui->textList->setColumnCount(LAN_NUM);
+
+    ui->imageCompress->addItems(PV->getEnumProperty("ImageCompress"));
+    ui->textType->addItems(PV->getEnumProperty("TextType"));
+    ui->textAlignH->addItems(PV->getEnumProperty("AlignH"));
+    ui->textAlignV->addItems(PV->getEnumProperty("AlignV"));
+    ui->textFont->addItems(PV->getEnumProperty("TextFont"));
 }
 
 PropertyDialog::~PropertyDialog()
@@ -24,31 +31,62 @@ void PropertyDialog::showDialog(Widget *w)
     QString name = EnumToStr(w->getType());
     switch (w->getType()) {
     case Window:
-        ui->tab_2->setEnabled(false);
-        ui->tab_3->setEnabled(false);
+        ui->tabText->setEnabled(false);
+        ui->tabAction->setEnabled(false);
+        ui->baseStack->setCurrentIndex(0);
+        ui->tabwidget->removeTab(2);
+        ui->tabwidget->removeTab(1);
+
+        ui->baseId->setRange(GUI_ID_WINDOW, GUI_ID_BUTTON);
         break;
     case Button:
-        ui->tab_2->setEnabled(true);
-        ui->tab_3->setEnabled(true);
+        ui->tabwidget->addTab(ui->tabText, "文本属性");
+        ui->tabwidget->addTab(ui->tabAction, "动作属性");
+        ui->baseStack->setCurrentIndex(0);
+        ui->tabText->setEnabled(true);
+        ui->tabAction->setEnabled(true);
+
+        ui->baseId->setRange(GUI_ID_BUTTON, GUI_ID_TEXT);
         break;
     case Text:
-        ui->tab_2->setEnabled(true);
+        ui->tabwidget->addTab(ui->tabText, "文本属性");
+        ui->tabwidget->addTab(ui->tabAction, "动作属性");
+        ui->baseStack->setCurrentIndex(0);
+        ui->tabText->setEnabled(true);
+
+        ui->baseId->setRange(GUI_ID_TEXT, GUI_ID_EDIT);
         break;
     case Edit:
-        ui->tab_2->setEnabled(true);
-        ui->tab_3->setEnabled(true);
+        ui->tabwidget->addTab(ui->tabText, "文本属性");
+        ui->tabwidget->addTab(ui->tabAction, "动作属性");
+        ui->baseStack->setCurrentIndex(0);
+        ui->tabText->setEnabled(true);
+        ui->tabAction->setEnabled(true);
+
+        ui->baseId->setRange(GUI_ID_EDIT, GUI_ID_EDIT+1000);
+        break;
+    case Image:
+        ui->tabwidget->removeTab(2);
+        ui->tabwidget->removeTab(1);
+        ui->baseStack->setCurrentIndex(1);
+        break;
+    case Line:
+    case Rect:
+    case Circle:
+        ui->tabwidget->removeTab(2);
+        ui->tabwidget->removeTab(1);
+        ui->baseStack->setCurrentIndex(2);
         break;
     default:
         return;
     }
 
-    initDialog();
+    setDialog();
 
     this->setWindowTitle(QString("%1-[%2]").arg(m_title).arg(name));
     this->show();
     this->raise();
 }
-
 
 void PropertyDialog::on_buttonBox_accepted()
 {
@@ -65,27 +103,29 @@ void PropertyDialog::on_buttonBox_accepted()
 
 void PropertyDialog::on_textType_currentIndexChanged(int index)
 {
+    if (!m_widget) return;
     m_widget->setTextType(index);
     switch (index) {
     case String:
         ui->textRegAddress->setEnabled(false);
         ui->textDotBef->setEnabled(false);
         ui->textDotAft->setEnabled(false);
-        ui->stackedWidget->setCurrentIndex(0);
+        ui->textStack->setCurrentIndex(0);
         ui->textEdit->setEnabled(true);
+
         break;
     case RegVaule:
         ui->textRegAddress->setEnabled(true);
         ui->textDotBef->setEnabled(true);
         ui->textDotAft->setEnabled(true);
-        ui->stackedWidget->setCurrentIndex(0);
+        ui->textStack->setCurrentIndex(0);
         ui->textEdit->setEnabled(false);
         break;
     case StringList:
         ui->textRegAddress->setEnabled(true);
         ui->textDotBef->setEnabled(false);
         ui->textDotAft->setEnabled(false);
-        ui->stackedWidget->setCurrentIndex(1);
+        ui->textStack->setCurrentIndex(1);
         break;
     default:
         break;
@@ -147,23 +187,29 @@ void PropertyDialog::on_textColor_clicked()
 
 void PropertyDialog::on_textAlignH_currentIndexChanged(int index)
 {
+    if (!m_widget) return;
     m_widget->setAlignH(index);
 }
 
 
 void PropertyDialog::on_textAlignV_currentIndexChanged(int index)
 {
+    if (!m_widget) return;
     m_widget->setAlignV(index);
 }
 
 void PropertyDialog::on_textEdit_textChanged()
 {
+    if (!m_widget) return;
     m_widget->setTextString(ui->textEdit->toPlainText());
     m_widget->setTextMaxLen(128);
 }
 
-void PropertyDialog::initDialog()
+void PropertyDialog::setDialog()
 {
+    ui->imageCompress->setCurrentIndex(m_widget->getImageCompress());
+
+
     ui->baseId->setValue(m_widget->getId());
     ui->baseBkColor->setStyleSheet(QString("background-color: #%1;")
                                    .arg(QString::number(m_widget->getBkColor().rgba(), 16)));
@@ -175,6 +221,8 @@ void PropertyDialog::initDialog()
     ui->textRegAddress->setValue(m_widget->getTextRegAddress());
     ui->textDotBef->setValue(m_widget->getTextTotLen());
     ui->textDotAft->setValue(m_widget->getTextDotLen());
+    ui->textFont->setCurrentIndex(m_widget->getTextFont());
+
 
     on_textType_currentIndexChanged(m_widget->getTextType());
     on_textAlignH_currentIndexChanged(m_widget->getAlignH());
@@ -225,6 +273,7 @@ void PropertyDialog::setStringList()
 
 void PropertyDialog::on_textFont_currentIndexChanged(int index)
 {
+    if (!m_widget) return;
     m_widget->setTextFont(index);
 }
 
@@ -240,4 +289,21 @@ void PropertyDialog::on_baseBkColor_clicked()
     ui->baseBkColor->setStyleSheet(QString("background-color: #%1;")
                                 .arg(QString::number(color.rgba(), 16)));
     m_widget->setBkColor(color);
+}
+
+void PropertyDialog::on_imagePath_clicked()
+{
+    //弹出打开对话框
+    QString filename = QFileDialog::getOpenFileName(this,
+                                                    tr("选择图片文件"),
+                                                    "",
+                                                    tr("*.bmp;*.png;*.jpg"));
+    if(filename.isEmpty()) return;
+    m_widget->setBkImage(filename);
+}
+
+void PropertyDialog::on_imageCompress_currentIndexChanged(int index)
+{
+    if (!m_widget) return;
+    m_widget->setImageCompress(index);
 }

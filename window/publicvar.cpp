@@ -3,22 +3,43 @@ PublicVar *PublicVar::m_instance = NULL;
 static QMap<int, int> m_IdPool;
 PublicVar::PublicVar(QObject *parent) : QObject(parent)
 {
+    QFile file(":/propertyEnumList");
+    if(!file.open(QIODevice::ReadOnly)){
+        return;
+    }
 
+    QDomDocument doc;
+    doc.setContent(&file,true);
+    file.close();
+
+    QDomElement root = doc.documentElement();
+    QDomNode Node = root.firstChild();
+    while (!Node.isNull())
+    {
+        QDomElement wDom = Node.toElement();
+        QString type = wDom.tagName();
+        propertyEnum.insert(type, QStringList());
+
+        QDomNode childNode = Node.firstChild();
+        while (!childNode.isNull())
+        {
+            QDomElement childDom = childNode.toElement();
+            QString value = childDom.attribute("value");
+            propertyEnum[type].append(value);
+
+            childNode = childNode.nextSibling();
+        }
+        Node = Node.nextSibling();
+    }
 }
 
 PublicVar::~PublicVar()
 {
-    delete propertyEnum;
     delete m_instance;
 }
-void PublicVar::setEnumProperty(QMap<QString, QStringList> *enumMap)
-{
-    propertyEnum = enumMap;
-}
-
 QStringList PublicVar::getEnumProperty(QString prop)
 {
-    return propertyEnum->value(prop);
+    return propertyEnum.value(prop);
 }
 
 int PublicVar::assignId(int type)

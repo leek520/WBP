@@ -61,15 +61,10 @@ private:
     QAction *recentFileActs[MaxRecentFiles];
     void updateRecentFiles();//更新最近打开文件列表
 
-    void readSettings();//读取保存窗口大小和位置的设置
-    void writeSettings();//记录窗口的大小和位置
-
     bool senceF;//是否区分大小写，1区分 0不区分
     bool upFindF;//向前还是向后查找，1向前 0向后
     void doFind(QString findText);//查找的实现函数
     bool doReplaceAllFind(QString findText);//全部替换的查找实现函数
-
-
 
 private slots:
     void on_action_zoomOut_triggered();

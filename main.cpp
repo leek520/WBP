@@ -4,7 +4,7 @@
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
-
+    a.connect(&a,SIGNAL(lastWindowClosed()),&a,SLOT(quit()));
     //设置程序中文字的编码方式
     QTextCodec *codec = QTextCodec::codecForName("UTF_8");
     QTextCodec::setCodecForLocale(codec);

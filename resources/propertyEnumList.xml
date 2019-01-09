@@ -20,4 +20,8 @@
 		<enum1 value="24"/>
 		<enum2 value="32"/>
 	</TextFont>
+	<ImageCompress>
+		<enum0 value="GUI_DRAW_BMP565"/>
+		<enum1 value="GUI_DRAW_RLE16"/>
+	</ImageCompress>
 </Property>

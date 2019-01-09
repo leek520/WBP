@@ -27,6 +27,6 @@
         <file>images/zoom-in.png</file>
         <file>images/zoom-out.png</file>
         <file>images/yafeilinux.gif</file>
-        <file>resources/keywords.txt</file>
+        <file alias="keywords">resources/keywords.txt</file>
     </qresource>
 </RCC>

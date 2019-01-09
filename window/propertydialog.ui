@@ -23,42 +23,89 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <widget class="QTabWidget" name="tabWidget">
+    <widget class="QTabWidget" name="tabwidget">
      <property name="currentIndex">
-      <number>2</number>
+      <number>1</number>
      </property>
-     <widget class="QWidget" name="tab_1">
+     <widget class="QWidget" name="tabBase">
       <attribute name="title">
        <string>控件属性</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout">
-       <item row="0" column="0">
-        <widget class="QLabel" name="label_2">
-         <property name="text">
-          <string>控件Id</string>
-         </property>
-        </widget>
-       </item>
        <item row="0" column="1">
-        <widget class="QSpinBox" name="baseId"/>
-       </item>
-       <item row="1" column="0">
-        <widget class="QLabel" name="label_3">
-         <property name="text">
-          <string>背景颜色</string>
+        <widget class="QStackedWidget" name="baseStack">
+         <property name="currentIndex">
+          <number>0</number>
          </property>
-        </widget>
-       </item>
-       <item row="1" column="1">
-        <widget class="QPushButton" name="baseBkColor">
-         <property name="text">
-          <string/>
-         </property>
+         <widget class="QWidget" name="pWidget">
+          <layout class="QGridLayout" name="gridLayout_2">
+           <item row="0" column="0" colspan="3">
+            <widget class="QLabel" name="label_2">
+             <property name="text">
+              <string>控件Id</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="3">
+            <widget class="QSpinBox" name="baseId"/>
+           </item>
+           <item row="1" column="3">
+            <widget class="QPushButton" name="baseBkColor">
+             <property name="text">
+              <string/>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="0">
+            <widget class="QLabel" name="label_3">
+             <property name="text">
+              <string>背景颜色</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+         <widget class="QWidget" name="pImage">
+          <layout class="QGridLayout" name="gridLayout_3">
+           <item row="1" column="0">
+            <widget class="QLabel" name="label_5">
+             <property name="text">
+              <string>压缩方式</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="1">
+            <widget class="QComboBox" name="imageCompress"/>
+           </item>
+           <item row="0" column="0" colspan="2">
+            <widget class="QPushButton" name="imagePath">
+             <property name="text">
+              <string> 选择图片</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+         <widget class="QWidget" name="pGraph">
+          <widget class="QLabel" name="label_4">
+           <property name="geometry">
+            <rect>
+             <x>140</x>
+             <y>160</y>
+             <width>54</width>
+             <height>12</height>
+            </rect>
+           </property>
+           <property name="text">
+            <string>TextLabel</string>
+           </property>
+          </widget>
+         </widget>
         </widget>
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="tab_2">
+     <widget class="QWidget" name="tabText">
       <attribute name="title">
        <string>文本属性</string>
       </attribute>
@@ -79,23 +126,7 @@
           </widget>
          </item>
          <item row="0" column="1">
-          <widget class="QComboBox" name="textType">
-           <item>
-            <property name="text">
-             <string>固定文本</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>寄存器值</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>文本列表</string>
-            </property>
-           </item>
-          </widget>
+          <widget class="QComboBox" name="textType"/>
          </item>
          <item row="2" column="0">
           <widget class="QLabel" name="Label_2">
@@ -112,23 +143,7 @@
           </widget>
          </item>
          <item row="4" column="1">
-          <widget class="QComboBox" name="textAlignH">
-           <item>
-            <property name="text">
-             <string>AlignLeft</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>AlignRight</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>AlignHCenter</string>
-            </property>
-           </item>
-          </widget>
+          <widget class="QComboBox" name="textAlignH"/>
          </item>
          <item row="5" column="0">
           <widget class="QLabel" name="Label_4">
@@ -138,23 +153,7 @@
           </widget>
          </item>
          <item row="5" column="1">
-          <widget class="QComboBox" name="textAlignV">
-           <item>
-            <property name="text">
-             <string>AlignTop</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>AlignBottom</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>AlignVCenter</string>
-            </property>
-           </item>
-          </widget>
+          <widget class="QComboBox" name="textAlignV"/>
          </item>
          <item row="6" column="0">
           <widget class="QLabel" name="Label_5">
@@ -222,23 +221,8 @@
          <item row="1" column="1">
           <widget class="QComboBox" name="textFont">
            <property name="currentIndex">
-            <number>2</number>
+            <number>-1</number>
            </property>
-           <item>
-            <property name="text">
-             <string>16</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>24</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>32</string>
-            </property>
-           </item>
           </widget>
          </item>
          <item row="7" column="0">
@@ -254,9 +238,9 @@
         </layout>
        </item>
        <item>
-        <widget class="QStackedWidget" name="stackedWidget">
+        <widget class="QStackedWidget" name="textStack">
          <property name="currentIndex">
-          <number>1</number>
+          <number>0</number>
          </property>
          <widget class="QWidget" name="page">
           <layout class="QHBoxLayout" name="horizontalLayout_2">
@@ -359,7 +343,7 @@
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="tab_3">
+     <widget class="QWidget" name="tabAction">
       <attribute name="title">
        <string>动作属性</string>
       </attribute>

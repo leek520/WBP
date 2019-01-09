@@ -69,6 +69,7 @@ class Widget : public QWidget
 
     Q_PROPERTY(QString BkImage READ getBkImage WRITE setBkImage)
     Q_PROPERTY(QPoint ImagePos READ getImagePos WRITE setImagePos)
+    Q_PROPERTY(ushort ImageCompress READ getImageCompress WRITE setImageCompress)
 
     Q_PROPERTY(int LineType READ getLineType WRITE setLineType)
     Q_PROPERTY(QPoint LineStart READ getLineStart WRITE setLineStart)
@@ -109,7 +110,7 @@ protected:
     void virtual createContexMenu();
 
 signals:
-    void MouseButtonDblClick(Widget *w);
+    void mouseButtonDblClick(Widget *w);
     void currentItemChanged(Widget *w);
     void checkContainWidget(Widget *w);
 private:
@@ -163,6 +164,9 @@ public:
 
     QString getBkImage();
     void setBkImage(QString BkImage);
+
+    ushort getImageCompress();
+    void setImageCompress(ushort type);
 
     QPoint getImagePos();
     void setImagePos(QPoint pos);
@@ -218,6 +222,7 @@ protected:
     QColor m_BkColor;
     QString m_BkImage;
     QPoint m_ImagePos;
+    ushort m_ImageCompress;
     QColor m_BkPressColor;
     QColor m_BkDisableColor;
 

@@ -1,6 +1,7 @@
 ﻿#include "mainwindow.h"
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
+    m_publicVar(new PublicVar()),
     m_buildInfo(new BuildInfo()),
     m_progressBar(new ProgressBar()),
     m_propD(new PropertyDialog),
@@ -17,7 +18,6 @@ MainWindow::MainWindow(QWidget *parent) :
     createStatusBar();
 
     setupUi();
-    initEnumProperty();
 
     connect(m_buildInfo, SIGNAL(ResProgress_sig(int,int,QString)),
             this, SLOT(ResProgress_slt(int,int,QString)));
@@ -317,42 +317,6 @@ void MainWindow::setupUi()
     m_dockBottom->close();
 }
 
-void MainWindow::initEnumProperty()
-{
-    QFile file(":/propertyEnumList");
-    if(!file.open(QIODevice::ReadOnly)){
-        return;
-    }
-
-    QDomDocument doc;
-    doc.setContent(&file,true);
-    file.close();
-
-    QDomElement root = doc.documentElement();
-    QDomNode Node = root.firstChild();
-    while (!Node.isNull())
-    {
-        QDomElement wDom = Node.toElement();
-        QString type = wDom.tagName();
-        propertyEnum.insert(type, QStringList());
-
-        QDomNode childNode = Node.firstChild();
-        while (!childNode.isNull())
-        {
-            QDomElement childDom = childNode.toElement();
-            QString value = childDom.attribute("value");
-            propertyEnum[type].append(value);
-
-            childNode = childNode.nextSibling();
-        }
-        Node = Node.nextSibling();
-    }
-    PV->setEnumProperty(&propertyEnum);
-}
-
-
-
-
 /**
 * 函数说明：创建xml文件
 *
@@ -474,8 +438,6 @@ bool MainWindow::saveProjectFile(QString &filename)
 
 bool MainWindow::openProjectFile(QString &filename)
 {
-    setCursor(Qt::WaitCursor);
-    qApp->processEvents();
     // 先读取xml文件
     if (!docXmlRead(filename))
     {
@@ -507,7 +469,7 @@ bool MainWindow::openProjectFile(QString &filename)
     }
     m_leftW->setInit();
 
-    setCursor(Qt::ArrowCursor);
+
     return true;
 }
 
@@ -696,13 +658,15 @@ bool MainWindow::open()
     {
         return false;              //如果关闭窗口或者点击取消，则返回-1，并退出
     }
+    setCursor(Qt::WaitCursor);
+    qApp->processEvents();
     //1、先保存工程文件
     if (!openProjectFile(filename))
     {
         qDebug()<<"打开工程文件失败！";
-
         return false;
     }
+    setCursor(Qt::ArrowCursor);
     return true;
 }
 
@@ -854,7 +818,10 @@ WindowInfo *MainWindow::setWidgetInfo(Widget *w, struct list_head *head, int *po
     case Image:
     {
         ImageInfo *imageInfo = (ImageInfo*)(start + curPos);
-        m_buildInfo->QImageToEImage(w->getBkImage(), w->getImagePos(), imageInfo);
+        m_buildInfo->QImageToEImage(w->getBkImage(),
+                                    w->getImagePos(),
+                                    w->getImageCompress(),
+                                    imageInfo);
         *pos = curPos + sizeof(ImageInfo);
 
         list_add_tail(&imageInfo->list, head);
@@ -1119,7 +1086,7 @@ void MainWindow::ResProgress_slt(int step, int pos, QString msg)
     }
 }
 
-void MainWindow::MouseButtonDblClick(Widget *w)
+void MainWindow::mouseButtonDblClick(Widget *w)
 {
     m_propD->showDialog(w);
 }
@@ -1174,8 +1141,8 @@ Widget* MainWindow::addWidget(WidgetType type)
                 m_propW, SLOT(currentItemChanged(Widget*)));
 
 
-        connect(win, SIGNAL(MouseButtonDblClick(Widget*)),
-                this, SLOT(MouseButtonDblClick(Widget*)));
+        connect(win, SIGNAL(mouseButtonDblClick(Widget*)),
+                this, SLOT(mouseButtonDblClick(Widget*)));
         connect(win, SIGNAL(addWidgetSgn(WidgetType,QPoint)),
                 this, SLOT(addWidgetSlt(WidgetType,QPoint)));
 
@@ -1237,8 +1204,8 @@ Widget* MainWindow::addWidget(WidgetType type)
     connect(create, SIGNAL(checkContainWidget(Widget*)),
             WindowWidget::m_curWin, SLOT(checkContainWidget(Widget*)));
 
-    connect(create, SIGNAL(MouseButtonDblClick(Widget*)),
-            this, SLOT(MouseButtonDblClick(Widget*)));
+    connect(create, SIGNAL(mouseButtonDblClick(Widget*)),
+            this, SLOT(mouseButtonDblClick(Widget*)));
     m_leftW->addWidget(create);
     return create;
 

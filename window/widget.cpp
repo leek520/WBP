@@ -53,7 +53,6 @@ void Widget::setImage()
         m_CentralWidget->setPixmap(QPixmap());
         move(m_ImagePos);
     }
-    //repaint();
 }
 
 void Widget::setPosProperty()
@@ -129,7 +128,7 @@ bool Widget::eventFilter(QObject *watched, QEvent *event)
         emit checkContainWidget(this);
         break;
     case QEvent::MouseButtonDblClick:
-        emit MouseButtonDblClick(this);
+        emit mouseButtonDblClick(this);
         break;
     case QEvent::FocusIn:
         //处理焦点事件
@@ -168,6 +167,7 @@ void Widget::initCenterWidget()
     m_CentralWidget->setMouseTracking(true); //开启鼠标追踪
     QFont font;
     font.setPixelSize(32);
+    font.setFamily("Times");
     font.setWeight(QFont::Thin);
     m_CentralWidget->setFont(font);
     m_CentralWidget->setMinimumSize(0,0);
@@ -188,7 +188,7 @@ void Widget::initParament()
     m_AlignV = (m_CentralWidget->alignment() & 0xff) >> 6;
 
     m_TextType = String;
-    m_TextFont = 0;
+    m_TextFont = 2;
     m_TextRegAddress = 0;
     m_TextDotLen = 0;
     m_TextDotLen = 0;
@@ -198,6 +198,7 @@ void Widget::initParament()
         m_TextString.append("");
         m_TextStringList.append(QStringList());
     }
+    m_ImageCompress = 0;
 }
 
 void Widget::createContexMenu()
@@ -289,6 +290,16 @@ void Widget::setBkImage(QString BkImage)
     m_BkImage = BkImage;
 
     setImage();
+}
+
+ushort Widget::getImageCompress()
+{
+    return m_ImageCompress;
+}
+
+void Widget::setImageCompress(ushort type)
+{
+    m_ImageCompress = type;
 }
 
 QPoint Widget::getImagePos()

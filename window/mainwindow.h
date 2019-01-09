@@ -72,7 +72,7 @@ private slots:
     void editor();
 
     void ResProgress_slt(int step, int pos, QString msg="");
-    void MouseButtonDblClick(Widget *w);
+    void mouseButtonDblClick(Widget *w);
     void focusChanged(QWidget *old, QWidget *now);
     void addWidget();
     void addWidgetSlt(WidgetType type, QPoint pos);
@@ -144,9 +144,8 @@ private:
     ProgressBar *m_progressBar;
     QDockWidget *m_dockBottom;
 
+    PublicVar *m_publicVar;
     BuildInfo *m_buildInfo;
-
-    QMap<QString, QStringList> propertyEnum;
 };
 
 #endif // MAINWINDOW_H

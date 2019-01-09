@@ -29,8 +29,6 @@ TextEdit::TextEdit(QWidget *parent) :
     connect(findReplace->ui->pushButtonReplace,SIGNAL(clicked()),this,SLOT(replace()));
     connect(findReplace->ui->pushButtonReplaceAll,SIGNAL(clicked()),this,SLOT(replaceAll()));
 
-    readSettings();//读取上次关闭窗口时窗口的大小与位置
-    this->setCentralWidget(ui->mdiArea);//将多文档区部件设为中心部件
 
     ui->mdiArea->setViewMode(QMdiArea::TabbedView);//设为标签栏显示模式
     connect(ui->mdiArea, SIGNAL(subWindowActivated(QMdiSubWindow*)),
@@ -208,8 +206,8 @@ void TextEdit::updateMenus()//更新菜单栏和标题的显示状态等
     actGrp->setEnabled(hasMdiChild);//对齐方式
     listBox->setEnabled(hasMdiChild);//排序
     ui->menu_SelectW->setEnabled(hasMdiChild);//“选择窗口”菜单
-    first_statusLabel->setText(hasMdiChild? first_statusLabel->text():tr("欢迎使用多文档文本编辑器"));
-    second_statusLabel->setText(hasMdiChild? second_statusLabel->text():tr("yafeilinux制作"));
+    first_statusLabel->setText(hasMdiChild? first_statusLabel->text():tr("宏指令编辑器"));
+    second_statusLabel->setText(hasMdiChild? second_statusLabel->text():tr("    "));
 
     bool hasSelection = (activeMdiChild() &&
                              activeMdiChild()->textCursor().hasSelection());
@@ -285,8 +283,8 @@ void TextEdit::init_statusBar()//初始化状态栏
     bar->addWidget(second_statusLabel);
     bar->addWidget(third_statusLabel);
 
-    first_statusLabel->setText(tr("欢迎使用多文档文本编辑器")); //初始化内容
-    second_statusLabel->setText(tr("yafeilinux制作"));
+    first_statusLabel->setText(tr("宏指令编辑器")); //初始化内容
+    second_statusLabel->setText(tr("      "));
     third_statusLabel->setText(tr("0000-00-00 00:00::00 星期 "));
 }
 
@@ -700,29 +698,12 @@ void TextEdit::setActiveSubWindow(QWidget *window)//激活窗口
     ui->mdiArea->setActiveSubWindow(qobject_cast<QMdiSubWindow *>(window));
 }
 
-void TextEdit::readSettings()//读取主窗口的大小、位置信息
-{
-    QSettings settings("yafeilinux", "MDI Example");
-    QPoint pos = settings.value("pos", QPoint(250, 100)).toPoint();
-    QSize size = settings.value("size", QSize(820, 600)).toSize();
-    move(pos);
-    resize(size);
-}
-
-void TextEdit::writeSettings()//记录主窗口的大小、位置信息
-{
-    QSettings settings("yafeilinux","MDI Example");
-    settings.setValue("pos", pos());
-    settings.setValue("size", size());
-}
-
 void TextEdit::closeEvent(QCloseEvent *event)//重写关闭事件
 {
     ui->mdiArea->closeAllSubWindows();
     if (ui->mdiArea->currentSubWindow()) {
         event->ignore();
     } else {
-        writeSettings();
         event->accept();
     }
 }

@@ -52,13 +52,13 @@ BuildInfo::WidgetBuf *BuildInfo::getWidgetBuf()
 uint BuildInfo::QColorToEColor(QColor color)
 {
     uint rgba = color.rgba();
-    qDebug()<<QString::number(rgba, 16);
+    //qDebug()<<QString::number(rgba, 16);
     //r从FF->00
     rgba = ((color.red() << 0) |
             (color.green() << 8) |
             (color.blue() << 16) |
             ((0x000000FF - color.alpha()) << 24));
-    qDebug()<<QString::number(rgba, 16);
+    //qDebug()<<QString::number(rgba, 16);
     return rgba;
 }
 int BuildInfo::QAlignToEAlign(int align)
@@ -199,9 +199,9 @@ char *BuildInfo::QStringToLuaChar(QString str)
     return (char *)address;
 }
 
-void BuildInfo::QImageToEImage(QString filename, QPoint leftTop, ImageInfo *imageinfo)
+void BuildInfo::QImageToEImage(QString filename, QPoint leftTop, int type, ImageInfo *imageinfo)
 {
-    ImageMethods type = GUI_DRAW_BMP565;   //0:无压缩，1：压缩
+    //ImageMethods type = GUI_DRAW_BMP565;   //0:无压缩，1：压缩
 
     int address = START_ADDR_SDRAM_IMAGE + imageBuf.pos;
     if (!QFile::exists(filename)){

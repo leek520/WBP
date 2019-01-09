@@ -12,8 +12,6 @@
 #define GUI_ID_EDIT     3000
 
 
-
-
 class PublicVar : public QObject
 {
     Q_OBJECT
@@ -27,7 +25,6 @@ public:
         }
         return m_instance;
     }
-    void setEnumProperty(QMap<QString, QStringList> *enumMap);
     QStringList getEnumProperty(QString prop);
     int assignId(int type);
 signals:
@@ -36,7 +33,7 @@ public slots:
 
 private:
     static PublicVar *m_instance;
-    QMap<QString, QStringList> *propertyEnum;
+    QMap<QString, QStringList> propertyEnum;
     QMap<int, int> m_IdPool;
 };
 
