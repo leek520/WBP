@@ -71,9 +71,9 @@ private slots:
 
     void editor();
 
-    void switchTabWindow(Widget *w);
     void ResProgress_slt(int step, int pos, QString msg="");
     void MouseButtonDblClick(Widget *w);
+    void focusChanged(QWidget *old, QWidget *now);
     void addWidget();
     void addWidgetSlt(WidgetType type, QPoint pos);
     Widget* addWidget(WidgetType type);

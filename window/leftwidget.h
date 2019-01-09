@@ -4,7 +4,7 @@
 #include <QTreeWidgetItem>
 #include "common.h"
 #include "widget.h"
-
+#include "widgetselection.h"
 class LeftWidget : public QWidget
 {
     Q_OBJECT
@@ -19,9 +19,9 @@ signals:
 private:
 public slots:
     void addWidget(Widget *w);
-    void currentItemChanged(Widget *w);
+    void setCurrentItem(QWidget *w);
+    void removeWidget(QWidget *w);
     void currentItemChanged(QTreeWidgetItem *current, QTreeWidgetItem *previous);
-    void removeWidgetSlt(Widget *w);
 private:
     QTreeWidget *m_objectTree;
     QTreeWidgetItem *m_curWinItem;

@@ -8,14 +8,17 @@ WindowWidget::WindowWidget(QWidget *parent) :
     m_windowList.append(this);
     addWidget(this);
     setAcceptDrops(true);   //设置接收拖拽
-    connect(qApp, SIGNAL(focusChanged(QWidget *, QWidget *)),
-                this, SLOT(focusChanged(QWidget *, QWidget *)));
     connect(SEL, SIGNAL(sizeChanged(QWidget*,QRect,QRect)),
                 this, SLOT(propertyChanged(QWidget*)));
 
     initPropertyTable();
     initCenterWidget();
     initParament();
+}
+
+WindowWidget::~WindowWidget()
+{
+
 }
 
 void WindowWidget::initPropertyTable()
@@ -56,36 +59,27 @@ void WindowWidget::addWidget(QWidget *w)
         }
     }
     SEL->addWidget(w);
-    setCurrent(w);
+    setCurrentItem(w);
 }
 
 void WindowWidget::removeWidget(QWidget *w)
 {
-    Widget *rw = (Widget *)w;
-    if (!SEL->isContainWidget(rw)) return;
-    emit removeWidgetSgn(rw);
-    if (Window == rw->getType()){
-        WindowWidget *win = (WindowWidget *)w;
-        QWidgetList childs = win->m_childList;
-        for(int i=0;i<childs.count();i++){
-            win->removeWidget(childs[i]);
+    SEL->removeWidget(w);
+    if (w == this){
+        for(int i=0;i<m_childList.count();i++){
+            removeWidget(m_childList[i]);
         }
-        childs = win->m_graphList;
-        for(int i=0;i<childs.count();i++){
-            win->removeWidget(childs[i]);
+        for(int i=0;i<m_graphList.count();i++){
+            removeWidget(m_graphList[i]);
         }
-        childs = win->m_imageList;
-        for(int i=0;i<childs.count();i++){
-            win->removeWidget(childs[i]);
+        for(int i=0;i<m_imageList.count();i++){
+            removeWidget(m_imageList[i]);
         }
-        SEL->removeWidget(win);
-        m_windowList.removeOne(win);
-        //resetCurrentWidget一定在delete之前，要不然窗体删除后信号发送不出去了
-        resetCurrentWidget();
-        delete win;
+        m_windowList.removeOne(this);
+        delete this;
     }else{
-        SEL->removeWidget(w);
-        switch (rw->getType()) {
+        Widget *child = (Widget *)w;
+        switch (child->getType()) {
         case Button:
         case Text:
         case Edit:
@@ -102,8 +96,7 @@ void WindowWidget::removeWidget(QWidget *w)
         default:
             break;
         }
-        delete w;
-        resetCurrentWidget();
+        delete child;
     }
 }
 
@@ -123,30 +116,6 @@ void WindowWidget::refreshAll()
             ((Widget *)childList[j])->refresh();
         }
         m_windowList[i]->repaint();
-    }
-}
-
-void WindowWidget::resetCurrentWidget()
-{
-    //重设当前窗口
-    if (!m_childList.isEmpty()){
-        setCurrent(m_childList.last());
-    }else{
-        if (!m_graphList.isEmpty()){
-            setCurrent(m_graphList.last());
-        }else{
-            if (!m_imageList.isEmpty()){
-                setCurrent(m_imageList.last());
-            }else{
-                //通知属性窗口更改
-                if (m_windowList.isEmpty()){
-                    m_curWin = NULL;
-                    emit currentItemChanged((Widget *)NULL);
-                }else{
-                    setCurrent(m_windowList.last());
-                }
-            }
-        }
     }
 }
 
@@ -218,17 +187,50 @@ void WindowWidget::dropEvent(QDropEvent *event)
     }
     QWidget::dropEvent(event);
 }
-
-void WindowWidget::setCurrent(QWidget *w)
+void WindowWidget::setCurrentItem(QWidget *w)
 {
     QWidget *curWidget = SEL->current();
     if (curWidget){
         SEL->hide(curWidget);
     }
+    if (w == this){
+        checkContainWidget((Widget *)w);
+    }
     SEL->setCurrent(w);
     SEL->show(w);
     w->show();
+    w->raise();
     propertyChanged(w);
+}
+Widget* WindowWidget::findContainWidget(Widget *w)
+{
+    Widget *dstChild = NULL;
+    QRect rect = w->frameGeometry();
+    QWidgetList childList = m_childList + m_imageList + m_graphList;
+    for(int i=0;i<childList.count();i++){
+        Widget *now = (Widget *)childList[i];
+        if (now == w) continue;
+        QRect nowRect = now->frameGeometry();
+        QPoint pos = this->mapFromGlobal(QCursor::pos());
+        if (rect.contains(nowRect, true)){
+            now->raise();
+            if (nowRect.contains(pos, true)){
+                dstChild = now;
+            }
+        }
+    }
+    if (dstChild){
+        if (!findContainWidget(dstChild)){
+            return dstChild;
+        }
+    }
+    return NULL;
+}
+void WindowWidget::checkContainWidget(Widget *w)
+{
+    Widget *cur = findContainWidget(w);
+    if (cur)
+        cur->setFocus();
 }
 
 void WindowWidget::setWidgetProperty(QWidget *w)
@@ -238,24 +240,7 @@ void WindowWidget::setWidgetProperty(QWidget *w)
     child->setRectangle(w->frameGeometry());
 }
 
-void WindowWidget::focusChanged(QWidget *old, QWidget *now)
-{
-    if (SEL->isContainWidget(now)){
-        setCurrent(now);
-        Widget *rw = (Widget *)now;
-        if (Window == rw->getType()){
-            m_curWin = (WindowWidget *)now;
-        }else{
-            if ((m_childList.indexOf(now) > -1) ||
-                (m_imageList.indexOf(now) > -1) ||
-                (m_graphList.indexOf(now) > -1)){
-                m_curWin = this;
-                now->raise();
-            }
-        }
-    }
-    m_curWin->raise();
-}
+
 
 void WindowWidget::propertyChanged(QWidget *w)
 {

@@ -29,9 +29,8 @@ void TextWidget::initPropertyTable()
 
 void TextWidget::initParament()
 {
-
     Widget::initParament();
-
+    setBkColor(QColor(255, 255, 255, 0));
     setTextString("text");
 }
 

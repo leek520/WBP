@@ -97,10 +97,7 @@ public:
     void setLanStringList(int lan, QStringList list);
     void refresh();
 private:
-    int assignId();
-
     void setImage();
-
 protected:
     bool eventFilter(QObject *watched, QEvent *event);
     void keyPressEvent(QKeyEvent *event);
@@ -114,7 +111,7 @@ protected:
 signals:
     void MouseButtonDblClick(Widget *w);
     void currentItemChanged(Widget *w);
-
+    void checkContainWidget(Widget *w);
 private:
     QPoint dragPosition;   //鼠标拖动的位置  
 protected:

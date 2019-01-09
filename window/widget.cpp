@@ -58,7 +58,6 @@ void Widget::setImage()
 
 void Widget::setPosProperty()
 {
-    this->setFocus();
     QRect rect = this->frameGeometry();
     m_LineStart = QPoint(rect.left(), (rect.top()+rect.bottom())/2);
     if (0 == m_LineType){  //水平
@@ -115,12 +114,11 @@ bool Widget::eventFilter(QObject *watched, QEvent *event)
            move(me->globalPos() - dragPosition);
            setPosProperty();
            emit currentItemChanged(this);
+           setCursor(Qt::SizeAllCursor);
         }
-//        if (((Widget *)watched->parent())->getType() == Window){
-//            setCursor(Qt::ArrowCursor);
-//        }else{
-//            setCursor(Qt::CrossCursor);
-//        }
+        break;
+    case QEvent::MouseButtonRelease:
+        setCursor(Qt::ArrowCursor);
         break;
     case QEvent::MouseButtonPress:
         me->ignore();
@@ -128,6 +126,7 @@ bool Widget::eventFilter(QObject *watched, QEvent *event)
          {
             dragPosition = me->globalPos() - frameGeometry().topLeft();  //获得鼠标按键位置相对窗口左上面的位置
         }
+        emit checkContainWidget(this);
         break;
     case QEvent::MouseButtonDblClick:
         emit MouseButtonDblClick(this);
@@ -167,7 +166,10 @@ void Widget::initCenterWidget()
 {
     m_CentralWidget = new QLabel();
     m_CentralWidget->setMouseTracking(true); //开启鼠标追踪
-    m_CentralWidget->setFont(QFont("Times", 26, QFont::Normal));
+    QFont font;
+    font.setPixelSize(32);
+    font.setWeight(QFont::Thin);
+    m_CentralWidget->setFont(font);
     m_CentralWidget->setMinimumSize(0,0);
     m_CentralWidget->installEventFilter(this);
     m_CentralWidget->setAutoFillBackground(true);

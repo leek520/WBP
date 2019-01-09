@@ -286,6 +286,9 @@ void MainWindow::setupUi()
 {
     setWindowState(Qt::WindowMaximized);
 
+    connect(qApp, SIGNAL(focusChanged(QWidget *, QWidget *)),
+                this, SLOT(focusChanged(QWidget *, QWidget *)));
+
     m_mdiArea = new TabWidget(this);
     m_mdiArea->setTabsClosable(true);
     setCentralWidget(m_mdiArea);
@@ -298,9 +301,6 @@ void MainWindow::setupUi()
     m_dockLeft->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
     m_dockLeft->setWidget(m_leftW);
     this->addDockWidget(Qt::LeftDockWidgetArea, m_dockLeft);//初始位置
-    connect(m_leftW, SIGNAL(switchTabWindow(Widget*)),
-            this, SLOT(switchTabWindow(Widget*)));
-
 
     QDockWidget *m_dockRight = new QDockWidget(tr("Property"), this);
     m_dockRight->setFeatures(QDockWidget::DockWidgetMovable | QDockWidget::DockWidgetClosable);//可移动
@@ -763,7 +763,29 @@ void MainWindow::cut()
 
 void MainWindow::remove()
 {
-    WindowWidget::m_curWin->removeWidget(focusWidget());
+    QWidget *now = this->focusWidget();
+    if (SEL->isContainWidget(now)){
+        WindowWidget *win = NULL;
+        Widget *w = (Widget *)now;
+        //根据类型取出父窗体
+        if (Window == w->getType()){
+            int rst = QMessageBox::warning(this, tr("提示"), tr("是否要删除当前屏？"),
+                                 QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
+            if (rst == QMessageBox::No)
+                return;
+            win = (WindowWidget *)w;
+            //删除父窗体所在的tab
+            m_mdiArea->removeWidget(win->parentWidget());
+        }else{
+            win = (WindowWidget *)w->parentWidget();
+        }
+
+        //window删除需要删除的控件
+        win->removeWidget(w);
+
+        //left删除对应的item
+        m_leftW->removeWidget(w);
+    }
 
 }
 
@@ -1073,23 +1095,6 @@ void MainWindow::editor()
     ce->show();
 }
 
-void MainWindow::switchTabWindow(Widget *w)
-{
-    QWidget *curTab = NULL;
-    for(int i=0;i<m_mdiArea->count();i++){
-        if (m_mdiArea->widget(i) == w->parentWidget()){
-            curTab = m_mdiArea->widget(i);
-        }
-    }
-    if (curTab){
-        m_mdiArea->setCurrentWidget(curTab);
-    }else{
-        curTab = w->parentWidget();
-        m_mdiArea->addTab(curTab, QString("Window-%1").arg(w->getId()));
-        m_mdiArea->setCurrentWidget(curTab);
-    }
-}
-
 void MainWindow::ResProgress_slt(int step, int pos, QString msg)
 {
     int maxStep = 6;
@@ -1119,6 +1124,25 @@ void MainWindow::MouseButtonDblClick(Widget *w)
     m_propD->showDialog(w);
 }
 
+void MainWindow::focusChanged(QWidget *old, QWidget *now)
+{
+    if (SEL->isContainWidget(now)){
+        //window
+        WindowWidget *win = NULL;
+        if (Window == ((Widget *)now)->getType()){
+            win = (WindowWidget *)now;
+        }else{
+            win = (WindowWidget *)now->parentWidget();
+        }
+        WindowWidget::m_curWin = win;
+        win->setCurrentItem(now);
+        //左侧栏
+        m_leftW->setCurrentItem(now);
+        //tabwidget
+        m_mdiArea->setCurrentItem(now);
+    }
+}
+
 void MainWindow::addWidget()
 {
     WidgetType type;
@@ -1141,16 +1165,15 @@ Widget* MainWindow::addWidget(WidgetType type)
 {
     if (type == Window){
         ScrollArea *scollArea = new ScrollArea(m_mdiArea);
+
         connect(scollArea, SIGNAL(addWidgetSgn(WidgetType,QPoint)),
                 this, SLOT(addWidgetSlt(WidgetType,QPoint)));
 
         WindowWidget *win = new WindowWidget(scollArea);
         connect(win, SIGNAL(currentItemChanged(Widget*)),
                 m_propW, SLOT(currentItemChanged(Widget*)));
-        connect(win, SIGNAL(removeWidgetSgn(Widget*)),
-                m_leftW, SLOT(removeWidgetSlt(Widget*)));
-        connect(win, SIGNAL(currentItemChanged(Widget*)),
-                m_leftW, SLOT(currentItemChanged(Widget*)));
+
+
         connect(win, SIGNAL(MouseButtonDblClick(Widget*)),
                 this, SLOT(MouseButtonDblClick(Widget*)));
         connect(win, SIGNAL(addWidgetSgn(WidgetType,QPoint)),
@@ -1210,8 +1233,10 @@ Widget* MainWindow::addWidget(WidgetType type)
     WindowWidget::m_curWin->addWidget(create);
     connect(create, SIGNAL(currentItemChanged(Widget*)),
             m_propW, SLOT(currentItemChanged(Widget*)));
-    connect(create, SIGNAL(currentItemChanged(Widget*)),
-            m_leftW, SLOT(currentItemChanged(Widget*)));
+
+    connect(create, SIGNAL(checkContainWidget(Widget*)),
+            WindowWidget::m_curWin, SLOT(checkContainWidget(Widget*)));
+
     connect(create, SIGNAL(MouseButtonDblClick(Widget*)),
             this, SLOT(MouseButtonDblClick(Widget*)));
     m_leftW->addWidget(create);

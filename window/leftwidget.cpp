@@ -14,6 +14,7 @@ LeftWidget::LeftWidget(QWidget *parent) :
     m_objectTree->setSelectionMode(QAbstractItemView::ExtendedSelection);
     m_objectTree->header()->setStretchLastSection(true);
     m_objectTree->setHeaderLabels(QStringList()<<tr("Wiget")<<tr("Id")); //设置头的标题
+
     connect(m_objectTree, SIGNAL(currentItemChanged(QTreeWidgetItem*,QTreeWidgetItem*)),
             this, SLOT(currentItemChanged(QTreeWidgetItem*,QTreeWidgetItem*)));
 }
@@ -65,10 +66,10 @@ void LeftWidget::addWidget(Widget *w)
     default:
         break;
     }
-
-    currentItemChanged(w);
+    setCurrentItem(w);
 }
-void LeftWidget::currentItemChanged(Widget *w)
+
+void LeftWidget::setCurrentItem(QWidget *w)
 {
     //先遍历，是否已经添加该w
     QTreeWidgetItemIterator it(m_objectTree);
@@ -87,24 +88,7 @@ void LeftWidget::currentItemChanged(Widget *w)
     }
 }
 
-void LeftWidget::currentItemChanged(QTreeWidgetItem *current, QTreeWidgetItem *previous)
-{
-    if (!current) return;
-    Widget *pItem;
-    QTreeWidgetItem *curParent = current->parent();
-    if (curParent){
-        pItem = (Widget *)(curParent->data(0, Qt::UserRole).toInt());
-    }else{
-        pItem = (Widget *)(current->data(0, Qt::UserRole).toInt());
-    }
-    emit switchTabWindow(pItem);
-
-    //设置焦点
-    pItem = (Widget *)(current->data(0, Qt::UserRole).toInt());
-    pItem->setFocus();
-}
-
-void LeftWidget::removeWidgetSlt(Widget *w)
+void LeftWidget::removeWidget(QWidget *w)
 {
     //先遍历，是否已经添加该w
     QTreeWidgetItemIterator it(m_objectTree);
@@ -123,3 +107,17 @@ void LeftWidget::removeWidgetSlt(Widget *w)
     }
 }
 
+void LeftWidget::currentItemChanged(QTreeWidgetItem *current, QTreeWidgetItem *previous)
+{
+    if (!current) return;
+    Widget *pItem;
+    QTreeWidgetItem *curParent = current->parent();
+    if (curParent){
+        pItem = (Widget *)(curParent->data(0, Qt::UserRole).toInt());
+    }else{
+        pItem = (Widget *)(current->data(0, Qt::UserRole).toInt());
+    }
+    //设置焦点
+    pItem = (Widget *)(current->data(0, Qt::UserRole).toInt());
+    pItem->setFocus();
+}

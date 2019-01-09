@@ -27,6 +27,8 @@ class TabWidget : public QTabWidget
     Q_OBJECT
 public:
     TabWidget(QWidget *parent = 0);
+    void setCurrentItem(QWidget *w);
+    void removeWidget(QWidget *w);
 private slots:
     void closeTab(int index);
 };

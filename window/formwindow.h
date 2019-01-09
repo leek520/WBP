@@ -13,13 +13,13 @@ class WindowWidget : public Widget
     Q_OBJECT
 public:
     explicit WindowWidget(QWidget *parent = 0);
+    ~WindowWidget();
     void addWidget(QWidget *w);
     void removeWidget(QWidget *w);
     static void refreshAll();
     QWidgetList getChildList(int type=0);
     static QList<WindowWidget *> getWindowList();
 signals:
-    void removeWidgetSgn(Widget *w);
     void addWidgetSgn(WidgetType type, QPoint pos);
 protected:
     void dragEnterEvent(QDragEnterEvent *event);
@@ -31,13 +31,11 @@ protected:
     void initParament();
 public slots:
     void propertyChanged(QWidget *w);
+    void setCurrentItem(QWidget *w);
+    void checkContainWidget(Widget *w);
 private:
-    void setCurrent(QWidget *w);
     void setWidgetProperty(QWidget *w);
-    void resetCurrentWidget();
-private slots:
-    void focusChanged(QWidget *old, QWidget *now);
-
+    Widget* findContainWidget(Widget *w);
 private:
     int m_dragMode;
     QWidgetList m_childList;

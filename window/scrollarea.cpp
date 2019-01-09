@@ -52,7 +52,45 @@ void ScrollArea::dropEvent(QDropEvent *event)
 TabWidget::TabWidget(QWidget *parent) : QTabWidget(parent)
 {
     setObjectName("mdiArea");
-    connect(this, SIGNAL(tabCloseRequested(int)), this, SLOT(closeTab(int)), Qt::UniqueConnection);
+    connect(this, SIGNAL(tabCloseRequested(int)),
+            this, SLOT(closeTab(int)), Qt::UniqueConnection);
+}
+
+void TabWidget::setCurrentItem(QWidget *w)
+{
+    //根据类型取出父窗体
+    QWidget *curTab = NULL;
+    Widget *win = NULL;
+    Widget *now = (Widget *)w;
+    if (Window == now->getType()){
+        win = now;
+    }else{
+        win = (Widget *)now->parentWidget();
+    }
+
+    //判断父窗体是否存在tab列表中
+    curTab = win->parentWidget();
+    bool find = false;
+    for(int i=0;i<count();i++){
+        if (widget(i) == curTab){
+            find = true;
+            break;
+        }
+    }
+    //如果存在，设为cur,如果不存在重新添加tab
+    if (!find){
+        addTab(curTab, QString("Window-%1").arg(win->getId()));
+    }
+    setCurrentWidget(curTab);
+}
+
+void TabWidget::removeWidget(QWidget *w)
+{
+    for(int i=0;i<count();i++){
+        if (widget(i) == w){
+            removeTab(i);
+        }
+    }
 }
 
 void TabWidget::closeTab(int index)
