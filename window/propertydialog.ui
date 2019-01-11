@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>523</width>
-    <height>435</height>
+    <width>528</width>
+    <height>464</height>
    </rect>
   </property>
   <property name="font">
@@ -25,42 +25,115 @@
    <item>
     <widget class="QTabWidget" name="tabwidget">
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="tabBase">
       <attribute name="title">
        <string>控件属性</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout">
-       <item row="0" column="1">
+       <item row="0" column="0">
         <widget class="QStackedWidget" name="baseStack">
          <property name="currentIndex">
           <number>0</number>
          </property>
          <widget class="QWidget" name="pWidget">
-          <layout class="QGridLayout" name="gridLayout_2">
-           <item row="0" column="0" colspan="3">
-            <widget class="QLabel" name="label_2">
-             <property name="text">
-              <string>控件Id</string>
+          <layout class="QVBoxLayout" name="verticalLayout_4">
+           <item>
+            <widget class="QGroupBox" name="boxbase">
+             <property name="title">
+              <string>基础属性</string>
              </property>
+             <layout class="QGridLayout" name="gridLayout_2">
+              <item row="0" column="0">
+               <widget class="QLabel" name="label_2">
+                <property name="text">
+                 <string>控件Id</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="0">
+               <widget class="QLabel" name="label_3">
+                <property name="text">
+                 <string>背景颜色</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="1">
+               <widget class="QSpinBox" name="baseId">
+                <property name="baseSize">
+                 <size>
+                  <width>0</width>
+                  <height>0</height>
+                 </size>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="1">
+               <widget class="QPushButton" name="baseBkColor">
+                <property name="text">
+                 <string/>
+                </property>
+               </widget>
+              </item>
+             </layout>
             </widget>
            </item>
-           <item row="0" column="3">
-            <widget class="QSpinBox" name="baseId"/>
-           </item>
-           <item row="1" column="3">
-            <widget class="QPushButton" name="baseBkColor">
-             <property name="text">
-              <string/>
+           <item>
+            <widget class="QGroupBox" name="boxWrite">
+             <property name="title">
+              <string>写入寄存器</string>
              </property>
-            </widget>
-           </item>
-           <item row="1" column="0">
-            <widget class="QLabel" name="label_3">
-             <property name="text">
-              <string>背景颜色</string>
-             </property>
+             <layout class="QGridLayout" name="gridLayout_6">
+              <item row="6" column="1">
+               <widget class="QSpinBox" name="writeValue">
+                <property name="minimum">
+                 <number>-100</number>
+                </property>
+               </widget>
+              </item>
+              <item row="6" column="0">
+               <widget class="QComboBox" name="writeValueType"/>
+              </item>
+              <item row="2" column="0">
+               <widget class="QLabel" name="label_7">
+                <property name="text">
+                 <string>位地址     00-15</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="0">
+               <widget class="QLabel" name="label_6">
+                <property name="text">
+                 <string>寄存器地址 0000-FFFF</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="1">
+               <widget class="QSpinBox" name="writeRegAddress">
+                <property name="maximum">
+                 <number>65535</number>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="1">
+               <widget class="QSpinBox" name="writeBitAddress">
+                <property name="maximum">
+                 <number>15</number>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="0">
+               <widget class="QLabel" name="label_8">
+                <property name="text">
+                 <string>操作寄存器类型</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="1">
+               <widget class="QComboBox" name="writeRegType"/>
+              </item>
+             </layout>
             </widget>
            </item>
           </layout>
@@ -109,138 +182,155 @@
       <attribute name="title">
        <string>文本属性</string>
       </attribute>
-      <layout class="QHBoxLayout" name="horizontalLayout_3">
+      <layout class="QHBoxLayout" name="horizontalLayout_5">
        <item>
-        <layout class="QFormLayout" name="formLayout">
-         <property name="horizontalSpacing">
-          <number>6</number>
-         </property>
-         <property name="verticalSpacing">
-          <number>10</number>
-         </property>
-         <item row="0" column="0">
-          <widget class="QLabel" name="Label">
-           <property name="text">
-            <string>文本类型</string>
+        <layout class="QVBoxLayout" name="verticalLayout_3" stretch="1,4,4">
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_3">
+           <item>
+            <widget class="QLabel" name="Label">
+             <property name="text">
+              <string>文本类型</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QComboBox" name="textType"/>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <widget class="QGroupBox" name="boxFormat">
+           <property name="title">
+            <string>文本格式</string>
            </property>
+           <layout class="QGridLayout" name="gridLayout_4">
+            <item row="0" column="0">
+             <widget class="QLabel" name="label">
+              <property name="text">
+               <string>字体大小</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="1">
+             <widget class="QComboBox" name="textFont">
+              <property name="currentIndex">
+               <number>-1</number>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="0">
+             <widget class="QLabel" name="Label_2">
+              <property name="text">
+               <string>字体颜色</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="1">
+             <widget class="QPushButton" name="textColor">
+              <property name="text">
+               <string/>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="0">
+             <widget class="QLabel" name="Label_3">
+              <property name="text">
+               <string>水平对齐</string>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="1">
+             <widget class="QComboBox" name="textAlignH"/>
+            </item>
+            <item row="3" column="0">
+             <widget class="QLabel" name="Label_4">
+              <property name="text">
+               <string>竖直对齐</string>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="1">
+             <widget class="QComboBox" name="textAlignV"/>
+            </item>
+           </layout>
+           <zorder>textAlignV</zorder>
+           <zorder>label</zorder>
+           <zorder>textColor</zorder>
+           <zorder>Label_3</zorder>
+           <zorder>Label_4</zorder>
+           <zorder>textFont</zorder>
+           <zorder>textAlignH</zorder>
+           <zorder>Label_2</zorder>
           </widget>
          </item>
-         <item row="0" column="1">
-          <widget class="QComboBox" name="textType"/>
-         </item>
-         <item row="2" column="0">
-          <widget class="QLabel" name="Label_2">
-           <property name="text">
-            <string>字体颜色</string>
+         <item>
+          <widget class="QGroupBox" name="boxRead">
+           <property name="title">
+            <string>读取寄存器</string>
            </property>
+           <layout class="QGridLayout" name="gridLayout_5">
+            <item row="1" column="1">
+             <widget class="QComboBox" name="textRegType"/>
+            </item>
+            <item row="1" column="0">
+             <widget class="QLabel" name="Label_9">
+              <property name="text">
+               <string>寄存器类型</string>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="0">
+             <widget class="QLabel" name="Label_7">
+              <property name="text">
+               <string>数据总位数</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="0">
+             <widget class="QLabel" name="Label_5">
+              <property name="text">
+               <string>寄存器地址</string>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="1">
+             <widget class="QSpinBox" name="textDotAft">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="0">
+             <widget class="QLabel" name="Label_8">
+              <property name="text">
+               <string>小数点后位数</string>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="1">
+             <widget class="QSpinBox" name="textDotBef">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="1">
+             <widget class="QSpinBox" name="textRegAddress">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
+             </widget>
+            </item>
+           </layout>
           </widget>
-         </item>
-         <item row="2" column="1">
-          <widget class="QPushButton" name="textColor">
-           <property name="text">
-            <string/>
-           </property>
-          </widget>
-         </item>
-         <item row="4" column="1">
-          <widget class="QComboBox" name="textAlignH"/>
-         </item>
-         <item row="5" column="0">
-          <widget class="QLabel" name="Label_4">
-           <property name="text">
-            <string>竖直对齐</string>
-           </property>
-          </widget>
-         </item>
-         <item row="5" column="1">
-          <widget class="QComboBox" name="textAlignV"/>
-         </item>
-         <item row="6" column="0">
-          <widget class="QLabel" name="Label_5">
-           <property name="text">
-            <string>寄存器号</string>
-           </property>
-          </widget>
-         </item>
-         <item row="6" column="1">
-          <widget class="QSpinBox" name="textRegAddress">
-           <property name="enabled">
-            <bool>false</bool>
-           </property>
-          </widget>
-         </item>
-         <item row="8" column="0">
-          <widget class="QLabel" name="Label_6">
-           <property name="text">
-            <string>显示格式</string>
-           </property>
-          </widget>
-         </item>
-         <item row="9" column="0">
-          <widget class="QLabel" name="Label_7">
-           <property name="text">
-            <string>总位数</string>
-           </property>
-          </widget>
-         </item>
-         <item row="9" column="1">
-          <widget class="QSpinBox" name="textDotBef">
-           <property name="enabled">
-            <bool>false</bool>
-           </property>
-          </widget>
-         </item>
-         <item row="10" column="0">
-          <widget class="QLabel" name="Label_8">
-           <property name="text">
-            <string>小数点后位数</string>
-           </property>
-          </widget>
-         </item>
-         <item row="10" column="1">
-          <widget class="QSpinBox" name="textDotAft">
-           <property name="enabled">
-            <bool>false</bool>
-           </property>
-          </widget>
-         </item>
-         <item row="4" column="0">
-          <widget class="QLabel" name="Label_3">
-           <property name="text">
-            <string>水平对齐</string>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="0">
-          <widget class="QLabel" name="label">
-           <property name="text">
-            <string>字体大小</string>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="1">
-          <widget class="QComboBox" name="textFont">
-           <property name="currentIndex">
-            <number>-1</number>
-           </property>
-          </widget>
-         </item>
-         <item row="7" column="0">
-          <widget class="QLabel" name="Label_9">
-           <property name="text">
-            <string>寄存器类型</string>
-           </property>
-          </widget>
-         </item>
-         <item row="7" column="1">
-          <widget class="QComboBox" name="comboBox"/>
          </item>
         </layout>
        </item>
        <item>
         <widget class="QStackedWidget" name="textStack">
          <property name="currentIndex">
-          <number>0</number>
+          <number>1</number>
          </property>
          <widget class="QWidget" name="page">
           <layout class="QHBoxLayout" name="horizontalLayout_2">
@@ -288,8 +378,8 @@
                 <string/>
                </property>
                <property name="icon">
-                <iconset>
-                 <normaloff>../images/dialog/add.png</normaloff>../images/dialog/add.png</iconset>
+                <iconset resource="../application.qrc">
+                 <normaloff>:/textListAdd</normaloff>:/textListAdd</iconset>
                </property>
               </widget>
              </item>
@@ -302,8 +392,8 @@
                 <string/>
                </property>
                <property name="icon">
-                <iconset>
-                 <normaloff>../images/dialog/up.png</normaloff>../images/dialog/up.png</iconset>
+                <iconset resource="../application.qrc">
+                 <normaloff>:/up</normaloff>:/up</iconset>
                </property>
               </widget>
              </item>
@@ -316,8 +406,8 @@
                 <string/>
                </property>
                <property name="icon">
-                <iconset>
-                 <normaloff>../images/dialog/down.png</normaloff>../images/dialog/down.png</iconset>
+                <iconset resource="../application.qrc">
+                 <normaloff>:/down</normaloff>:/down</iconset>
                </property>
               </widget>
              </item>
@@ -330,8 +420,8 @@
                 <string/>
                </property>
                <property name="icon">
-                <iconset>
-                 <normaloff>../images/dialog/remove.png</normaloff>../images/dialog/remove.png</iconset>
+                <iconset resource="../application.qrc">
+                 <normaloff>:/textListRemove</normaloff>:/textListRemove</iconset>
                </property>
               </widget>
              </item>
@@ -347,11 +437,7 @@
       <attribute name="title">
        <string>动作属性</string>
       </attribute>
-      <layout class="QHBoxLayout" name="horizontalLayout">
-       <item>
-        <widget class="QTextEdit" name="LuaEditor"/>
-       </item>
-      </layout>
+      <layout class="QHBoxLayout" name="horizontalLayout"/>
      </widget>
     </widget>
    </item>
@@ -367,7 +453,9 @@
    </item>
   </layout>
  </widget>
- <resources/>
+ <resources>
+  <include location="../application.qrc"/>
+ </resources>
  <connections>
   <connection>
    <sender>buttonBox</sender>

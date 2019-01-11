@@ -79,7 +79,6 @@ struct list_head
     struct list_head *prev;
     struct list_head *next;
 };
-
 typedef enum _eWidgetType
 {
     Window = 0,
@@ -99,19 +98,37 @@ typedef enum _eTextType
     RegVaule,
     StringList,
 }TextType;
-
+typedef enum _eWriteType
+{
+    FixValue,
+    Addiction,
+    Reduction,
+}WriteType;
+typedef enum _eRegType
+{
+    I8,
+    U8,
+    I16,
+    U16,
+    I32,
+    U32,
+    F32,
+    D64,
+}RegType;
 typedef struct {
   uchar XSize;
   uchar XDist;
   uchar BytesPerLine;
   uchar *pData;
 }GUI_CHARINFO;
+
 typedef struct GUI_FONT_PROP {
   ushort First;                                              /* First character               */
   ushort Last;                                               /* Last character                */
   GUI_CHARINFO *paCharInfo;     /* Address of first character    */
   struct GUI_FONT_PROP *pNext;          /* Pointer to next               */
 } GUI_FONT_PROP;
+
 struct GUI_FONT {
   void * pfDispChar;
   void * pfGetCharDistX;
@@ -160,9 +177,16 @@ typedef struct _tTextPara
 
     uchar totLen;
     uchar dotLen;
-    ushort regAdress;
+    ushort regAddress;
 }TextPara;
-
+typedef struct _tOptRegPara
+{
+    ushort regAddress;
+    uchar bitAddress;
+    uchar regType;
+    ushort valueType;
+    ushort value;
+}OptRegPara;    //2bytes
 typedef struct {
   ushort XSize;
   ushort YSize;
@@ -220,7 +244,7 @@ typedef struct _tButtonInfo
     BasePara base;
     int BkColor[3];
     TextPara text;
-    char *cmd;
+    OptRegPara optReg;
 }ButtonInfo;    //12*4byte
 /*********ÎÄ±¾¿òÐÅÏ¢½á¹¹************/
 typedef struct _tTextInfo
@@ -238,6 +262,13 @@ typedef struct _tEditInfo
     uchar maxLen;
     char resv[3];
 }EditInfo;      //11*4byte
+
+typedef struct _tMacroInfo
+{
+    struct list_head list;
+    OptRegPara optReg;
+    char *content;
+}MacroInfo;
 
 /************双向循环链表*************/
 

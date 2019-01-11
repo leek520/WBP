@@ -1,0 +1,449 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>QEditor</class>
+ <widget class="QMainWindow" name="QEditor">
+  <property name="windowModality">
+   <enum>Qt::WindowModal</enum>
+  </property>
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1036</width>
+    <height>644</height>
+   </rect>
+  </property>
+  <property name="font">
+   <font>
+    <pointsize>12</pointsize>
+   </font>
+  </property>
+  <property name="windowTitle">
+   <string>宏指令编辑器</string>
+  </property>
+  <widget class="QWidget" name="centralWidget">
+   <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="1,4">
+    <item>
+     <layout class="QVBoxLayout" name="verticalLayout" stretch="5,2">
+      <item>
+       <widget class="QTableWidget" name="tableWidget">
+        <property name="font">
+         <font>
+          <pointsize>12</pointsize>
+         </font>
+        </property>
+        <property name="columnCount">
+         <number>1</number>
+        </property>
+        <attribute name="horizontalHeaderVisible">
+         <bool>false</bool>
+        </attribute>
+        <attribute name="horizontalHeaderStretchLastSection">
+         <bool>true</bool>
+        </attribute>
+        <attribute name="verticalHeaderStretchLastSection">
+         <bool>false</bool>
+        </attribute>
+        <column/>
+       </widget>
+      </item>
+      <item>
+       <widget class="QGroupBox" name="groupBox">
+        <property name="title">
+         <string>触发设置</string>
+        </property>
+        <layout class="QGridLayout" name="gridLayout">
+         <item row="2" column="0">
+          <widget class="QLabel" name="label_6">
+           <property name="text">
+            <string>bit位地址</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="2">
+          <widget class="QSpinBox" name="regAddress"/>
+         </item>
+         <item row="1" column="0">
+          <widget class="QLabel" name="label_5">
+           <property name="text">
+            <string>寄存器地址</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="0">
+          <widget class="QLabel" name="label_2">
+           <property name="text">
+            <string>寄存器类型</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="2">
+          <widget class="QComboBox" name="regType"/>
+         </item>
+         <item row="2" column="2">
+          <widget class="QSpinBox" name="bitAddress"/>
+         </item>
+         <item row="3" column="0">
+          <widget class="QLabel" name="label_3">
+           <property name="text">
+            <string>触发类型</string>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="2">
+          <widget class="QComboBox" name="triggerType"/>
+         </item>
+        </layout>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <layout class="QVBoxLayout" name="verticalLayout_2" stretch="10">
+      <item>
+       <widget class="CodeEidtor" name="codeEditor" native="true"/>
+      </item>
+     </layout>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menuBar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1036</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menu_F">
+    <property name="title">
+     <string>文件(&amp;F)</string>
+    </property>
+    <widget class="QMenu" name="menu_RecentFile">
+     <property name="title">
+      <string>最近打开(&amp;R)</string>
+     </property>
+    </widget>
+    <addaction name="action_New"/>
+    <addaction name="action_Open"/>
+    <addaction name="action_Save"/>
+    <addaction name="action_Asave"/>
+    <addaction name="separator"/>
+    <addaction name="menu_RecentFile"/>
+    <addaction name="separator"/>
+    <addaction name="action_Quit"/>
+   </widget>
+   <widget class="QMenu" name="menu_E">
+    <property name="title">
+     <string>编辑(&amp;E)</string>
+    </property>
+    <addaction name="action_Undo"/>
+    <addaction name="action_Redo"/>
+    <addaction name="separator"/>
+    <addaction name="action_Cut"/>
+    <addaction name="action_Copy"/>
+    <addaction name="action_Paste"/>
+    <addaction name="action_Delete"/>
+    <addaction name="separator"/>
+    <addaction name="action_SelectAll"/>
+    <addaction name="action_Clear"/>
+    <addaction name="separator"/>
+    <addaction name="action_Find"/>
+    <addaction name="action_Replace"/>
+   </widget>
+   <widget class="QMenu" name="menu_O">
+    <property name="title">
+     <string>格式(&amp;O)</string>
+    </property>
+    <addaction name="action_Switch"/>
+    <addaction name="separator"/>
+    <addaction name="action_Font"/>
+    <addaction name="action_Color"/>
+   </widget>
+   <widget class="QMenu" name="menu_V">
+    <property name="title">
+     <string>查看 (&amp;V)</string>
+    </property>
+    <addaction name="action_ToolsBar"/>
+    <addaction name="action_StatusBar"/>
+    <addaction name="separator"/>
+    <addaction name="action_Highlight"/>
+    <addaction name="separator"/>
+    <addaction name="action_Zoomout"/>
+    <addaction name="action_Zoomin"/>
+   </widget>
+   <widget class="QMenu" name="menu_H">
+    <property name="title">
+     <string>帮助(&amp;H)</string>
+    </property>
+    <addaction name="action_About"/>
+   </widget>
+   <widget class="QMenu" name="menu_B">
+    <property name="title">
+     <string>编译 (&amp;B)</string>
+    </property>
+   </widget>
+   <addaction name="menu_F"/>
+   <addaction name="menu_E"/>
+   <addaction name="menu_O"/>
+   <addaction name="menu_V"/>
+   <addaction name="menu_B"/>
+   <addaction name="menu_H"/>
+  </widget>
+  <widget class="QToolBar" name="mainToolBar">
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="action_New"/>
+   <addaction name="action_Open"/>
+   <addaction name="action_Save"/>
+   <addaction name="action_Asave"/>
+   <addaction name="separator"/>
+   <addaction name="action_Undo"/>
+   <addaction name="action_Redo"/>
+   <addaction name="action_Cut"/>
+   <addaction name="action_Copy"/>
+   <addaction name="action_Paste"/>
+   <addaction name="action_Find"/>
+   <addaction name="separator"/>
+   <addaction name="action_Font"/>
+   <addaction name="action_Color"/>
+   <addaction name="separator"/>
+   <addaction name="action_Zoomout"/>
+   <addaction name="action_Zoomin"/>
+   <addaction name="separator"/>
+  </widget>
+  <widget class="QStatusBar" name="statusBar"/>
+  <action name="action_New">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/new</normaloff>:/new</iconset>
+   </property>
+   <property name="text">
+    <string>新建(&amp;N)</string>
+   </property>
+  </action>
+  <action name="action_Open">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/open</normaloff>:/open</iconset>
+   </property>
+   <property name="text">
+    <string>打开(&amp;O)</string>
+   </property>
+  </action>
+  <action name="action_Save">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/save</normaloff>:/save</iconset>
+   </property>
+   <property name="text">
+    <string>保存(&amp;S)</string>
+   </property>
+  </action>
+  <action name="action_Asave">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/asave</normaloff>:/asave</iconset>
+   </property>
+   <property name="text">
+    <string>另存为(&amp;A)</string>
+   </property>
+  </action>
+  <action name="action_R">
+   <property name="text">
+    <string>最近打开(&amp;R)</string>
+   </property>
+  </action>
+  <action name="action_Quit">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/quit</normaloff>:/quit</iconset>
+   </property>
+   <property name="text">
+    <string>退出(&amp;Q)</string>
+   </property>
+  </action>
+  <action name="action_Undo">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/undo</normaloff>:/undo</iconset>
+   </property>
+   <property name="text">
+    <string>撤销(&amp;U)</string>
+   </property>
+  </action>
+  <action name="action_Redo">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/redo</normaloff>:/redo</iconset>
+   </property>
+   <property name="text">
+    <string>重复(&amp;R)</string>
+   </property>
+  </action>
+  <action name="action_Cut">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/cut</normaloff>:/cut</iconset>
+   </property>
+   <property name="text">
+    <string>剪切(&amp;T)</string>
+   </property>
+  </action>
+  <action name="action_Copy">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/copy</normaloff>:/copy</iconset>
+   </property>
+   <property name="text">
+    <string>复制(&amp;C)</string>
+   </property>
+  </action>
+  <action name="action_Paste">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/paste</normaloff>:/paste</iconset>
+   </property>
+   <property name="text">
+    <string>粘贴(&amp;P)</string>
+   </property>
+  </action>
+  <action name="action_Delete">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/stock_delete</normaloff>:/stock_delete</iconset>
+   </property>
+   <property name="text">
+    <string>删除(&amp;D)</string>
+   </property>
+  </action>
+  <action name="action_SelectAll">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/edit-select-all</normaloff>:/edit-select-all</iconset>
+   </property>
+   <property name="text">
+    <string>全选(&amp;A)</string>
+   </property>
+  </action>
+  <action name="action_Clear">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/editclear</normaloff>:/editclear</iconset>
+   </property>
+   <property name="text">
+    <string>清空(&amp;L)</string>
+   </property>
+  </action>
+  <action name="action_Find">
+   <property name="icon">
+    <iconset>
+     <normaloff>images/find.png</normaloff>images/find.png</iconset>
+   </property>
+   <property name="text">
+    <string>查找(&amp;F)</string>
+   </property>
+  </action>
+  <action name="action_Replace">
+   <property name="text">
+    <string>替换(&amp;R)</string>
+   </property>
+  </action>
+  <action name="action_Switch">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>自动换行(&amp;W)</string>
+   </property>
+  </action>
+  <action name="action_Font">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/font</normaloff>:/font</iconset>
+   </property>
+   <property name="text">
+    <string>字体设置(F)</string>
+   </property>
+  </action>
+  <action name="action_Color">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/textcolor</normaloff>:/textcolor</iconset>
+   </property>
+   <property name="text">
+    <string>字体颜色(&amp;L)</string>
+   </property>
+  </action>
+  <action name="action_ToolsBar">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>工具栏(T)</string>
+   </property>
+  </action>
+  <action name="action_StatusBar">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>状态栏(&amp;S)</string>
+   </property>
+  </action>
+  <action name="action_Highlight">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>高亮显示(&amp;H)</string>
+   </property>
+  </action>
+  <action name="action_Zoomout">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/zoom-in</normaloff>:/zoom-in</iconset>
+   </property>
+   <property name="text">
+    <string>放大(&amp;I)</string>
+   </property>
+  </action>
+  <action name="action_Zoomin">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/zoom-out</normaloff>:/zoom-out</iconset>
+   </property>
+   <property name="text">
+    <string>缩小(&amp;O)</string>
+   </property>
+  </action>
+  <action name="action_About">
+   <property name="text">
+    <string>关于(&amp;A)</string>
+   </property>
+  </action>
+  <action name="actionSdf">
+   <property name="text">
+    <string>sdf</string>
+   </property>
+  </action>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>CodeEidtor</class>
+   <extends>QWidget</extends>
+   <header>codeeidtor.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <resources>
+  <include location="resources.qrc"/>
+ </resources>
+ <connections/>
+</ui>

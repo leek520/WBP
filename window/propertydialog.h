@@ -49,8 +49,11 @@ private slots:
 
     void on_imageCompress_currentIndexChanged(int index);
 
+    void on_writeRegType_currentIndexChanged(int index);
+
 private:
-    void setDialog();
+    void setProperty();
+    void getProperty();
     void getStringList();
     void setStringList();
 private:

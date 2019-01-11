@@ -7,7 +7,8 @@ MainWindow::MainWindow(QWidget *parent) :
     m_propD(new PropertyDialog),
     m_propW(new PropertyWidget()),
     m_leftW(new LeftWidget()),
-    m_bottomW(new BottomWidget())
+    m_bottomW(new BottomWidget()),
+    m_editor(new QEditor())
 {
     setWindowTitle(tr("WBP"));//设置窗口标题
     setWindowIcon(QIcon(":/mamtool.ico"));
@@ -132,7 +133,7 @@ void MainWindow::createActions()
 
     //tools
     editorAct = new QAction(QIcon(":/editor"), tr("&editor"), this);
-    connect(editorAct, SIGNAL(triggered()), this, SLOT(editor()));
+    connect(editorAct, SIGNAL(triggered()), this, SLOT(codeEditor()));
 
 
     lan_nextAct = new QAction(QIcon(":/lan_next"), tr("&lan_next"), this);
@@ -780,8 +781,15 @@ WindowInfo *MainWindow::setWidgetInfo(Widget *w, struct list_head *head, int *po
         btnInfo->BkColor[0] = m_buildInfo->QColorToEColor(w->getBkColor());
         btnInfo->BkColor[1] = m_buildInfo->QColorToEColor(w->getBkPressColor());
         btnInfo->BkColor[2] = m_buildInfo->QColorToEColor(w->getBkDisableColor());
-        btnInfo->cmd = m_buildInfo->QStringToLuaChar(w->getLuaCmd());
+        //btnInfo->cmd = m_buildInfo->QStringToLuaChar(w->getLuaCmd());
         setTextInfo(w, &btnInfo->text);
+
+        btnInfo->optReg.regAddress = w->getWriteRegAddress();
+        btnInfo->optReg.bitAddress = w->getWriteBitAddress();
+        btnInfo->optReg.regType = w->getWriteRegType();
+        btnInfo->optReg.valueType = w->getWriteValueType();
+        btnInfo->optReg.value = w->getWriteValue();
+
         base = &btnInfo->base;
         *pos = curPos + sizeof(ButtonInfo);
 
@@ -866,7 +874,7 @@ void MainWindow::setTextInfo(Widget *w, TextPara *text)
     text->alignment = m_buildInfo->QAlignToEAlign((w->getAlignH() << 1) | (w->getAlignV() << 6));
     text->maxNum = w->getTextStringList().count();
     text->maxLen = w->getTextMaxLen();
-    text->regAdress = w->getTextRegAddress();
+    text->regAddress = w->getTextRegAddress();
     text->totLen = w->getTextTotLen();
     text->dotLen = w->getTextDotLen();
 
@@ -911,6 +919,8 @@ void MainWindow::recordUsedChar()
         }
     }
 }
+
+
 void MainWindow::build()
 {
     QList<WindowWidget *> winList = WindowWidget::getWindowList();
@@ -920,8 +930,9 @@ void MainWindow::build()
     m_bottomW->clear();
     m_bottomW->insertMessage(tr("Build init!"));
 
+    //初始化
     m_buildInfo->initBuild();
-
+    //统计所用到的字体并生成字体信息
     recordUsedChar();
     m_buildInfo->SortRecordChar();
     QStringList fontList = PV->getEnumProperty("TextFont");
@@ -929,8 +940,8 @@ void MainWindow::build()
         m_buildInfo->FontToChar(fontList[i].toInt());
     }
 
-
-    BuildInfo::WidgetBuf *widgetBuf = m_buildInfo->getWidgetBuf();
+    //生成widget链表
+    BuildInfo::WidgetBuf *widgetBuf = &m_buildInfo->widgetBuf;
     int startAddress = (int)(&widgetBuf->buf);
     struct list_head *winHead = ConvListAdd(startAddress, 0);
 
@@ -969,46 +980,66 @@ void MainWindow::build()
 
         m_bottomW->insertMessage(tr("GraphList sucess!"));
     }
+
     //处理地址
     int offset = START_ADDR_SDRAM_WIDGET - startAddress;
     struct list_head *win;
-
     list_for_each(win, winHead){
+
         win->prev->next = ConvListAdd(win->prev->next, offset);
         win->prev = ConvListAdd(win->prev, offset);
 
-        struct list_head *child;
-        struct list_head *childHead = &((WindowInfo *)win)->childList;
-        list_for_each(child, childHead){
-            child->prev->next = ConvListAdd(child->prev->next, offset);
-            child->prev = ConvListAdd(child->prev, offset);
-        }
-        childHead->prev->next = ConvListAdd(childHead->prev->next, offset);
-        childHead->prev = ConvListAdd(childHead->prev, offset);
-
-        struct list_head *imageHead = &((WindowInfo *)win)->imageList;
-        list_for_each(child, imageHead){
-            child->prev->next = ConvListAdd(child->prev->next, offset);
-            child->prev = ConvListAdd(child->prev, offset);
-        }
-        imageHead->prev->next = ConvListAdd(imageHead->prev->next, offset);
-        imageHead->prev = ConvListAdd(imageHead->prev, offset);
-
-        struct list_head *graphHead = &((WindowInfo *)win)->graphList;
-        list_for_each(child, graphHead){
-            child->prev->next = ConvListAdd(child->prev->next, offset);
-            child->prev = ConvListAdd(child->prev, offset);
-        }
-        graphHead->prev->next = ConvListAdd(graphHead->prev->next, offset);
-        graphHead->prev = ConvListAdd(graphHead->prev, offset);
+        WindowInfo *winInfo = (WindowInfo *)win;
+        modifyAddressInfo(&winInfo->childList, offset);
+        modifyAddressInfo(&winInfo->imageList, offset);
+        modifyAddressInfo(&winInfo->graphList, offset);
     }
     winHead->prev->next = ConvListAdd(winHead->prev->next, offset);
     winHead->prev = ConvListAdd(winHead->prev, offset);
 
+
+    //生成宏指令链表
+    BuildInfo::LuaBuf *luaBuf = &m_buildInfo->luaBuf;
+    startAddress = (int)(&luaBuf->buf);
+    struct list_head *luaHead = ConvListAdd(startAddress, 0);
+
+    init_list_head(luaHead);
+    luaBuf->pos += sizeof(struct list_head);
+    QList<QEditor::Macro> *macroList =m_editor->getMacroList();
+    for(int i=0;i<macroList->count();i++){
+        QEditor::Macro item = macroList->at(i);
+        if (!item.isUsed) continue;
+        MacroInfo *macroInfo = (MacroInfo *)(luaBuf->buf + luaBuf->pos);
+        luaBuf->pos += sizeof(MacroInfo);
+        macroInfo->optReg.regAddress = item.regAddress;
+        macroInfo->optReg.bitAddress = item.bitAddress;
+        macroInfo->optReg.regType = item.regType;
+        macroInfo->optReg.valueType = item.tirggerType;
+        macroInfo->optReg.value = 0;
+        macroInfo->content = m_buildInfo->QStringToLuaChar(item.content);
+
+        list_add_tail(&macroInfo->list, luaHead);
+    }
+
+    //处理地址
+    offset = START_ADDR_SDRAM_LUA - startAddress;
+    modifyAddressInfo(luaHead, offset);
+
+
+    //显示状态
     m_bottomW->insertMessage(tr("Build sucess!"));
     stateBar->showMessage("编译完成！", 3000); // 显示临时信息，时间3秒钟.
 }
-
+void MainWindow::modifyAddressInfo(struct list_head *head, int offset)
+{
+    struct list_head *pos;
+    list_for_each(pos, head){
+        pos->prev->next = ConvListAdd(pos->prev->next, offset);
+        pos->prev = ConvListAdd(pos->prev, offset);
+    }
+    head->prev->next = ConvListAdd(head->prev->next, offset);
+    head->prev = ConvListAdd(head->prev, offset);
+}
 void MainWindow::download()
 {
     m_buildInfo->downLoadInfo();
@@ -1056,10 +1087,9 @@ void MainWindow::lanPrev()
     WindowWidget::refreshAll();
 }
 
-void MainWindow::editor()
+void MainWindow::codeEditor()
 {
-    TextEdit *ce = new TextEdit();
-    ce->show();
+    m_editor->show();
 }
 
 void MainWindow::ResProgress_slt(int step, int pos, QString msg)

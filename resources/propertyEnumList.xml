@@ -11,9 +11,9 @@
 		<enum2 value="AlignVCenter"/>
 	</AlignV>
 	<TextType>
-		<enum0 value="String"/>
-		<enum1 value="RegValue"/>
-		<enum2 value="StringList"/>
+		<enum0 value="固定字符串"/>
+		<enum1 value="寄存器值"/>
+		<enum2 value="字符串列表"/>
 	</TextType>
 	<TextFont>
 		<enum0 value="16"/>
@@ -24,4 +24,30 @@
 		<enum0 value="GUI_DRAW_BMP565"/>
 		<enum1 value="GUI_DRAW_RLE16"/>
 	</ImageCompress>
+	<RegType>
+		<enum0 value="I8(char)"/>
+		<enum1 value="U8(unsigned char)"/>
+		<enum2 value="I16(short)"/>
+		<enum3 value="U16(unsigned short)"/>
+		<enum4 value="I32(long)"/>
+		<enum5 value="U32(unsigned long)"/>
+		<enum6 value="F32(float)"/>
+		<enum7 value="D64(double)"/>
+	</RegType>
+	<WriteRegType>
+		<enum0 value="寄存器"/>
+		<enum0 value="寄存器bit位"/>
+	</WriteRegType>	
+	<WriteValueType>
+		<enum0 value="写入固定值"/>
+		<enum1 value="写入递加1"/>
+		<enum2 value="写入递减1"/>
+	</WriteValueType>
+	<TriggerType>
+		<enum0 value="等于0触发"/>
+		<enum1 value="等于1触发"/>
+		<enum2 value="0到1触发"/>
+		<enum3 value="1到0触发"/>
+		<enum4 value="固定值触发"/>
+	</TriggerType>
 </Property>

@@ -36,5 +36,7 @@
         <file alias="simstart">resources/images/tools/start.png</file>
         <file alias="simstop">resources/images/tools/stop.png</file>
         <file alias="editor">resources/images/tools/editor.png</file>
+        <file alias="down">resources/images/dialog/down.png</file>
+        <file alias="up">resources/images/dialog/up.png</file>
     </qresource>
 </RCC>

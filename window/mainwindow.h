@@ -13,7 +13,7 @@
 #include "scrollarea.h"
 #include "bottomwidget.h"
 #include "buildinfo.h"
-#include "textedit.h"
+#include "qeditor.h"
 
 class MainWindow : public QMainWindow
 {
@@ -44,6 +44,7 @@ private:
     void setBaseInfo(Widget *w, BasePara *base);
     void setTextInfo(Widget *w, TextPara *text);
     void recordUsedChar();
+    void modifyAddressInfo(struct list_head *head, int offset);
 private slots:
     void newFile();
     bool open();
@@ -69,7 +70,7 @@ private slots:
     void lanNext();
     void lanPrev();
 
-    void editor();
+    void codeEditor();
 
     void ResProgress_slt(int step, int pos, QString msg="");
     void mouseButtonDblClick(Widget *w);
@@ -143,6 +144,8 @@ private:
     ComDialog *m_comD;
     ProgressBar *m_progressBar;
     QDockWidget *m_dockBottom;
+
+    QEditor *m_editor;
 
     PublicVar *m_publicVar;
     BuildInfo *m_buildInfo;

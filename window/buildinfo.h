@@ -6,10 +6,12 @@
 
 #define WidgetLen   10240
 #define StringLen   10240
-#define LuaLen      10240
+#define LuaLen      102400
 #define CharLen     10240
 #define FontLen     512000
 #define ImageLen    512000  //500k
+
+
 
 class BuildInfo : public QObject
 {
@@ -27,6 +29,7 @@ public:
        int pos;
        char buf[LuaLen];
     };
+
     struct FontBuf{
        int pos;
        char buf[FontLen];
@@ -43,7 +46,6 @@ public:
     explicit BuildInfo();
     void initBuild();
 
-    WidgetBuf *getWidgetBuf();
     uint QColorToEColor(QColor color);
     int QAlignToEAlign(int align);
     char *QStringToMultBytes(QString str);
@@ -71,13 +73,14 @@ private:
     QString m_CharRecord;
     QMap<int, int> m_fontList;
 
+    int downloadStep;
+public:
     struct WidgetBuf widgetBuf;
     struct StringBuf stringBuf;
     struct LuaBuf luaBuf;
     struct FontBuf fontBuf;
     struct CharBuf charBuf;
     struct ImageBuf imageBuf;
-    int downloadStep;
 };
 
 #endif // BUILDINFO_H

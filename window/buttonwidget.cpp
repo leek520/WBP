@@ -17,7 +17,6 @@ void ButtonWidget::initPropertyTable()
     m_propTable << qMakePair(QVariant::Color, QString("BkColor"));
     m_propTable << qMakePair(QVariant::Color, QString("BkPressColor"));
     m_propTable << qMakePair(QVariant::Color, QString("BkDisableColor"));
-    m_propTable << qMakePair(QVariant::String, QString("LuaCmd"));
 
     m_propTable << qMakePair(QVariant::TextFormat, QString("TextType"));
     m_propTable << qMakePair(QVariant::Int, QString("TextRegAddress"));
@@ -29,6 +28,12 @@ void ButtonWidget::initPropertyTable()
     m_propTable << qMakePair(QVariant::TextFormat, QString("AlignV"));
     m_propTable << qMakePair(QVariant::TextFormat, QString("TextFont"));
     m_propTable << qMakePair(QVariant::TextFormat, QString("TextMaxLen"));
+
+    m_propTable << qMakePair(QVariant::Int, QString("WriteRegAddress"));
+    m_propTable << qMakePair(QVariant::Int, QString("WriteBitAddress"));
+    m_propTable << qMakePair(QVariant::Int, QString("WriteRegType"));
+    m_propTable << qMakePair(QVariant::Int, QString("WriteValueType"));
+    m_propTable << qMakePair(QVariant::Int, QString("WriteValue"));
 }
 
 void ButtonWidget::initCenterWidget()

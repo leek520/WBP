@@ -3,16 +3,11 @@
 # Project created by QtCreator 2018-10-29T13:40:10
 #
 #-------------------------------------------------
+greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
+INCLUDEPATH += $$PWD
+DEPENDPATH += $$PWD
 
-TARGET = WBP
-TEMPLATE = app
+SOURCES += $$PWD/comobject.cpp
 
-include(./window/window.pri)
-
-SOURCES += main.cpp
-
-RESOURCES += \
-    application.qrc
-
-RC_ICONS = resources/images/wbp.ico
+HEADERS  += $$PWD/comobject.h
 

@@ -83,7 +83,11 @@ class Widget : public QWidget
     Q_PROPERTY(QColor FillColor READ getFillColor WRITE setFillColor)
     Q_PROPERTY(QColor LineColor READ getLineColor WRITE setLineColor)
 
-    Q_PROPERTY(QString LuaCmd READ getLuaCmd WRITE setLuaCmd)
+    Q_PROPERTY(ushort WriteRegAddress READ getWriteRegAddress WRITE setWriteRegAddress)
+    Q_PROPERTY(ushort WriteBitAddress READ getWriteBitAddress WRITE setWriteBitAddress)
+    Q_PROPERTY(ushort WriteRegType READ getWriteRegType WRITE setWriteRegType)
+    Q_PROPERTY(ushort WriteValueType READ getWriteValueType WRITE setWriteValueType)
+    Q_PROPERTY(int WriteValue READ getWriteValue WRITE setWriteValue)
 
     Q_PROPERTY(QVariant BkColor1 READ getBkColor1 WRITE setBkColor1)
 public:
@@ -159,9 +163,6 @@ public:
     bool getFillEnable();
     void setFillEnable(bool enable);
 
-    QString getLuaCmd();
-    void setLuaCmd(QString LuaCmd);
-
     QString getBkImage();
     void setBkImage(QString BkImage);
 
@@ -213,6 +214,21 @@ public:
     QStringList getTextStringList();
     void setTextStringList(QStringList String);
 
+    ushort getWriteRegAddress();
+    void setWriteRegAddress(ushort value);
+
+    ushort getWriteBitAddress();
+    void setWriteBitAddress(ushort value);
+
+    ushort getWriteRegType();
+    void setWriteRegType(ushort value);
+
+    ushort getWriteValueType();
+    void setWriteValueType(ushort value);
+
+    int getWriteValue();
+    void setWriteValue(int value);
+
     QVariant getBkColor1();
     void virtual setBkColor1(QVariant bkColor);
 protected:
@@ -252,6 +268,12 @@ protected:
     bool m_FillEnable;
     int m_LineWidth;
     QColor m_LineColor;
+
+    ushort m_WriteRegAddress;
+    ushort m_WriteBitAddress;
+    ushort m_WriteRegType;
+    ushort m_WriteValueType;
+    int m_WriteValue;
 };
 
 #endif // WIDGET_H

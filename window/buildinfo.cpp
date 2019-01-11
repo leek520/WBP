@@ -44,11 +44,6 @@ void BuildInfo::initBuild()
 }
 
 
-BuildInfo::WidgetBuf *BuildInfo::getWidgetBuf()
-{
-    return (&widgetBuf);
-}
-
 uint BuildInfo::QColorToEColor(QColor color)
 {
     uint rgba = color.rgba();

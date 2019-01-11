@@ -18,6 +18,11 @@ PropertyDialog::PropertyDialog(QWidget *parent) :
     ui->textAlignH->addItems(PV->getEnumProperty("AlignH"));
     ui->textAlignV->addItems(PV->getEnumProperty("AlignV"));
     ui->textFont->addItems(PV->getEnumProperty("TextFont"));
+    ui->textRegType->addItems(PV->getEnumProperty("RegType"));
+
+
+    ui->writeRegType->addItems(PV->getEnumProperty("WriteRegType"));
+    ui->writeValueType->addItems(PV->getEnumProperty("WriteValueType"));
 }
 
 PropertyDialog::~PropertyDialog()
@@ -81,7 +86,7 @@ void PropertyDialog::showDialog(Widget *w)
         return;
     }
 
-    setDialog();
+    getProperty();
 
     this->setWindowTitle(QString("%1-[%2]").arg(m_title).arg(name));
     this->show();
@@ -90,15 +95,7 @@ void PropertyDialog::showDialog(Widget *w)
 
 void PropertyDialog::on_buttonBox_accepted()
 {
-    m_widget->setTextFont(ui->textFont->currentIndex());
-    m_widget->setTextRegAddress(ui->textRegAddress->value());
-    m_widget->setTextTotLen(ui->textDotBef->value());
-    m_widget->setTextDotLen(ui->textDotAft->value());
-    setStringList();
-
-    m_widget->setLuaCmd(ui->LuaEditor->toPlainText());
-    m_widget->refresh();
-    emit m_widget->currentItemChanged(m_widget);
+    setProperty();
 }
 
 void PropertyDialog::on_textType_currentIndexChanged(int index)
@@ -205,15 +202,23 @@ void PropertyDialog::on_textEdit_textChanged()
     m_widget->setTextMaxLen(128);
 }
 
-void PropertyDialog::setDialog()
+void PropertyDialog::getProperty()
 {
+    /*write*/
+    ui->writeRegAddress->setValue(m_widget->getWriteRegAddress());
+    ui->writeBitAddress->setValue(m_widget->getWriteBitAddress());
+    ui->writeRegType->setCurrentIndex(m_widget->getWriteRegType());
+    ui->writeValueType->setCurrentIndex(m_widget->getWriteValueType());
+    ui->writeValue->setValue(m_widget->getWriteValue());
+    /*image*/
     ui->imageCompress->setCurrentIndex(m_widget->getImageCompress());
 
-
+    /*base*/
     ui->baseId->setValue(m_widget->getId());
     ui->baseBkColor->setStyleSheet(QString("background-color: #%1;")
                                    .arg(QString::number(m_widget->getBkColor().rgba(), 16)));
 
+    /*text*/
     ui->textColor->setStyleSheet(QString("background-color: #%1;")
                                 .arg(QString::number(m_widget->getTextColor().rgba(), 16)));
 
@@ -222,19 +227,38 @@ void PropertyDialog::setDialog()
     ui->textDotBef->setValue(m_widget->getTextTotLen());
     ui->textDotAft->setValue(m_widget->getTextDotLen());
     ui->textFont->setCurrentIndex(m_widget->getTextFont());
-
+    ui->textEdit->setText(m_widget->getTextString());
+    ui->textList->clear();
+    ui->textList->setRowCount(0);
 
     on_textType_currentIndexChanged(m_widget->getTextType());
     on_textAlignH_currentIndexChanged(m_widget->getAlignH());
     on_textAlignV_currentIndexChanged(m_widget->getAlignV());
 
-    ui->textEdit->setText(m_widget->getTextString());
-    ui->textList->clear();
-    ui->textList->setRowCount(0);
+
     getStringList();
 
+}
 
-    ui->LuaEditor->setText(m_widget->getLuaCmd());
+void PropertyDialog::setProperty()
+{
+    /*write*/
+    m_widget->setWriteRegAddress(ui->writeRegAddress->value());
+    m_widget->setWriteBitAddress(ui->writeBitAddress->value());
+    m_widget->setWriteRegType(ui->writeRegType->currentIndex());
+    m_widget->setWriteValueType(ui->writeValueType->currentIndex());
+    m_widget->setWriteValue(ui->writeValue->value());
+
+    /*text*/
+    m_widget->setTextFont(ui->textFont->currentIndex());
+    m_widget->setTextRegAddress(ui->textRegAddress->value());
+    m_widget->setTextTotLen(ui->textDotBef->value());
+    m_widget->setTextDotLen(ui->textDotAft->value());
+    setStringList();
+
+
+    m_widget->refresh();
+    emit m_widget->currentItemChanged(m_widget);
 }
 
 void PropertyDialog::getStringList()
@@ -306,4 +330,13 @@ void PropertyDialog::on_imageCompress_currentIndexChanged(int index)
 {
     if (!m_widget) return;
     m_widget->setImageCompress(index);
+}
+
+void PropertyDialog::on_writeRegType_currentIndexChanged(int index)
+{
+    if (index == 0){
+        ui->writeBitAddress->setEnabled(false);
+    }else{
+        ui->writeBitAddress->setEnabled(true);
+    }
 }

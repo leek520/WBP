@@ -199,6 +199,12 @@ void Widget::initParament()
         m_TextStringList.append(QStringList());
     }
     m_ImageCompress = 0;
+
+    m_WriteRegAddress = 0;
+    m_WriteBitAddress = 0;
+    m_WriteRegType = 0;
+    m_WriteValueType = 0;
+    m_WriteValue = 0;
 }
 
 void Widget::createContexMenu()
@@ -592,14 +598,53 @@ void Widget::setTextStringList(QStringList String)
 {
     m_TextStringList[Widget::m_curLan] = String;
 }
-QString Widget::getLuaCmd()
+
+ushort Widget::getWriteRegAddress()
 {
-    return m_LudCmd;
+    return m_WriteRegAddress;
 }
 
-void Widget::setLuaCmd(QString LuaCmd)
+void Widget::setWriteRegAddress(ushort value)
 {
-    m_LudCmd = LuaCmd;
+    m_WriteRegAddress = value;
+}
+ushort Widget::getWriteBitAddress()
+{
+    return m_WriteBitAddress;
+}
+
+void Widget::setWriteBitAddress(ushort value)
+{
+    m_WriteBitAddress = value;
+}
+ushort Widget::getWriteRegType()
+{
+    return m_WriteRegType;
+}
+
+void Widget::setWriteRegType(ushort value)
+{
+    m_WriteRegType = value;
+}
+
+ushort Widget::getWriteValueType()
+{
+    return m_WriteValueType;
+}
+
+void Widget::setWriteValueType(ushort value)
+{
+    m_WriteValueType = value;
+}
+
+int Widget::getWriteValue()
+{
+    return m_WriteValue;
+}
+
+void Widget::setWriteValue(int value)
+{
+    m_WriteValue = value;
 }
 
 QVariant Widget::getBkColor1()
