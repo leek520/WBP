@@ -6,12 +6,12 @@
 class SciLexerLua : public QsciLexerLua
 {
 public:
-    SciLexerLua(QObject *parent = 0);
-
+    SciLexerLua(char *words, QObject *parent = 0);
 protected:
     const char * keywords(int set) const;
 private:
     SciAPIsLua *m_apis;
+    char *m_keywords;
 };
 
 #endif // SCILEXERLUA_H

@@ -2,6 +2,20 @@
 
 SciAPIsLua::SciAPIsLua(QsciLexer *lexer) : QsciAPIs(lexer)
 {
+    initKeyWords();
+}
+
+SciAPIsLua::SciAPIsLua(char *words, QsciLexer *lexer) : QsciAPIs(lexer)
+{
+    QStringList strList = QString(QLatin1String(words)).split(" ");
+    for(int i=0;i<strList.count();i++){
+        this->add(strList[i]);
+    }
+    initKeyWords();
+}
+
+void SciAPIsLua::initKeyWords()
+{
     this->add(QString("move"));
     this->add(QString("moive"));
     this->add("test1?1(double,int,int) Extra info");

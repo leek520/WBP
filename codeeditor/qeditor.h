@@ -4,14 +4,9 @@
 #include <QMainWindow>
 #include <QFontDialog>
 #include <QTableWidgetItem>
-#include <QProcess>
+#include <QScrollBar>
+#include "luafun.h"
 
-#include <lua/lua.hpp>
-#include "lua/lua.h"
-#include "lua/lualib.h"
-#include "lua/lauxlib.h"
-#include <windows.h>
-#define IS(s)	(strcmp(argv[0],s)==0)
 namespace Ui {
 class QEditor;
 }
@@ -38,8 +33,12 @@ public:
 private slots:
     void currentChanged(int currentRow, int currentColumn, int previousRow, int previousColumn);
     void itemChanged(QTableWidgetItem *item);
+    void outputCellClicked(int row, int col);
     void saveItem(int row);
     void openItem(int row);
+    void addUserKeyWords();
+    void insertRecordToOutput(int row, QString key, QString value);
+    int syntaxCheck(QString &in, QString &out, bool execute);
 
     void on_action_Font_triggered();
 
@@ -53,6 +52,7 @@ protected:
 private:
     Ui::QEditor *ui;
     QList<Macro> m_macroList;
+    lua_State* L;
 };
 
 #endif // QEDITOR_H

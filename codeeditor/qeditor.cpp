@@ -7,13 +7,27 @@ QEditor::QEditor(QWidget *parent) :
     ui(new Ui::QEditor)
 {
     ui->setupUi(this);
-    setWindowModality(Qt::ApplicationModal);
+    //setWindowModality(Qt::ApplicationModal);
 
+    ui->tableWidget->setSelectionMode (QAbstractItemView::SingleSelection); //设置选择模式，选择单行
+    ui->output->setColumnWidth(0, 40);
+    ui->output->verticalHeader()->setDefaultSectionSize(20);
+    ui->output->setShowGrid(false);
+    ui->output->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    ui->output->setSelectionMode(QAbstractItemView::SingleSelection);
+    ui->output->setSelectionBehavior(QAbstractItemView::SelectRows);
+    connect(ui->output, SIGNAL(cellDoubleClicked(int,int)),
+            this, SLOT(outputCellClicked(int,int)));
     connect(ui->tableWidget, SIGNAL(currentCellChanged(int,int,int,int)),
             this, SLOT(currentChanged(int,int,int,int)));
     connect(ui->tableWidget, SIGNAL(itemChanged(QTableWidgetItem*)),
             this, SLOT(itemChanged(QTableWidgetItem*)));
     on_action_New_triggered();
+
+    L = openLua();
+
+    addUserKeyWords();
+    ui->codeEditor->initLexer();
 
     ui->regType->addItems(PV->getEnumProperty("WriteRegType"));
     ui->triggerType->addItems(PV->getEnumProperty("TriggerType"));
@@ -21,6 +35,7 @@ QEditor::QEditor(QWidget *parent) :
 
 QEditor::~QEditor()
 {
+    closeLua(L);
     delete ui;
 }
 
@@ -64,6 +79,13 @@ void QEditor::itemChanged(QTableWidgetItem *item)
 
 }
 
+void QEditor::outputCellClicked(int row, int col)
+{
+    int line = ui->output->item(row, 0)->text().toInt();
+    ui->codeEditor->setCurrentLine(line-1);
+    ui->codeEditor->setFocus();
+}
+
 void QEditor::saveItem(int row)
 {
     if (row >= m_macroList.count()) return;
@@ -90,6 +112,24 @@ void QEditor::openItem(int row)
     ui->tableWidget->item(row, 0)->setText(m_macroList[row].name);
 }
 
+void QEditor::addUserKeyWords()
+{
+    const char space[] = " ";
+    const luaL_Reg *l = luaLib;
+    for (; l->name != NULL; l++) {  /* fill the table with given functions */
+        ui->codeEditor->addUserKeywords(l->name);
+        ui->codeEditor->addUserKeywords(space);
+    }
+}
+
+void QEditor::insertRecordToOutput(int row, QString key, QString value)
+{
+    QTableWidgetItem *item;
+    item = new QTableWidgetItem(key);
+    ui->output->setItem(row, 0, item);
+    item = new QTableWidgetItem(value);
+    ui->output->setItem(row, 1, item);
+}
 
 void QEditor::on_action_Font_triggered()
 {
@@ -141,31 +181,85 @@ void QEditor::closeEvent(QCloseEvent *event)
 
 void QEditor::on_action_Build_triggered()
 {
-    QString outMsg = "";
-    char *inStr;
-    const char *outStr;
-    QByteArray ba = ui->codeEditor->text().toLatin1();
-    inStr = ba.data();
-    lua_State* L;
-    L=luaL_newstate();
-    luaopen_base(L);    //调用print使用
-    if (luaL_loadstring(L, inStr) != LUA_OK){
-        outStr = lua_tostring(L,-1);
-        QString tmpStr = QString(QLatin1String(outStr));
-        tmpStr.replace(QRegExp("\\[.+\\]:"), "Line ");
-        outMsg += tmpStr + "\n";
-    }else{
-        outMsg += "Build success!\n";
-        if (lua_pcall(L,0,0,0) != LUA_OK){
-            outStr = lua_tostring(L,-1);
-            QString tmpStr = QString(QLatin1String(outStr));
-            tmpStr = tmpStr.replace(QRegExp("\\[.+\\]:"), "Line ");
-            outMsg += tmpStr  + "\n";
+    QMap<int, QString> outMsgMap;
+
+    QString allStr = ui->codeEditor->text().toLatin1();
+    QStringList allStrList = allStr.split("\n");
+    QString outMsg;;
+    int line;
+    int start = 0;
+    while(!allStr.isEmpty()){
+        line = syntaxCheck(allStr, outMsg, false);
+        if (line < 0){
+            allStr.clear();
         }else{
-           outMsg += "Excute success!\n";
+            start += line;
+            outMsgMap.insert(start, outMsg);
+            //qDebug()<<"line:"<<line;
+            while(line--){
+                allStrList.removeFirst();
+            }
+            allStr = allStrList.join("\n");
         }
     }
-    lua_close(L);
-    ui->outText->setText(outMsg);
+    //执行
+    if (outMsgMap.count()==0){
+        allStr = ui->codeEditor->text().toLatin1();
+        line = syntaxCheck(allStr, outMsg, true);
+        if (line >= 0){
+            outMsgMap.insert(line, outMsg);
+        }
+    }
+
+    //加入output窗口
+    int cnt = outMsgMap.count();
+
+    ui->output->setRowCount(cnt);
+    QTableWidgetItem *item;
+    QMap<int, QString>::iterator iter = outMsgMap.begin();
+    int i = 0;
+    while (iter != outMsgMap.end()){
+        insertRecordToOutput(i,
+                             QString("%1").arg(iter.key()),
+                             iter.value());
+        iter++;
+        i++;
+    }
+    ui->output->insertRow(cnt);
+    if (cnt == 0){
+        insertRecordToOutput(0,
+                             QString("Total:"),
+                             QString("0 Errors!"));
+    }else{
+        insertRecordToOutput(outMsgMap.count(),
+                             QString("Total:"),
+                             QString("%1 Errors!").arg(outMsgMap.count()));
+    }
+    ui->output->scrollToBottom();
 }
 
+int QEditor::syntaxCheck(QString &in, QString &out, bool execute)
+{
+    int ret, line = -1;
+    char *inStr;
+    const char *outStr;
+    QByteArray ba = in.toLatin1();
+    inStr = ba.data();
+
+    ret = luaL_loadstring(L, inStr);
+    if (execute && (ret == LUA_OK)){
+        ret = lua_pcall(L,0,0,0);
+    }
+    if (ret != LUA_OK){
+        outStr = lua_tostring(L,-1);
+        QString tmpStr = QString(QLatin1String(outStr));
+        QRegExp rx("\\[string.+\\]:([0-9]+):");
+        int pos = tmpStr.indexOf(rx);
+        if (pos >= 0){
+            out = tmpStr.mid(pos + rx.matchedLength());
+            line = rx.cap(1).toInt();
+        }
+    }
+
+    return line;
+}

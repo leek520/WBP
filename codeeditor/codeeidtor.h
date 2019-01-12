@@ -16,6 +16,9 @@ public:
     explicit CodeEidtor(QWidget *parent = 0);
     void setCurrentFont(QFont font);
     const QFont getCurrentFont();
+    void setCurrentLine(int line);
+    void addUserKeywords(const char *keywords);
+    void initLexer();
 protected:
 
 signals:
@@ -26,7 +29,8 @@ private slots:
     void lineNumberChanged();
 public slots:
 private:
-    QsciLexer *m_textLexer;
+    SciLexerLua *m_textLexer;
+    char m_keyWords[512];
 };
 
 #endif // CODEEIDTOR_H

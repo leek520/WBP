@@ -104,7 +104,22 @@
        <widget class="CodeEidtor" name="codeEditor" native="true"/>
       </item>
       <item>
-       <widget class="QTextEdit" name="outText"/>
+       <widget class="QTableWidget" name="output">
+        <property name="columnCount">
+         <number>2</number>
+        </property>
+        <attribute name="horizontalHeaderVisible">
+         <bool>false</bool>
+        </attribute>
+        <attribute name="horizontalHeaderStretchLastSection">
+         <bool>true</bool>
+        </attribute>
+        <attribute name="verticalHeaderVisible">
+         <bool>false</bool>
+        </attribute>
+        <column/>
+        <column/>
+       </widget>
       </item>
      </layout>
     </item>
@@ -186,6 +201,7 @@
     <property name="title">
      <string>编译 (&amp;B)</string>
     </property>
+    <addaction name="action_Build"/>
    </widget>
    <addaction name="menu_F"/>
    <addaction name="menu_E"/>

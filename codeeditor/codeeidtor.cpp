@@ -1,14 +1,11 @@
 ﻿#include "codeeidtor.h"
 
-CodeEidtor::CodeEidtor(QWidget *parent) : QsciScintilla(parent)
+CodeEidtor::CodeEidtor(QWidget *parent) :
+    QsciScintilla(parent)
 {
-    setUtf8(true);  //支持中文
+    memset(m_keyWords, 0, 512);
 
-    //词法分析器
-    m_textLexer = new SciLexerLua;
-    setFont(QFont("Courier", 20, QFont::Normal));
-    m_textLexer->setFont(font());
-    this->setLexer(m_textLexer);
+    setUtf8(true);  //支持中文
 
     setAutoCompletionSource(QsciScintilla::AcsAll);    //自动补全所以地方出现的
     setAutoCompletionCaseSensitivity(true);   //设置自动补全大小写敏感
@@ -64,6 +61,25 @@ void CodeEidtor::setCurrentFont(QFont font)
 const QFont CodeEidtor::getCurrentFont()
 {
     return m_textLexer->defaultFont(-1);
+}
+
+void CodeEidtor::setCurrentLine(int line)
+{
+    setCursorPosition(line, 0);
+}
+
+void CodeEidtor::addUserKeywords(const char *keywords)
+{
+    strcat(m_keyWords, keywords);
+}
+
+void CodeEidtor::initLexer()
+{
+    //词法分析器
+    m_textLexer = new SciLexerLua(m_keyWords);
+    setFont(QFont("Courier", 20, QFont::Normal));
+    m_textLexer->setFont(font());
+    setLexer(m_textLexer);
 }
 
 void CodeEidtor::setMarginsArea()
