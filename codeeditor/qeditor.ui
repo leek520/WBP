@@ -22,7 +22,7 @@
    <string>宏指令编辑器</string>
   </property>
   <widget class="QWidget" name="centralWidget">
-   <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="1,4">
+   <layout class="QHBoxLayout" name="horizontalLayout" stretch="2,7">
     <item>
      <layout class="QVBoxLayout" name="verticalLayout" stretch="5,2">
       <item>
@@ -99,9 +99,12 @@
      </layout>
     </item>
     <item>
-     <layout class="QVBoxLayout" name="verticalLayout_2" stretch="10">
+     <layout class="QVBoxLayout" name="verticalLayout_2" stretch="10,2">
       <item>
        <widget class="CodeEidtor" name="codeEditor" native="true"/>
+      </item>
+      <item>
+       <widget class="QTextEdit" name="outText"/>
       </item>
      </layout>
     </item>
@@ -216,11 +219,12 @@
    <addaction name="action_Zoomout"/>
    <addaction name="action_Zoomin"/>
    <addaction name="separator"/>
+   <addaction name="action_Build"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <action name="action_New">
    <property name="icon">
-    <iconset resource="resources.qrc">
+    <iconset resource="../application.qrc">
      <normaloff>:/new</normaloff>:/new</iconset>
    </property>
    <property name="text">
@@ -229,7 +233,7 @@
   </action>
   <action name="action_Open">
    <property name="icon">
-    <iconset resource="resources.qrc">
+    <iconset resource="../application.qrc">
      <normaloff>:/open</normaloff>:/open</iconset>
    </property>
    <property name="text">
@@ -238,7 +242,7 @@
   </action>
   <action name="action_Save">
    <property name="icon">
-    <iconset resource="resources.qrc">
+    <iconset resource="../application.qrc">
      <normaloff>:/save</normaloff>:/save</iconset>
    </property>
    <property name="text">
@@ -247,7 +251,7 @@
   </action>
   <action name="action_Asave">
    <property name="icon">
-    <iconset resource="resources.qrc">
+    <iconset resource="../application.qrc">
      <normaloff>:/asave</normaloff>:/asave</iconset>
    </property>
    <property name="text">
@@ -270,7 +274,7 @@
   </action>
   <action name="action_Undo">
    <property name="icon">
-    <iconset resource="resources.qrc">
+    <iconset resource="../application.qrc">
      <normaloff>:/undo</normaloff>:/undo</iconset>
    </property>
    <property name="text">
@@ -279,7 +283,7 @@
   </action>
   <action name="action_Redo">
    <property name="icon">
-    <iconset resource="resources.qrc">
+    <iconset resource="../application.qrc">
      <normaloff>:/redo</normaloff>:/redo</iconset>
    </property>
    <property name="text">
@@ -288,7 +292,7 @@
   </action>
   <action name="action_Cut">
    <property name="icon">
-    <iconset resource="resources.qrc">
+    <iconset resource="../application.qrc">
      <normaloff>:/cut</normaloff>:/cut</iconset>
    </property>
    <property name="text">
@@ -297,7 +301,7 @@
   </action>
   <action name="action_Copy">
    <property name="icon">
-    <iconset resource="resources.qrc">
+    <iconset resource="../application.qrc">
      <normaloff>:/copy</normaloff>:/copy</iconset>
    </property>
    <property name="text">
@@ -306,7 +310,7 @@
   </action>
   <action name="action_Paste">
    <property name="icon">
-    <iconset resource="resources.qrc">
+    <iconset resource="../application.qrc">
      <normaloff>:/paste</normaloff>:/paste</iconset>
    </property>
    <property name="text">
@@ -342,8 +346,8 @@
   </action>
   <action name="action_Find">
    <property name="icon">
-    <iconset>
-     <normaloff>images/find.png</normaloff>images/find.png</iconset>
+    <iconset resource="resources.qrc">
+     <normaloff>:/replace</normaloff>:/replace</iconset>
    </property>
    <property name="text">
     <string>查找(&amp;F)</string>
@@ -432,6 +436,21 @@
     <string>sdf</string>
    </property>
   </action>
+  <action name="action_Build">
+   <property name="icon">
+    <iconset resource="../application.qrc">
+     <normaloff>:/build</normaloff>:/build</iconset>
+   </property>
+   <property name="text">
+    <string>编译</string>
+   </property>
+   <property name="toolTip">
+    <string>编译</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+B</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
@@ -443,6 +462,7 @@
   </customwidget>
  </customwidgets>
  <resources>
+  <include location="../application.qrc"/>
   <include location="resources.qrc"/>
  </resources>
  <connections/>

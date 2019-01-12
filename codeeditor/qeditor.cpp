@@ -29,29 +29,31 @@ QList<QEditor::Macro> *QEditor::getMacroList()
     return &m_macroList;
 }
 
+void QEditor::showEditor()
+{
+    if (ui->tableWidget->rowCount() != m_macroList.count()){
+        ui->tableWidget->setRowCount(m_macroList.count());
+        for(int i=0;i<m_macroList.count();i++){
+            QTableWidgetItem *item = new QTableWidgetItem(m_macroList[i].name);
+            item->setCheckState((m_macroList[i].isUsed==0?(Qt::Unchecked):(Qt::Checked)));
+            ui->tableWidget->setItem(i, 0, item);
+        }
+        openItem(0);
+        ui->tableWidget->setCurrentCell(0,0);
+    }
+    show();
+}
+
 void QEditor::currentChanged(int currentRow, int currentColumn, int previousRow, int previousColumn)
 {
     if ((currentRow >= m_macroList.count()) ||
         (previousRow >= m_macroList.count())||
         (currentRow < 0) || (previousRow < 0))
         return;
-    QTableWidgetItem *item = ui->tableWidget->item(previousRow, previousColumn);
-    m_macroList[previousRow].isUsed = item->checkState();
-    m_macroList[previousRow].name = item->text();
-    m_macroList[previousRow].content = ui->codeEditor->text();
-    m_macroList[previousRow].mark = "";
-    m_macroList[previousRow].regAddress = ui->regAddress->value();
-    m_macroList[previousRow].bitAddress = ui->bitAddress->value();
-    m_macroList[previousRow].regType = ui->regType->currentIndex();
-    m_macroList[previousRow].tirggerType = ui->triggerType->currentIndex();
 
-    item = ui->tableWidget->item(currentRow, currentColumn);
-    ui->codeEditor->setText(m_macroList[currentRow].content);
+    saveItem(previousRow);
 
-    ui->regAddress->setValue(m_macroList[currentRow].regAddress);
-    ui->bitAddress->setValue(m_macroList[currentRow].bitAddress);
-    ui->regType->setCurrentIndex(m_macroList[currentRow].regType);
-    ui->triggerType->setCurrentIndex(m_macroList[currentRow].tirggerType);
+    openItem(currentRow);
 }
 
 void QEditor::itemChanged(QTableWidgetItem *item)
@@ -59,7 +61,35 @@ void QEditor::itemChanged(QTableWidgetItem *item)
     int row = item->row();
     m_macroList[row].isUsed = item->checkState();
     m_macroList[row].name = item->text();
+
 }
+
+void QEditor::saveItem(int row)
+{
+    if (row >= m_macroList.count()) return;
+    QTableWidgetItem *item = ui->tableWidget->item(row, 0);
+    m_macroList[row].isUsed = item->checkState();
+    m_macroList[row].name = item->text();
+    m_macroList[row].content = ui->codeEditor->text();
+    m_macroList[row].mark = "";
+    m_macroList[row].regAddress = ui->regAddress->value();
+    m_macroList[row].bitAddress = ui->bitAddress->value();
+    m_macroList[row].regType = ui->regType->currentIndex();
+    m_macroList[row].tirggerType = ui->triggerType->currentIndex();
+}
+
+void QEditor::openItem(int row)
+{
+    if (row >= m_macroList.count()) return;
+    ui->codeEditor->setText(m_macroList[row].content);
+    ui->regAddress->setValue(m_macroList[row].regAddress);
+    ui->bitAddress->setValue(m_macroList[row].bitAddress);
+    ui->regType->setCurrentIndex(m_macroList[row].regType);
+    ui->triggerType->setCurrentIndex(m_macroList[row].tirggerType);
+    ui->tableWidget->item(row, 0)->setCheckState((m_macroList[row].isUsed==0?(Qt::Unchecked):(Qt::Checked)));
+    ui->tableWidget->item(row, 0)->setText(m_macroList[row].name);
+}
+
 
 void QEditor::on_action_Font_triggered()
 {
@@ -102,3 +132,40 @@ void QEditor::on_regType_currentIndexChanged(int index)
         ui->bitAddress->setEnabled(true);
     }
 }
+
+void QEditor::closeEvent(QCloseEvent *event)
+{
+    saveItem(ui->tableWidget->currentRow());
+    event->accept();
+}
+
+void QEditor::on_action_Build_triggered()
+{
+    QString outMsg = "";
+    char *inStr;
+    const char *outStr;
+    QByteArray ba = ui->codeEditor->text().toLatin1();
+    inStr = ba.data();
+    lua_State* L;
+    L=luaL_newstate();
+    luaopen_base(L);    //调用print使用
+    if (luaL_loadstring(L, inStr) != LUA_OK){
+        outStr = lua_tostring(L,-1);
+        QString tmpStr = QString(QLatin1String(outStr));
+        tmpStr.replace(QRegExp("\\[.+\\]:"), "Line ");
+        outMsg += tmpStr + "\n";
+    }else{
+        outMsg += "Build success!\n";
+        if (lua_pcall(L,0,0,0) != LUA_OK){
+            outStr = lua_tostring(L,-1);
+            QString tmpStr = QString(QLatin1String(outStr));
+            tmpStr = tmpStr.replace(QRegExp("\\[.+\\]:"), "Line ");
+            outMsg += tmpStr  + "\n";
+        }else{
+           outMsg += "Excute success!\n";
+        }
+    }
+    lua_close(L);
+    ui->outText->setText(outMsg);
+}
+

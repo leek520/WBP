@@ -6,7 +6,7 @@ CodeEidtor::CodeEidtor(QWidget *parent) : QsciScintilla(parent)
 
     //词法分析器
     m_textLexer = new SciLexerLua;
-    setFont(QFont("Times", 20, QFont::Normal));
+    setFont(QFont("Courier", 20, QFont::Normal));
     m_textLexer->setFont(font());
     this->setLexer(m_textLexer);
 
@@ -39,12 +39,12 @@ CodeEidtor::CodeEidtor(QWidget *parent) : QsciScintilla(parent)
     //显示选中行号的背景色
     setCaretLineBackgroundColor(Qt::lightGray);
     //setCaretForegroundColor(QColor("white"))
-    setSelectionBackgroundColor(QColor("#606060"));
-    setSelectionForegroundColor(QColor("#FFFFFF"));
+    //setSelectionBackgroundColor(QColor("#606060"));
+    //setSelectionForegroundColor(QColor("#FFFFFF"));
 
     //设置括号匹配
     setBraceMatching(QsciScintilla::SloppyBraceMatch);
-    setMatchedBraceBackgroundColor(Qt::yellow);
+    setMatchedBraceBackgroundColor(Qt::magenta);
 
     setMarginsArea();
     lineNumberChanged();

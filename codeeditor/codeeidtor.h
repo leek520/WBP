@@ -6,7 +6,7 @@
 #include <QDebug>
 #include <QApplication>
 #include <Qsci/qsciscintilla.h>
-
+#include <Qsci/qscilexercpp.h>
 #include "scilexerlua.h"
 
 class CodeEidtor : public QsciScintilla
@@ -26,7 +26,7 @@ private slots:
     void lineNumberChanged();
 public slots:
 private:
-    SciLexerLua *m_textLexer;
+    QsciLexer *m_textLexer;
 };
 
 #endif // CODEEIDTOR_H

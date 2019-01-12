@@ -3,7 +3,6 @@
         <file alias="asave">images/asave.png</file>
         <file alias="copy">images/copy.png</file>
         <file alias="cut">images/cut.png</file>
-        <file alias="find">images/find.png</file>
         <file alias="new">images/new.png</file>
         <file alias="open">images/open.png</file>
         <file alias="paste">images/paste.png</file>
@@ -20,5 +19,6 @@
         <file alias="zoom-in">images/zoom-in.png</file>
         <file alias="zoom-out">images/zoom-out.png</file>
         <file alias="keywords">resources/keywords.txt</file>
+        <file alias="replace">images/replace.png</file>
     </qresource>
 </RCC>

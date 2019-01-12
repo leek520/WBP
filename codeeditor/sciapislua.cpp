@@ -10,9 +10,9 @@ SciAPIsLua::SciAPIsLua(QsciLexer *lexer) : QsciAPIs(lexer)
     this->add("Foo::test4?1(const char *s, int)");
     this->add("Foo::test5?1(int)");
     this->add("Foo::test6?1(std::string)");
-    if(this->load(QString(":/keywords")))
-        qDebug()<<"读取成功";
-    else
-        qDebug()<<"读取失败";
+    if(this->load(QString(":/keywords")));
+        //qDebug()<<"读取成功";
+    //else
+        //qDebug()<<"读取失败";
     this->prepare();
 }

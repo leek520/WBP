@@ -414,6 +414,7 @@ bool MainWindow::saveProjectFile(QString &filename)
     root.setAttributeNode(curDate);
     doc.appendChild(root);
 
+    //保存widget部分
     QList<WindowWidget *> winList = WindowWidget::getWindowList();
     for(int i=0;i<winList.count();i++){
         QDomElement winDom = widgetToDom(winList[i], root);
@@ -432,7 +433,57 @@ bool MainWindow::saveProjectFile(QString &filename)
             widgetToDom((Widget *)childList[j], winDom);
         }
     }
-    // 2、写入到文件
+
+    //2.保存macro部分
+    QDomElement macroDom = doc.createElement("Macro");
+    QList<QEditor::Macro> *macroList = m_editor->getMacroList();
+    QDomAttr childAttr;
+    for(int i=0;i<macroList->count();i++){
+        QEditor::Macro macro = macroList->at(i);
+        QDomElement childDom = doc.createElement(QString("macro%1").arg(i));
+        childAttr = doc.createAttribute("name");
+        childAttr.setValue(macro.name);
+        childDom.setAttributeNode(childAttr);
+
+        childAttr = doc.createAttribute("regAddress");
+        childAttr.setValue(QString::number(macro.regAddress));
+        childDom.setAttributeNode(childAttr);
+
+        childAttr = doc.createAttribute("bitAddress");
+        childAttr.setValue(QString::number(macro.bitAddress));
+        childDom.setAttributeNode(childAttr);
+
+        childAttr = doc.createAttribute("isUsed");
+        childAttr.setValue(QString::number(macro.isUsed));
+        childDom.setAttributeNode(childAttr);
+
+        childAttr = doc.createAttribute("regType");
+        childAttr.setValue(QString::number(macro.regType));
+        childDom.setAttributeNode(childAttr);
+
+        childAttr = doc.createAttribute("tirggerType");
+        childAttr.setValue(QString::number(macro.tirggerType));
+        childDom.setAttributeNode(childAttr);
+
+        childAttr = doc.createAttribute("mark");
+        childAttr.setValue(macro.mark);
+        childDom.setAttributeNode(childAttr);
+
+        childAttr = doc.createAttribute("content");
+        childAttr.setValue(macro.content);
+        childDom.setAttributeNode(childAttr);
+
+//        QDomElement contentDom = doc.createElement("content");
+//        childAttr = doc.createAttribute("str");
+//        childAttr.setValue(macro.content);
+//        contentDom.setAttributeNode(childAttr);
+//        childDom.appendChild(contentDom);
+
+        macroDom.appendChild(childDom);
+    }
+    root.appendChild(macroDom);
+
+    // 3、写入到文件
     docXmlWrite(filename);
     return true;
 }
@@ -450,21 +501,43 @@ bool MainWindow::openProjectFile(QString &filename)
     QString date = root.attribute(tr("date"));
 
     QDomNode winNode = root.firstChild();
+    QDomNode childNode;
     while (!winNode.isNull())
     {
         QDomElement wDom = winNode.toElement();
         QString type = wDom.tagName();
+        if ("Window" == type){
+            Widget *win = addWidget(Window);
+            DomToWidget(wDom, win);
+            childNode = winNode.firstChild();
+            while (!childNode.isNull()){
+                wDom = childNode.toElement();
+                type = wDom.tagName();
+                Widget *child = addWidget(StrToEnum(type));
+                DomToWidget(wDom, child);
 
-        Widget *win = addWidget(Window);
-        DomToWidget(wDom, win);
-        QDomNode childNode = winNode.firstChild();
-        while (!childNode.isNull()){
-            wDom = childNode.toElement();
-            type = wDom.tagName();
-            Widget *child = addWidget(StrToEnum(type));
-            DomToWidget(wDom, child);
+                childNode = childNode.nextSibling();
+            }
+        }else if ("Macro" == type){
+            QList<QEditor::Macro> *macroList = m_editor->getMacroList();
+            macroList->clear();
+            childNode = winNode.firstChild();
+            while (!childNode.isNull()){
+                QDomElement macroDom = childNode.toElement();
+                QEditor::Macro macro;
+                macro.name = macroDom.attribute("name");
+                macro.regAddress = macroDom.attribute("regAddress").toInt();
+                macro.bitAddress = macroDom.attribute("bitAddress").toInt();
+                macro.regType = macroDom.attribute("regType").toInt();
+                macro.tirggerType = macroDom.attribute("tirggerType").toInt();
+                macro.isUsed = macroDom.attribute("isUsed").toInt();
+                macro.mark = macroDom.attribute("mark");
 
-            childNode = childNode.nextSibling();
+                macro.content = macroDom.attribute("content");
+
+                macroList->append(macro);
+                childNode = childNode.nextSibling();
+            }
         }
         winNode = winNode.nextSibling();
     }
@@ -650,6 +723,7 @@ void MainWindow::newFile()
 
 bool MainWindow::open()
 {
+    bool ret;
     //弹出打开对话框
     QString filename = QFileDialog::getOpenFileName(this,
                                                     tr("打开工程文件"),
@@ -657,7 +731,7 @@ bool MainWindow::open()
                                                     tr("工程文件(*.eprg);;All files(*.*)"));
     if(filename.isEmpty())
     {
-        return false;              //如果关闭窗口或者点击取消，则返回-1，并退出
+        ret = false;              //如果关闭窗口或者点击取消，则返回-1，并退出
     }
     setCursor(Qt::WaitCursor);
     qApp->processEvents();
@@ -665,30 +739,37 @@ bool MainWindow::open()
     if (!openProjectFile(filename))
     {
         qDebug()<<"打开工程文件失败！";
-        return false;
+        ret = false;
+    }else{
+        ret = true;
     }
     setCursor(Qt::ArrowCursor);
-    return true;
+    return ret;
 }
 
 bool MainWindow::save()
 {
+    bool ret;
     QString filename = QFileDialog::getSaveFileName(this,
                                                     tr("保存项目文件"),
                                                     "",
                                                     tr("保存为 (*.eprg)"));
     if(filename.isEmpty())
     {
-        return false;              //如果关闭窗口或者点击取消，则返回-1，并退出
+        ret = false;              //如果关闭窗口或者点击取消，则返回-1，并退出
     }
+    setCursor(Qt::WaitCursor);
+    qApp->processEvents();
     //1、先保存工程文件
     if (!saveProjectFile(filename))
     {
         qDebug()<<"保存工程文件失败！";
-
-        return false;
+        ret = false;
+    }else{
+        ret = true;
     }
-    return true;
+    setCursor(Qt::ArrowCursor);
+    return ret;
 }
 
 bool MainWindow::saveAs()
@@ -1089,7 +1170,7 @@ void MainWindow::lanPrev()
 
 void MainWindow::codeEditor()
 {
-    m_editor->show();
+    m_editor->showEditor();
 }
 
 void MainWindow::ResProgress_slt(int step, int pos, QString msg)
