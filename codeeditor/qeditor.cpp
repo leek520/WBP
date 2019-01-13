@@ -263,3 +263,8 @@ int QEditor::syntaxCheck(QString &in, QString &out, bool execute)
 
     return line;
 }
+
+void QEditor::on_action_Clear_triggered()
+{
+    ui->output->clearContents();
+}

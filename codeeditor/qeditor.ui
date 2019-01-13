@@ -202,6 +202,7 @@
      <string>编译 (&amp;B)</string>
     </property>
     <addaction name="action_Build"/>
+    <addaction name="action_Clear"/>
    </widget>
    <addaction name="menu_F"/>
    <addaction name="menu_E"/>
@@ -226,7 +227,6 @@
    <addaction name="action_Redo"/>
    <addaction name="action_Cut"/>
    <addaction name="action_Copy"/>
-   <addaction name="action_Paste"/>
    <addaction name="action_Find"/>
    <addaction name="separator"/>
    <addaction name="action_Font"/>
@@ -236,6 +236,7 @@
    <addaction name="action_Zoomin"/>
    <addaction name="separator"/>
    <addaction name="action_Build"/>
+   <addaction name="action_Clear"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <action name="action_New">
@@ -357,7 +358,10 @@
      <normaloff>:/editclear</normaloff>:/editclear</iconset>
    </property>
    <property name="text">
-    <string>清空(&amp;L)</string>
+    <string>清理(&amp;L)</string>
+   </property>
+   <property name="toolTip">
+    <string>清理(L)</string>
    </property>
   </action>
   <action name="action_Find">

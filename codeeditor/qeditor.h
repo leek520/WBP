@@ -47,6 +47,8 @@ private slots:
     void on_regType_currentIndexChanged(int index);
     void on_action_Build_triggered();
 
+    void on_action_Clear_triggered();
+
 protected:
     void closeEvent(QCloseEvent *event);
 private:
