@@ -497,6 +497,7 @@ void BuildInfo::downLoadInfo()
 void BuildInfo::cancel()
 {
     downloadStep = 10;
+    com->CancelCom();
 }
 
 void BuildInfo::writeBufToTxt()
@@ -576,7 +577,8 @@ void BuildInfo::writeBufToTxt(QTextStream &out, char *buf, int len)
 void BuildInfo::ResProgress_slt(int pos, QString msg)
 {
     emit ResProgress_sig(downloadStep, pos, msg);
-    if (pos >= 100){
+    if (pos > 100){
+
         downloadStep++;
         int erase;
         int address;
@@ -612,7 +614,7 @@ void BuildInfo::ResProgress_slt(int pos, QString msg)
             }
         case 3:
             //擦除20K，下载地址，下载文本数据包
-            erase = 0x5c;
+            erase = 0x5f;   //252K
             address = START_ADDR_FLASH_LUA;
             if (luaBuf.pos > 0){
                 byte.resize(luaBuf.pos);
@@ -666,6 +668,13 @@ void BuildInfo::ResProgress_slt(int pos, QString msg)
             }else{
                 downloadStep++;
             }
+        case 7:
+            erase = 0xff;
+            address = 0;
+            byte.resize(0);
+            emit DownLoad_sig(erase, address, byte);
+            emit ResProgress_sig(downloadStep+1, 100, "");
+            break;
         default:
             break;
         }

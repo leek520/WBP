@@ -321,7 +321,7 @@ void ProgressBar::setValue(int step, int pos)
 
 void ProgressBar::cancel_slt()
 {
-    emit cancel_sig(m_maxStep+10, 0);
+    emit cancel_sig(0xff, 0);
     hide();
 }
 

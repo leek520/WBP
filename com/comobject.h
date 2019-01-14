@@ -46,6 +46,7 @@ public:
     ComDriver(QString name, QString baud, QString parity, QString stopbit, QObject *parent = 0);
     bool OpenSerial();
     bool OpenSerial(QString name, QString baud, QString parity, QString stopbit);
+    void CancelCom();
 private:
     //CRC-16校验
     unsigned int CRC16Check(uchar *pchMsg, ushort wDataLen);
@@ -79,6 +80,7 @@ private:
     QByteArray m_dataAll;
     QByteArray m_ReceiveBuf;
     QTimer *m_sendTimer;
+    bool cancel;
 };
 
 #endif // COMOBJECT_H

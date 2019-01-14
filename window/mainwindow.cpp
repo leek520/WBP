@@ -1191,7 +1191,7 @@ void MainWindow::ResProgress_slt(int step, int pos, QString msg)
             stateBar->removeWidget(m_progressBar);
             disconnect(m_progressBar, SIGNAL(cancel_sig(int,int)),
                     this, SLOT(ResProgress_slt(int,int)));
-            if ((pos >= 100) && (step < (maxStep+1))){
+            if ((pos >= 100) && (step != 0xff)){
                 QMessageBox::information(this, tr("提示"), tr("下载完成！"));
             }else{
                 m_buildInfo->cancel();

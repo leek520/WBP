@@ -129,6 +129,11 @@ bool ComDriver::OpenSerial(QString name, QString baud, QString parity, QString s
     qDebug()<<"parity:"<<m_com->parity();
     return true;
 }
+
+void ComDriver::CancelCom()
+{
+    cancel = true;
+}
 /**
 * 函数说明：CRC校验
 *
@@ -260,8 +265,13 @@ void ComDriver::DownLoad_slt(const int cmd, const int addr, const QByteArray dat
     if (!m_com->isOpen()){
 
     }
-
+    //是否为关机
+    if (cmd == 0xff){
+        SendMsgDownLoad(cmd, addr, NULL, 0);
+        return;
+    }
     //定位
+    cancel = false;
     m_cmd = cmd;
     m_address = addr;
     m_sendData = data;
@@ -273,6 +283,7 @@ void ComDriver::DownLoad_slt(const int cmd, const int addr, const QByteArray dat
 
 void ComDriver::ReceiveMsg()
 {
+    if (cancel) return;
     m_sendTimer->stop();
     //1、读取并处理串口缓冲区数据
     bool status = false;
