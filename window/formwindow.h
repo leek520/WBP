@@ -19,6 +19,7 @@ public:
     static void refreshAll();
     QWidgetList getChildList(int type=0);
     static QList<WindowWidget *> getWindowList();
+    static bool staticCheck();
 signals:
     void addWidgetSgn(WidgetType type, QPoint pos);
 protected:

@@ -52,10 +52,10 @@ void QEditor::showEditor()
             QTableWidgetItem *item = new QTableWidgetItem(m_macroList[i].name);
             item->setCheckState((m_macroList[i].isUsed==0?(Qt::Unchecked):(Qt::Checked)));
             ui->tableWidget->setItem(i, 0, item);
+            ui->tableWidget->setCurrentCell(0,0);
         }
-        openItem(0);
-        ui->tableWidget->setCurrentCell(0,0);
     }
+    openItem(ui->tableWidget->currentRow());
     show();
 }
 

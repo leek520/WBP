@@ -179,7 +179,7 @@ void Widget::initCenterWidget()
 
 void Widget::initParament()
 {
-    m_Id = PV->assignId(m_Type);
+    m_Id = 0;
     m_BkColor = m_CentralWidget->palette().color(QPalette::Window);
     m_BkPressColor = m_BkDisableColor = m_BkColor;
 

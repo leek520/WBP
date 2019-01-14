@@ -32,6 +32,7 @@ void WindowWidget::initParament()
 {
     m_Type = Window;
     Widget::initParament();
+    m_Id = m_windowList.count();
 }
 
 void WindowWidget::addWidget(QWidget *w)
@@ -137,6 +138,34 @@ QWidgetList WindowWidget::getChildList(int type)
 QList<WindowWidget *> WindowWidget::getWindowList()
 {
     return m_windowList;
+}
+
+bool WindowWidget::staticCheck()
+{
+    QString msg;
+    //1.查看是否有window具有重复ID
+    QList<int> usedId;
+    for(int i=0;i<m_windowList.count();i++){
+        int id = m_windowList[i]->getId();
+        int index = usedId.indexOf(id);
+        if (index >= 0){
+            msg = QString("窗口%1和窗口%2ID重复，请检查！").arg(index).arg(i);
+            QMessageBox::critical(m_windowList[i], tr("错误"), msg, QMessageBox::Yes, QMessageBox::Yes);
+            return false;
+        }else{
+            usedId.append(id);
+        }
+    }
+    //2.给子窗体分配静态ID
+    for(int i=0;i<m_windowList.count();i++){
+        int id = m_windowList[i]->getId();
+        QWidgetList childs = m_windowList[i]->getChildList(0);
+        for(int j=0;j<childs.count();j++){
+            Widget *child = (Widget *)childs[j];
+            child->setId(CAL_ID(id, j));
+        }
+    }
+    return true;
 }
 //https://blog.csdn.net/iamshaofa/article/details/17629897
 /******************************************************************************

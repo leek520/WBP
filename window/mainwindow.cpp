@@ -1021,6 +1021,8 @@ void MainWindow::build()
         m_buildInfo->FontToChar(fontList[i].toInt());
     }
 
+    //分配静态ID
+    if (!WindowWidget::staticCheck()) return;
     //生成widget链表
     BuildInfo::WidgetBuf *widgetBuf = &m_buildInfo->widgetBuf;
     int startAddress = (int)(&widgetBuf->buf);
@@ -1180,7 +1182,8 @@ void MainWindow::ResProgress_slt(int step, int pos, QString msg)
         connect(m_progressBar, SIGNAL(cancel_sig(int,int)),
                 this, SLOT(ResProgress_slt(int,int)));
         m_progressBar->setMaxStep(maxStep);
-        m_progressBar->setValue(0, 0);
+        m_progressBar->setValue(0, 0);\
+        stateBar->clearMessage();
         stateBar->addWidget(m_progressBar);
     }else{
         m_progressBar->setValue(step, pos);

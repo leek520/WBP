@@ -15,7 +15,7 @@
   </property>
   <property name="font">
    <font>
-    <pointsize>12</pointsize>
+    <pointsize>14</pointsize>
    </font>
   </property>
   <property name="windowTitle">
@@ -24,6 +24,11 @@
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
     <widget class="QTabWidget" name="tabwidget">
+     <property name="font">
+      <font>
+       <pointsize>12</pointsize>
+      </font>
+     </property>
      <property name="currentIndex">
       <number>0</number>
      </property>
@@ -32,45 +37,97 @@
        <string>控件属性</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout">
-       <item row="0" column="0">
+       <item row="1" column="0">
         <widget class="QStackedWidget" name="baseStack">
+         <property name="font">
+          <font>
+           <pointsize>12</pointsize>
+          </font>
+         </property>
          <property name="currentIndex">
           <number>0</number>
          </property>
          <widget class="QWidget" name="pWidget">
-          <layout class="QVBoxLayout" name="verticalLayout_4">
+          <layout class="QVBoxLayout" name="verticalLayout_4" stretch="1,3,6">
+           <item>
+            <layout class="QHBoxLayout" name="IdLayout">
+             <item>
+              <widget class="QLabel" name="label_2">
+               <property name="font">
+                <font>
+                 <pointsize>12</pointsize>
+                </font>
+               </property>
+               <property name="text">
+                <string> 控件Id</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QSpinBox" name="baseId">
+               <property name="minimumSize">
+                <size>
+                 <width>0</width>
+                 <height>30</height>
+                </size>
+               </property>
+               <property name="baseSize">
+                <size>
+                 <width>0</width>
+                 <height>0</height>
+                </size>
+               </property>
+               <property name="font">
+                <font>
+                 <pointsize>12</pointsize>
+                </font>
+               </property>
+               <property name="minimum">
+                <number>1</number>
+               </property>
+               <property name="maximum">
+                <number>1000</number>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
            <item>
             <widget class="QGroupBox" name="boxbase">
+             <property name="font">
+              <font>
+               <pointsize>12</pointsize>
+              </font>
+             </property>
              <property name="title">
               <string>基础属性</string>
              </property>
              <layout class="QGridLayout" name="gridLayout_2">
-              <item row="0" column="0">
-               <widget class="QLabel" name="label_2">
-                <property name="text">
-                 <string>控件Id</string>
-                </property>
-               </widget>
-              </item>
               <item row="1" column="0">
                <widget class="QLabel" name="label_3">
+                <property name="font">
+                 <font>
+                  <pointsize>12</pointsize>
+                 </font>
+                </property>
                 <property name="text">
                  <string>背景颜色</string>
                 </property>
                </widget>
               </item>
-              <item row="0" column="1">
-               <widget class="QSpinBox" name="baseId">
-                <property name="baseSize">
-                 <size>
-                  <width>0</width>
-                  <height>0</height>
-                 </size>
-                </property>
-               </widget>
-              </item>
               <item row="1" column="1">
                <widget class="QPushButton" name="baseBkColor">
+                <property name="minimumSize">
+                 <size>
+                  <width>0</width>
+                  <height>30</height>
+                 </size>
+                </property>
+                <property name="font">
+                 <font>
+                  <pointsize>12</pointsize>
+                 </font>
+                </property>
                 <property name="text">
                  <string/>
                 </property>
@@ -81,22 +138,55 @@
            </item>
            <item>
             <widget class="QGroupBox" name="boxWrite">
+             <property name="font">
+              <font>
+               <pointsize>12</pointsize>
+              </font>
+             </property>
              <property name="title">
               <string>写入寄存器</string>
              </property>
              <layout class="QGridLayout" name="gridLayout_6">
               <item row="6" column="1">
                <widget class="QSpinBox" name="writeValue">
+                <property name="minimumSize">
+                 <size>
+                  <width>0</width>
+                  <height>30</height>
+                 </size>
+                </property>
+                <property name="font">
+                 <font>
+                  <pointsize>12</pointsize>
+                 </font>
+                </property>
                 <property name="minimum">
                  <number>-100</number>
                 </property>
                </widget>
               </item>
               <item row="6" column="0">
-               <widget class="QComboBox" name="writeValueType"/>
+               <widget class="QComboBox" name="writeValueType">
+                <property name="minimumSize">
+                 <size>
+                  <width>0</width>
+                  <height>30</height>
+                 </size>
+                </property>
+                <property name="font">
+                 <font>
+                  <pointsize>12</pointsize>
+                 </font>
+                </property>
+               </widget>
               </item>
               <item row="2" column="0">
                <widget class="QLabel" name="label_7">
+                <property name="font">
+                 <font>
+                  <pointsize>12</pointsize>
+                 </font>
+                </property>
                 <property name="text">
                  <string>位地址     00-15</string>
                 </property>
@@ -104,6 +194,11 @@
               </item>
               <item row="1" column="0">
                <widget class="QLabel" name="label_6">
+                <property name="font">
+                 <font>
+                  <pointsize>12</pointsize>
+                 </font>
+                </property>
                 <property name="text">
                  <string>寄存器地址 0000-FFFF</string>
                 </property>
@@ -111,6 +206,17 @@
               </item>
               <item row="1" column="1">
                <widget class="QSpinBox" name="writeRegAddress">
+                <property name="minimumSize">
+                 <size>
+                  <width>0</width>
+                  <height>30</height>
+                 </size>
+                </property>
+                <property name="font">
+                 <font>
+                  <pointsize>12</pointsize>
+                 </font>
+                </property>
                 <property name="maximum">
                  <number>65535</number>
                 </property>
@@ -118,6 +224,17 @@
               </item>
               <item row="2" column="1">
                <widget class="QSpinBox" name="writeBitAddress">
+                <property name="minimumSize">
+                 <size>
+                  <width>0</width>
+                  <height>30</height>
+                 </size>
+                </property>
+                <property name="font">
+                 <font>
+                  <pointsize>12</pointsize>
+                 </font>
+                </property>
                 <property name="maximum">
                  <number>15</number>
                 </property>
@@ -125,13 +242,30 @@
               </item>
               <item row="0" column="0">
                <widget class="QLabel" name="label_8">
+                <property name="font">
+                 <font>
+                  <pointsize>12</pointsize>
+                 </font>
+                </property>
                 <property name="text">
                  <string>操作寄存器类型</string>
                 </property>
                </widget>
               </item>
               <item row="0" column="1">
-               <widget class="QComboBox" name="writeRegType"/>
+               <widget class="QComboBox" name="writeRegType">
+                <property name="minimumSize">
+                 <size>
+                  <width>0</width>
+                  <height>30</height>
+                 </size>
+                </property>
+                <property name="font">
+                 <font>
+                  <pointsize>12</pointsize>
+                 </font>
+                </property>
+               </widget>
               </item>
              </layout>
             </widget>
@@ -195,7 +329,14 @@
             </widget>
            </item>
            <item>
-            <widget class="QComboBox" name="textType"/>
+            <widget class="QComboBox" name="textType">
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>25</height>
+              </size>
+             </property>
+            </widget>
            </item>
           </layout>
          </item>
@@ -214,6 +355,12 @@
             </item>
             <item row="0" column="1">
              <widget class="QComboBox" name="textFont">
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>25</height>
+               </size>
+              </property>
               <property name="currentIndex">
                <number>-1</number>
               </property>
@@ -228,6 +375,12 @@
             </item>
             <item row="1" column="1">
              <widget class="QPushButton" name="textColor">
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>25</height>
+               </size>
+              </property>
               <property name="text">
                <string/>
               </property>
@@ -241,7 +394,14 @@
              </widget>
             </item>
             <item row="2" column="1">
-             <widget class="QComboBox" name="textAlignH"/>
+             <widget class="QComboBox" name="textAlignH">
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>25</height>
+               </size>
+              </property>
+             </widget>
             </item>
             <item row="3" column="0">
              <widget class="QLabel" name="Label_4">
@@ -251,7 +411,14 @@
              </widget>
             </item>
             <item row="3" column="1">
-             <widget class="QComboBox" name="textAlignV"/>
+             <widget class="QComboBox" name="textAlignV">
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>25</height>
+               </size>
+              </property>
+             </widget>
             </item>
            </layout>
            <zorder>textAlignV</zorder>
@@ -271,7 +438,14 @@
            </property>
            <layout class="QGridLayout" name="gridLayout_5">
             <item row="1" column="1">
-             <widget class="QComboBox" name="textRegType"/>
+             <widget class="QComboBox" name="textRegType">
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>25</height>
+               </size>
+              </property>
+             </widget>
             </item>
             <item row="1" column="0">
              <widget class="QLabel" name="Label_9">
@@ -299,6 +473,12 @@
               <property name="enabled">
                <bool>false</bool>
               </property>
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>25</height>
+               </size>
+              </property>
              </widget>
             </item>
             <item row="3" column="0">
@@ -313,12 +493,24 @@
               <property name="enabled">
                <bool>false</bool>
               </property>
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>25</height>
+               </size>
+              </property>
              </widget>
             </item>
             <item row="0" column="1">
              <widget class="QSpinBox" name="textRegAddress">
               <property name="enabled">
                <bool>false</bool>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>25</height>
+               </size>
               </property>
              </widget>
             </item>
@@ -330,7 +522,7 @@
        <item>
         <widget class="QStackedWidget" name="textStack">
          <property name="currentIndex">
-          <number>1</number>
+          <number>0</number>
          </property>
          <widget class="QWidget" name="page">
           <layout class="QHBoxLayout" name="horizontalLayout_2">
@@ -443,6 +635,11 @@
    </item>
    <item>
     <widget class="QDialogButtonBox" name="buttonBox">
+     <property name="font">
+      <font>
+       <pointsize>12</pointsize>
+      </font>
+     </property>
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
      </property>

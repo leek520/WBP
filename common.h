@@ -68,10 +68,7 @@
 
 #define INVALID_COLOR 0x80000000
 
-#define GUI_ID_WINDOW   0000  //4096个
-#define GUI_ID_BUTTON   1000
-#define GUI_ID_TEXT     2000
-#define GUI_ID_EDIT     3000
+#define CAL_ID(parent, index)   ((parent<<11) | index)  //父窗体最多可容纳2^10=1024个子窗体
 /************??????*************/
 //链表结构
 struct list_head

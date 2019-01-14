@@ -41,8 +41,7 @@ void PropertyDialog::showDialog(Widget *w)
         ui->baseStack->setCurrentIndex(0);
         ui->tabwidget->removeTab(2);
         ui->tabwidget->removeTab(1);
-
-        ui->baseId->setRange(GUI_ID_WINDOW, GUI_ID_BUTTON);
+        ui->baseId->setEnabled(true);
         break;
     case Button:
         ui->tabwidget->addTab(ui->tabText, "文本属性");
@@ -50,16 +49,14 @@ void PropertyDialog::showDialog(Widget *w)
         ui->baseStack->setCurrentIndex(0);
         ui->tabText->setEnabled(true);
         ui->tabAction->setEnabled(true);
-
-        ui->baseId->setRange(GUI_ID_BUTTON, GUI_ID_TEXT);
+        ui->baseId->setEnabled(false);
         break;
     case Text:
         ui->tabwidget->addTab(ui->tabText, "文本属性");
         ui->tabwidget->addTab(ui->tabAction, "动作属性");
         ui->baseStack->setCurrentIndex(0);
         ui->tabText->setEnabled(true);
-
-        ui->baseId->setRange(GUI_ID_TEXT, GUI_ID_EDIT);
+        ui->baseId->setEnabled(false);
         break;
     case Edit:
         ui->tabwidget->addTab(ui->tabText, "文本属性");
@@ -67,8 +64,7 @@ void PropertyDialog::showDialog(Widget *w)
         ui->baseStack->setCurrentIndex(0);
         ui->tabText->setEnabled(true);
         ui->tabAction->setEnabled(true);
-
-        ui->baseId->setRange(GUI_ID_EDIT, GUI_ID_EDIT+1000);
+        ui->baseId->setEnabled(false);
         break;
     case Image:
         ui->tabwidget->removeTab(2);

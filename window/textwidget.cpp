@@ -11,7 +11,7 @@ TextWidget::TextWidget(QWidget *parent) :
 }
 void TextWidget::initPropertyTable()
 {
-    m_propTable << qMakePair(QVariant::Int, QString("Id"));
+    //m_propTable << qMakePair(QVariant::Int, QString("Id"));
     m_propTable << qMakePair(QVariant::Rect, QString("geometry"));
     m_propTable << qMakePair(QVariant::Color, QString("BkColor"));
 

@@ -6,12 +6,6 @@
 
 #define PV (PublicVar::GetInstance())
 
-#define GUI_ID_WINDOW   0000  //4096个
-#define GUI_ID_BUTTON   1000
-#define GUI_ID_TEXT     2000
-#define GUI_ID_EDIT     3000
-
-
 class PublicVar : public QObject
 {
     Q_OBJECT
@@ -26,7 +20,6 @@ public:
         return m_instance;
     }
     QStringList getEnumProperty(QString prop);
-    int assignId(int type);
 signals:
 
 public slots:
@@ -34,7 +27,6 @@ public slots:
 private:
     static PublicVar *m_instance;
     QMap<QString, QStringList> propertyEnum;
-    QMap<int, int> m_IdPool;
 };
 
 /*************加载qss文件的函数*************/
