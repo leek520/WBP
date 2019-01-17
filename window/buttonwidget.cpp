@@ -29,9 +29,11 @@ void ButtonWidget::initPropertyTable()
     m_propTable << qMakePair(QVariant::TextFormat, QString("TextFont"));
     m_propTable << qMakePair(QVariant::TextFormat, QString("TextMaxLen"));
 
-    m_propTable << qMakePair(QVariant::Int, QString("WriteRegAddress"));
-    m_propTable << qMakePair(QVariant::Int, QString("WriteBitAddress"));
+    m_propTable << qMakePair(QVariant::Bool, QString("WriteEnable"));
     m_propTable << qMakePair(QVariant::Int, QString("WriteRegType"));
+    m_propTable << qMakePair(QVariant::Int, QString("WriteRegAddress"));
+    m_propTable << qMakePair(QVariant::Bool, QString("IsBitReg"));
+    m_propTable << qMakePair(QVariant::Int, QString("WriteBitAddress"));
     m_propTable << qMakePair(QVariant::Int, QString("WriteValueType"));
     m_propTable << qMakePair(QVariant::Int, QString("WriteValue"));
 }

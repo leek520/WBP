@@ -83,9 +83,11 @@ class Widget : public QWidget
     Q_PROPERTY(QColor FillColor READ getFillColor WRITE setFillColor)
     Q_PROPERTY(QColor LineColor READ getLineColor WRITE setLineColor)
 
+    Q_PROPERTY(bool   WriteEnable READ getWriteEnable WRITE setWriteEnable)
     Q_PROPERTY(ushort WriteRegAddress READ getWriteRegAddress WRITE setWriteRegAddress)
     Q_PROPERTY(ushort WriteBitAddress READ getWriteBitAddress WRITE setWriteBitAddress)
     Q_PROPERTY(ushort WriteRegType READ getWriteRegType WRITE setWriteRegType)
+    Q_PROPERTY(bool   IsBitReg READ getIsBitReg WRITE setIsBitReg)
     Q_PROPERTY(ushort WriteValueType READ getWriteValueType WRITE setWriteValueType)
     Q_PROPERTY(int WriteValue READ getWriteValue WRITE setWriteValue)
 
@@ -217,6 +219,12 @@ public:
     ushort getWriteRegAddress();
     void setWriteRegAddress(ushort value);
 
+    bool getIsBitReg();
+    void setIsBitReg(bool value);
+
+    bool getWriteEnable();
+    void setWriteEnable(bool value);
+
     ushort getWriteBitAddress();
     void setWriteBitAddress(ushort value);
 
@@ -274,6 +282,8 @@ protected:
     ushort m_WriteRegType;
     ushort m_WriteValueType;
     int m_WriteValue;
+    bool m_IsBitReg;
+    bool m_WriteEnable;
 };
 
 #endif // WIDGET_H

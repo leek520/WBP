@@ -1,7 +1,9 @@
 /bin
+/output/bin
+/output/Debug
+/output/Release
 /*Debug
 /*Release
 /exe
-/output/*
 *user*
 *.o

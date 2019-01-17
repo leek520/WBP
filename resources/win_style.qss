@@ -1,6 +1,6 @@
 ﻿/**********中心容器页签项**********/
 QTabWidget#mdiArea::pane {
-        border: none;
+        border: 1px solid gray;
         background: gray;
 }
 

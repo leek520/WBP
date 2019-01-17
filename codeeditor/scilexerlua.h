@@ -8,7 +8,7 @@ class SciLexerLua : public QsciLexerLua
 public:
     SciLexerLua(char *words, QObject *parent = 0);
 protected:
-    const char * keywords(int set) const;
+    const char *keywords(int set) const;
 private:
     SciAPIsLua *m_apis;
     char *m_keywords;

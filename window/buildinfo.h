@@ -50,7 +50,7 @@ public:
     int QAlignToEAlign(int align);
     char *QStringToMultBytes(QString str);
     char *QStringListToMultBytes(QStringList strList, int maxLen);
-    char *QStringToLuaChar(QString str);
+    void QStringToLuaChar(QString name, QString content, int *nameAddr, int *contentAddr);
     void QImageToEImage(QString filename, QPoint leftTop, int type, ImageInfo *imageinfo);
     void GraphToEgraph(Widget *w, GraphInfo *graphinfo);
 

@@ -1,4 +1,3 @@
 getData?1(int address)
 setData?1(int address, int value)
 switchWindow?1(int Id)
-print

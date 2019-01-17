@@ -180,18 +180,26 @@ char *BuildInfo::QStringListToMultBytes(QStringList strList, int maxLen)
     return (char *)address;
 }
 
-char *BuildInfo::QStringToLuaChar(QString str)
+void BuildInfo::QStringToLuaChar(QString name, QString content,
+                                 int *nameAddr, int *contentAddr)
 {
-    int address = 0;
-    int RealLen = str.toLocal8Bit().length();
+    //name
+    int RealLen = name.toLocal8Bit().length();
     if (RealLen > 0){
-        address = START_ADDR_SDRAM_LUA + luaBuf.pos;
-        memcpy(&luaBuf.buf[luaBuf.pos], str.toLocal8Bit().data(), RealLen);
+        *nameAddr = START_ADDR_SDRAM_LUA + luaBuf.pos;
+        memcpy(&luaBuf.buf[luaBuf.pos], name.toLocal8Bit().data(), RealLen);
         luaBuf.pos += RealLen;
-        luaBuf.buf[luaBuf.pos++] = '\n';
         luaBuf.buf[luaBuf.pos++] = '\0';
     }
-    return (char *)address;
+    //content
+    content = QString("function %1()\n%2\nend").arg(name).arg(content);
+    RealLen = content.toLocal8Bit().length();
+    if (RealLen > 0){
+        *contentAddr = START_ADDR_SDRAM_LUA + luaBuf.pos;
+        memcpy(&luaBuf.buf[luaBuf.pos], content.toLocal8Bit().data(), RealLen);
+        luaBuf.pos += RealLen;
+        luaBuf.buf[luaBuf.pos++] = '\0';
+    }
 }
 
 void BuildInfo::QImageToEImage(QString filename, QPoint leftTop, int type, ImageInfo *imageinfo)
@@ -511,22 +519,22 @@ void BuildInfo::writeBufToTxt()
 
     QTextStream out(&file);
 
-    out << "widgetBuf:";
+    out << "widgetBuf:"<<QString::number(widgetBuf.pos);
     writeBufToTxt(out, widgetBuf.buf, widgetBuf.pos);
 
-    out << "stringBuf:";
+    out << "stringBuf:"<<QString::number(stringBuf.pos);
     writeBufToTxt(out, stringBuf.buf, stringBuf.pos);
 
-    out << "luaBuf:";
+    out << "luaBuf:"<<QString::number(luaBuf.pos);
     writeBufToTxt(out, luaBuf.buf, luaBuf.pos);
 
-    out << "charBuf:";
+    out << "charBuf:"<<QString::number(charBuf.pos);
     writeBufToTxt(out, charBuf.buf, charBuf.pos);
 
-    out << "fontBuf:";
+    out << "fontBuf:"<<QString::number(fontBuf.pos);
     writeBufToTxt(out, fontBuf.buf, fontBuf.pos);
 
-    out << "imageBuf:";
+    out << "imageBuf:"<<QString::number(imageBuf.pos);
     writeBufToTxt(out, imageBuf.buf, imageBuf.pos);
 
     file.close();

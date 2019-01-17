@@ -1,4 +1,4 @@
-#ifndef LUAFUN_H
+﻿#ifndef LUAFUN_H
 #define LUAFUN_H
 
 #include "lua/lua.hpp"
@@ -17,7 +17,6 @@ static const struct luaL_Reg luaLib[] =
     {"getData", getData},
     {"setData", setData},
     {"switchWindow", switchWindow},
-    {"printl", printl},
     {NULL, NULL},
 };
 

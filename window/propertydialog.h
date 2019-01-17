@@ -51,6 +51,17 @@ private slots:
 
     void on_writeRegType_currentIndexChanged(int index);
 
+    void on_writeCheckBit_clicked(bool checked);
+
+    void on_readAllBtn_clicked();
+
+    void on_writeAllBtn_clicked();
+
+
+    void on_keyBoardCk_clicked(bool checked);
+
+    void on_actionEnableCk_clicked(bool checked);
+
 private:
     void setProperty();
     void getProperty();

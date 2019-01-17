@@ -35,8 +35,8 @@
 		<enum7 value="D64(double)"/>
 	</RegType>
 	<WriteRegType>
-		<enum0 value="寄存器"/>
-		<enum0 value="寄存器bit位"/>
+		<enum0 value="内部预留"/>
+		<enum1 value="其他"/>
 	</WriteRegType>	
 	<WriteValueType>
 		<enum0 value="写入固定值"/>
@@ -46,8 +46,12 @@
 	<TriggerType>
 		<enum0 value="等于0触发"/>
 		<enum1 value="等于1触发"/>
-		<enum2 value="0到1触发"/>
-		<enum3 value="1到0触发"/>
-		<enum4 value="固定值触发"/>
 	</TriggerType>
+	<InternalReg>
+		<enum0 value="换页寄存器"/>
+	</InternalReg>
+	<KeyBoard>
+		<enum0 value="数字键盘"/>
+		<enum1 value="全键盘"/>
+	</KeyBoard>
 </Property>

@@ -847,7 +847,7 @@ WindowInfo *MainWindow::setWidgetInfo(Widget *w, struct list_head *head, int *po
         ret = winInfo;
         init_list_head(&winInfo->childList);
         winInfo->BkColor[0] = m_buildInfo->QColorToEColor(w->getBkColor());
-        winInfo->timer.Id = 100;
+        winInfo->timer.Id = w->getId()<<8;
         winInfo->timer.time = 100;
         base = &winInfo->base;
         *pos = curPos + sizeof(WindowInfo);
@@ -864,12 +864,7 @@ WindowInfo *MainWindow::setWidgetInfo(Widget *w, struct list_head *head, int *po
         btnInfo->BkColor[2] = m_buildInfo->QColorToEColor(w->getBkDisableColor());
         //btnInfo->cmd = m_buildInfo->QStringToLuaChar(w->getLuaCmd());
         setTextInfo(w, &btnInfo->text);
-
-        btnInfo->optReg.regAddress = w->getWriteRegAddress();
-        btnInfo->optReg.bitAddress = w->getWriteBitAddress();
-        btnInfo->optReg.regType = w->getWriteRegType();
-        btnInfo->optReg.valueType = w->getWriteValueType();
-        btnInfo->optReg.value = w->getWriteValue();
+        setOptRegInfo(w, &btnInfo->optReg);
 
         base = &btnInfo->base;
         *pos = curPos + sizeof(ButtonInfo);
@@ -980,6 +975,21 @@ void MainWindow::setTextInfo(Widget *w, TextPara *text)
 
 }
 
+void MainWindow::setOptRegInfo(Widget *w, OptRegPara *optReg)
+{
+    optReg->enable = w->getWriteEnable();
+    optReg->regAddress = w->getWriteRegAddress();
+    if (w->getIsBitReg()){
+        optReg->bitAddress = w->getWriteBitAddress();
+        optReg->regType = 1;
+    }else{
+        optReg->bitAddress = 0xff;
+        optReg->regType = 0;
+    }
+    optReg->valueType = w->getWriteValueType();
+    optReg->value = w->getWriteValue();
+}
+
 void MainWindow::recordUsedChar()
 {
     QList<WindowWidget *> winList = WindowWidget::getWindowList();
@@ -1086,6 +1096,8 @@ void MainWindow::build()
     startAddress = (int)(&luaBuf->buf);
     struct list_head *luaHead = ConvListAdd(startAddress, 0);
 
+    int nameAddr, contentAddr;
+    QString name;
     init_list_head(luaHead);
     luaBuf->pos += sizeof(struct list_head);
     QList<QEditor::Macro> *macroList =m_editor->getMacroList();
@@ -1099,8 +1111,10 @@ void MainWindow::build()
         macroInfo->optReg.regType = item.regType;
         macroInfo->optReg.valueType = item.tirggerType;
         macroInfo->optReg.value = 0;
-        macroInfo->content = m_buildInfo->QStringToLuaChar(item.content);
-
+        name = QString("macro_%1").arg(i);
+        m_buildInfo->QStringToLuaChar(name, item.content, &nameAddr, &contentAddr);
+        macroInfo->name = (char *)nameAddr;
+        macroInfo->content = (char *)contentAddr;
         list_add_tail(&macroInfo->list, luaHead);
     }
 

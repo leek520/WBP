@@ -20,9 +20,12 @@ PropertyDialog::PropertyDialog(QWidget *parent) :
     ui->textFont->addItems(PV->getEnumProperty("TextFont"));
     ui->textRegType->addItems(PV->getEnumProperty("RegType"));
 
-
+    ui->writeRegInternal->addItems(PV->getEnumProperty("InternalReg"));
     ui->writeRegType->addItems(PV->getEnumProperty("WriteRegType"));
     ui->writeValueType->addItems(PV->getEnumProperty("WriteValueType"));
+    ui->writeRegAddress->setRange(InterRegEnd, VAR_BUF_LEN);
+
+    ui->keyBoard->addItems(PV->getEnumProperty("KeyBoard"));
 }
 
 PropertyDialog::~PropertyDialog()
@@ -36,37 +39,46 @@ void PropertyDialog::showDialog(Widget *w)
     QString name = EnumToStr(w->getType());
     switch (w->getType()) {
     case Window:
-        ui->tabText->setEnabled(false);
-        ui->tabAction->setEnabled(false);
         ui->baseStack->setCurrentIndex(0);
+
+        ui->tabwidget->removeTab(3);
         ui->tabwidget->removeTab(2);
         ui->tabwidget->removeTab(1);
+
         ui->baseId->setEnabled(true);
+        ui->boxPage->setVisible(true);
         break;
     case Button:
-        ui->tabwidget->addTab(ui->tabText, "文本属性");
-        ui->tabwidget->addTab(ui->tabAction, "动作属性");
         ui->baseStack->setCurrentIndex(0);
-        ui->tabText->setEnabled(true);
-        ui->tabAction->setEnabled(true);
+        ui->tabwidget->addTab(ui->tabText, "文本属性");
+        ui->tabwidget->addTab(ui->tabSecurity, "安全属性");
+        ui->tabwidget->addTab(ui->tabAction, "动作属性");
+
         ui->baseId->setEnabled(false);
+        ui->boxPage->setVisible(false);
         break;
     case Text:
-        ui->tabwidget->addTab(ui->tabText, "文本属性");
-        ui->tabwidget->addTab(ui->tabAction, "动作属性");
         ui->baseStack->setCurrentIndex(0);
-        ui->tabText->setEnabled(true);
+
+        ui->tabwidget->addTab(ui->tabText, "文本属性");
+        ui->tabwidget->addTab(ui->tabSecurity, "安全属性");
+        ui->tabwidget->removeTab(3);
+
         ui->baseId->setEnabled(false);
+        ui->boxPage->setVisible(false);
         break;
     case Edit:
-        ui->tabwidget->addTab(ui->tabText, "文本属性");
-        ui->tabwidget->addTab(ui->tabAction, "动作属性");
         ui->baseStack->setCurrentIndex(0);
-        ui->tabText->setEnabled(true);
-        ui->tabAction->setEnabled(true);
+
+        ui->tabwidget->addTab(ui->tabText, "文本属性");
+        ui->tabwidget->addTab(ui->tabSecurity, "安全属性");
+        ui->tabwidget->removeTab(3);
+
         ui->baseId->setEnabled(false);
+        ui->boxPage->setVisible(false);
         break;
     case Image:
+        ui->tabwidget->removeTab(3);
         ui->tabwidget->removeTab(2);
         ui->tabwidget->removeTab(1);
         ui->baseStack->setCurrentIndex(1);
@@ -74,6 +86,7 @@ void PropertyDialog::showDialog(Widget *w)
     case Line:
     case Rect:
     case Circle:
+        ui->tabwidget->removeTab(3);
         ui->tabwidget->removeTab(2);
         ui->tabwidget->removeTab(1);
         ui->baseStack->setCurrentIndex(2);
@@ -201,9 +214,19 @@ void PropertyDialog::on_textEdit_textChanged()
 void PropertyDialog::getProperty()
 {
     /*write*/
-    ui->writeRegAddress->setValue(m_widget->getWriteRegAddress());
+    ui->actionEnableCk->setChecked(m_widget->getWriteEnable());
+    on_actionEnableCk_clicked(m_widget->getWriteEnable());
+    int type = m_widget->getWriteRegType();
+    ui->writeRegType->setCurrentIndex(type);
+    if (type == 0){
+        ui->writeRegInternal->setCurrentIndex(m_widget->getWriteRegAddress());
+    }else{
+        ui->writeRegAddress->setValue(m_widget->getWriteRegAddress());
+    }
+    ui->writeCheckBit->setChecked(m_widget->getIsBitReg());
     ui->writeBitAddress->setValue(m_widget->getWriteBitAddress());
-    ui->writeRegType->setCurrentIndex(m_widget->getWriteRegType());
+    on_writeCheckBit_clicked(m_widget->getIsBitReg());
+
     ui->writeValueType->setCurrentIndex(m_widget->getWriteValueType());
     ui->writeValue->setValue(m_widget->getWriteValue());
     /*image*/
@@ -239,9 +262,19 @@ void PropertyDialog::getProperty()
 void PropertyDialog::setProperty()
 {
     /*write*/
-    m_widget->setWriteRegAddress(ui->writeRegAddress->value());
+    m_widget->setWriteEnable(ui->actionEnableCk->isChecked());
+
+    int type = ui->writeRegType->currentIndex();
+    m_widget->setWriteRegType(ui->writeRegType->currentIndex());
+    if (type == 0){
+        m_widget->setWriteRegAddress(ui->writeRegInternal->currentIndex());
+    }else{
+        m_widget->setWriteRegAddress(ui->writeRegAddress->value());
+    }
+
     m_widget->setWriteBitAddress(ui->writeBitAddress->value());
     m_widget->setWriteRegType(ui->writeRegType->currentIndex());
+    m_widget->setIsBitReg(ui->writeCheckBit->isChecked());
     m_widget->setWriteValueType(ui->writeValueType->currentIndex());
     m_widget->setWriteValue(ui->writeValue->value());
 
@@ -331,8 +364,104 @@ void PropertyDialog::on_imageCompress_currentIndexChanged(int index)
 void PropertyDialog::on_writeRegType_currentIndexChanged(int index)
 {
     if (index == 0){
-        ui->writeBitAddress->setEnabled(false);
+        ui->writeStack->setCurrentIndex(1);
+        ui->writeRegAddressLab->setText(tr("选择内部寄存器       "));
     }else{
+        ui->writeStack->setCurrentIndex(0);
+        ui->writeRegAddressLab->setText(tr("寄存器地址 0000-FFFF"));
+    }
+}
+
+void PropertyDialog::on_writeCheckBit_clicked(bool checked)
+{
+    if (checked){
         ui->writeBitAddress->setEnabled(true);
+        ui->writeValue->setRange(0,1);
+    }else{
+        ui->writeBitAddress->setEnabled(false);
+        ui->writeValue->setRange(0,65535);
+    }
+
+}
+
+
+void PropertyDialog::on_readAllBtn_clicked()
+{
+    if (ui->readAllBtn->text() == "全部取消"){
+        ui->readAllBtn->setText(tr("全部勾选"));
+        ui->readCk1->setChecked(false);
+        ui->readCk2->setChecked(false);
+        ui->readCk3->setChecked(false);
+        ui->readCk4->setChecked(false);
+        ui->readCk5->setChecked(false);
+        ui->readCk6->setChecked(false);
+        ui->readCk7->setChecked(false);
+        ui->readCk8->setChecked(false);
+        ui->readCk9->setChecked(false);
+    }else{
+        ui->readAllBtn->setText(tr("全部取消"));
+        ui->readCk1->setChecked(true);
+        ui->readCk2->setChecked(true);
+        ui->readCk3->setChecked(true);
+        ui->readCk4->setChecked(true);
+        ui->readCk5->setChecked(true);
+        ui->readCk6->setChecked(true);
+        ui->readCk7->setChecked(true);
+        ui->readCk8->setChecked(true);
+        ui->readCk9->setChecked(true);
+    }
+}
+
+void PropertyDialog::on_writeAllBtn_clicked()
+{
+    if (ui->writeAllBtn->text() == "全部取消"){
+        ui->writeAllBtn->setText(tr("全部勾选"));
+        ui->writeCk1->setChecked(false);
+        ui->writeCk2->setChecked(false);
+        ui->writeCk3->setChecked(false);
+        ui->writeCk4->setChecked(false);
+        ui->writeCk5->setChecked(false);
+        ui->writeCk6->setChecked(false);
+        ui->writeCk7->setChecked(false);
+        ui->writeCk8->setChecked(false);
+        ui->writeCk9->setChecked(false);
+    }else{
+        ui->writeAllBtn->setText(tr("全部取消"));
+        ui->writeCk1->setChecked(true);
+        ui->writeCk2->setChecked(true);
+        ui->writeCk3->setChecked(true);
+        ui->writeCk4->setChecked(true);
+        ui->writeCk5->setChecked(true);
+        ui->writeCk6->setChecked(true);
+        ui->writeCk7->setChecked(true);
+        ui->writeCk8->setChecked(true);
+        ui->writeCk9->setChecked(true);
+    }
+}
+
+
+void PropertyDialog::on_keyBoardCk_clicked(bool checked)
+{
+    if (checked){
+        ui->keyBoard->setEnabled(true);
+        ui->toolBox->setEnabled(true);
+    }else{
+        ui->keyBoard->setEnabled(false);
+        ui->toolBox->setEnabled(false);
+    }
+}
+
+
+void PropertyDialog::on_actionEnableCk_clicked(bool checked)
+{
+    if (checked){
+        ui->boxWrite->setEnabled(true);
+        ui->writeStack->setEnabled(true);
+        ui->pageWriteRegAddress->setEnabled(true);
+        ui->pageWriteRegInternal->setEnabled(true);
+        ui->writeRegAddress->setEnabled(true);
+        ui->writeRegInternal->setEnabled(true);
+    }else{
+        ui->boxWrite->setEnabled(false);
     }
 }

@@ -205,6 +205,8 @@ void Widget::initParament()
     m_WriteRegType = 0;
     m_WriteValueType = 0;
     m_WriteValue = 0;
+    m_IsBitReg = false;
+    m_WriteEnable = false;
 }
 
 void Widget::createContexMenu()
@@ -607,6 +609,26 @@ ushort Widget::getWriteRegAddress()
 void Widget::setWriteRegAddress(ushort value)
 {
     m_WriteRegAddress = value;
+}
+
+bool Widget::getIsBitReg()
+{
+    return m_IsBitReg;
+}
+
+void Widget::setIsBitReg(bool value)
+{
+    m_IsBitReg = value;
+}
+
+bool Widget::getWriteEnable()
+{
+    return m_WriteEnable;
+}
+
+void Widget::setWriteEnable(bool value)
+{
+    m_WriteEnable = value;
 }
 ushort Widget::getWriteBitAddress()
 {

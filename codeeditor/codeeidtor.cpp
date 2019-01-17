@@ -8,11 +8,14 @@ CodeEidtor::CodeEidtor(QWidget *parent) :
     setUtf8(true);  //支持中文
 
     setAutoCompletionSource(QsciScintilla::AcsAll);    //自动补全所以地方出现的
-    setAutoCompletionCaseSensitivity(true);   //设置自动补全大小写敏感
+    setAutoCompletionCaseSensitivity(false);   //设置自动补全大小写敏感
     setAutoCompletionThreshold(1);             //输入1字符就会出现自动补全的提示
     setAutoCompletionUseSingle(QsciScintilla::AcusNever);
     setCallTipsStyle(QsciScintilla::CallTipsContext);
-
+    setAutoCompletionFillupsEnabled(true);
+    //setCallTipsBackgroundColor();
+    //setCallTipsForegroundColor();
+    //setCallTipsHighlightColor();
 
 //    //whitespace
 //    setWhitespaceVisibility(QsciScintilla::WsInvisible);
@@ -40,7 +43,7 @@ CodeEidtor::CodeEidtor(QWidget *parent) :
     //setSelectionForegroundColor(QColor("#FFFFFF"));
 
     //设置括号匹配
-    setBraceMatching(QsciScintilla::SloppyBraceMatch);
+    setBraceMatching(QsciScintilla::SloppyBraceMatch);  //稀松匹配
     setMatchedBraceBackgroundColor(Qt::magenta);
 
     setMarginsArea();
@@ -56,6 +59,7 @@ void CodeEidtor::setCurrentFont(QFont font)
     QFontMetrics fm(font);
     int space = 10 + fm.width(QString::number(lines()));
     setMarginWidth(0, space);   //设置页边宽度
+
 }
 
 const QFont CodeEidtor::getCurrentFont()
@@ -77,6 +81,7 @@ void CodeEidtor::initLexer()
 {
     //词法分析器
     m_textLexer = new SciLexerLua(m_keyWords);
+
     setFont(QFont("Courier", 20, QFont::Normal));
     m_textLexer->setFont(font());
     setLexer(m_textLexer);

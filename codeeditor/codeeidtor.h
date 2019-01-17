@@ -29,7 +29,7 @@ private slots:
     void lineNumberChanged();
 public slots:
 private:
-    SciLexerLua *m_textLexer;
+    QsciLexer *m_textLexer;
     char m_keyWords[512];
 };
 

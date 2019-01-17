@@ -14,10 +14,10 @@ const char *SciLexerLua::keywords(int set) const
 {
     if(set == 1 || set == 3)
         return QsciLexerLua::keywords(set);
-    if(set == 5)
+    else
         return m_keywords;
         //下面是自定义的想要有特殊颜色的关键字
-        //"getData setData switchWindow";
+        //return "getData setData switchWindow";
 
 
 }

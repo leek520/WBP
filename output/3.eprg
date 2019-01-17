@@ -1,0 +1,290 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PLT date="2019-01-09 星期三 18:54">
+    <Window geometry="[(0,0)],800×480" Id="0" BkColor="#f0f0f0">
+        <Rect Rectangle="[(0,0)],800×375" LineColor="#000000" Radius="0" LineWidth="1" FillEnable="true" FillColor="#5baed3"/>
+        <Rect Rectangle="[(0,0)],398×380" LineColor="#000000" Radius="0" LineWidth="1" FillEnable="true" FillColor="#84c225"/>
+        <Rect Rectangle="[(0,376)],800×104" LineColor="#000000" Radius="0" LineWidth="1" FillEnable="true" FillColor="#82c699"/>
+        <Rect Rectangle="[(400,14)],273×54" LineColor="#000000" Radius="0" LineWidth="1" FillEnable="true" FillColor="#b6ddc7"/>
+        <Rect Rectangle="[(400,86)],273×54" LineColor="#000000" Radius="0" LineWidth="1" FillEnable="true" FillColor="#b6ddc7"/>
+        <Rect Rectangle="[(400,158)],273×54" LineColor="#000000" Radius="0" LineWidth="1" FillEnable="true" FillColor="#b6ddc7"/>
+        <Rect Rectangle="[(400,230)],273×54" LineColor="#000000" Radius="0" LineWidth="1" FillEnable="true" FillColor="#b6ddc7"/>
+        <Rect Rectangle="[(400,302)],273×54" LineColor="#000000" Radius="0" LineWidth="1" FillEnable="true" FillColor="#b6ddc7"/>
+        <Image BkImage="D:\2-Work\leek.project\WBP\123.bmp" ImagePos="(0,5)" ImageCompress="0"/>
+        <Button AlignV="2" BkDisableColor="#f0f0f0" TextRegAddress="0" geometry="[(686,14)],100×52" TextFont="2" Id="1000" LuaCmd="switchWindow(1)" TextMaxLen="0" BkPressColor="#f0f0f0" TextDotLen="0" BkColor="#ffff7f" TextType="0" TextTotLen="0" TextColor="#000000" AlignH="2">
+            <LAN0>
+                <String value="菜单"/>
+            </LAN0>
+            <LAN1>
+                <String value=""/>
+            </LAN1>
+        </Button>
+        <Button AlignV="2" BkDisableColor="#f0f0f0" TextRegAddress="0" geometry="[(686,86)],100×52" TextFont="2" Id="1001" LuaCmd="" TextMaxLen="0" BkPressColor="#f0f0f0" TextDotLen="0" BkColor="#ffff7f" TextType="0" TextTotLen="0" TextColor="#000000" AlignH="2">
+            <LAN0>
+                <String value="复位"/>
+            </LAN0>
+            <LAN1>
+                <String value=""/>
+            </LAN1>
+        </Button>
+        <Button AlignV="2" BkDisableColor="#f0f0f0" TextRegAddress="0" geometry="[(686,230)],100×52" TextFont="2" Id="1002" LuaCmd="" TextMaxLen="0" BkPressColor="#f0f0f0" TextDotLen="0" BkColor="#00ff00" TextType="0" TextTotLen="0" TextColor="#000000" AlignH="2">
+            <LAN0>
+                <String value="启动"/>
+            </LAN0>
+            <LAN1>
+                <String value=""/>
+            </LAN1>
+        </Button>
+        <Button AlignV="2" BkDisableColor="#f0f0f0" TextRegAddress="0" geometry="[(686,158)],100×52" TextFont="2" Id="1003" LuaCmd="" TextMaxLen="0" BkPressColor="#f0f0f0" TextDotLen="0" BkColor="#ffff7f" TextType="0" TextTotLen="0" TextColor="#000000" AlignH="2">
+            <LAN0>
+                <String value="加载"/>
+            </LAN0>
+            <LAN1>
+                <String value=""/>
+            </LAN1>
+        </Button>
+        <Button AlignV="2" BkDisableColor="#f0f0f0" TextRegAddress="0" geometry="[(686,302)],100×52" TextFont="2" Id="1004" LuaCmd="" TextMaxLen="0" BkPressColor="#f0f0f0" TextDotLen="0" BkColor="#ff0000" TextType="0" TextTotLen="0" TextColor="#000000" AlignH="2">
+            <LAN0>
+                <String value="停机"/>
+            </LAN0>
+            <LAN1>
+                <String value=""/>
+            </LAN1>
+        </Button>
+        <Text AlignV="2" TextRegAddress="0" geometry="[(411,21)],250×38" TextFont="2" Id="2000" TextMaxLen="0" TextDotLen="0" BkColor="#00f0f0f0" TextType="0" TextTotLen="0" TextColor="#000000" AlignH="0">
+            <LAN0>
+                <String value="压力:0000 Bar"/>
+            </LAN0>
+            <LAN1>
+                <String value=""/>
+            </LAN1>
+        </Text>
+        <Text AlignV="2" TextRegAddress="0" geometry="[(412,95)],250×38" TextFont="2" Id="2001" TextMaxLen="0" TextDotLen="0" BkColor="#00f0f0f0" TextType="0" TextTotLen="0" TextColor="#000000" AlignH="0">
+            <LAN0>
+                <String value="温度:0368 ℃"/>
+            </LAN0>
+            <LAN1>
+                <String value=""/>
+            </LAN1>
+        </Text>
+        <Text AlignV="2" TextRegAddress="0" geometry="[(412,164)],250×38" TextFont="2" Id="2002" TextMaxLen="0" TextDotLen="0" BkColor="#00f0f0f0" TextType="0" TextTotLen="0" TextColor="#000000" AlignH="0">
+            <LAN0>
+                <String value="频率:0000 Hz"/>
+            </LAN0>
+            <LAN1>
+                <String value=""/>
+            </LAN1>
+        </Text>
+        <Text AlignV="2" TextRegAddress="0" geometry="[(412,236)],250×38" TextFont="2" Id="2003" TextMaxLen="0" TextDotLen="0" BkColor="#00f0f0f0" TextType="0" TextTotLen="0" TextColor="#000000" AlignH="0">
+            <LAN0>
+                <String value="功率:0000 KW"/>
+            </LAN0>
+            <LAN1>
+                <String value=""/>
+            </LAN1>
+        </Text>
+        <Text AlignV="2" TextRegAddress="0" geometry="[(412,308)],250×38" TextFont="2" Id="2004" TextMaxLen="0" TextDotLen="0" BkColor="#00f0f0f0" TextType="0" TextTotLen="0" TextColor="#000000" AlignH="0">
+            <LAN0>
+                <String value="风机停止"/>
+            </LAN0>
+            <LAN1>
+                <String value=""/>
+            </LAN1>
+        </Text>
+        <Text AlignV="2" TextRegAddress="0" geometry="[(10,385)],160×38" TextFont="2" Id="2013" TextMaxLen="0" TextDotLen="0" BkColor="#00f0f0f0" TextType="0" TextTotLen="0" TextColor="#000000" AlignH="0">
+            <LAN0>
+                <String value="运行状态:"/>
+            </LAN0>
+            <LAN1>
+                <String value=""/>
+            </LAN1>
+        </Text>
+        <Text AlignV="2" TextRegAddress="0" geometry="[(170,385)],500×38" TextFont="2" Id="2014" TextMaxLen="0" TextDotLen="0" BkColor="#ff0000" TextType="0" TextTotLen="0" TextColor="#000000" AlignH="0">
+            <LAN0>
+                <String value="电压过高"/>
+            </LAN0>
+            <LAN1>
+                <String value=""/>
+            </LAN1>
+        </Text>
+        <Text AlignV="2" TextRegAddress="0" geometry="[(690,385)],100×38" TextFont="2" Id="2015" TextMaxLen="0" TextDotLen="0" BkColor="#00f0f0f0" TextType="0" TextTotLen="0" TextColor="#000000" AlignH="0">
+            <LAN0>
+                <String value="0001V"/>
+            </LAN0>
+            <LAN1>
+                <String value=""/>
+            </LAN1>
+        </Text>
+        <Text AlignV="2" TextRegAddress="0" geometry="[(10,432)],420×38" TextFont="2" Id="2017" TextMaxLen="0" TextDotLen="0" BkColor="#00f0f0f0" TextType="0" TextTotLen="0" TextColor="#000000" AlignH="0">
+            <LAN0>
+                <String value="运行总时间:000010:01:25"/>
+            </LAN0>
+            <LAN1>
+                <String value=""/>
+            </LAN1>
+        </Text>
+        <Text AlignV="2" TextRegAddress="0" geometry="[(438,432)],362×38" TextFont="2" Id="2016" TextMaxLen="0" TextDotLen="0" BkColor="#ffff00" TextType="0" TextTotLen="0" TextColor="#000000" AlignH="0">
+            <LAN0>
+                <String value="排气温度高"/>
+            </LAN0>
+            <LAN1>
+                <String value=""/>
+            </LAN1>
+        </Text>
+    </Window>
+    <Window geometry="[(0,0)],800×480" Id="1" BkColor="#5aaed5">
+        <Rect Rectangle="[(12,8)],783×397" LineColor="#ffffff" Radius="10" LineWidth="2" FillEnable="false" FillColor="#ffffff"/>
+        <Rect Rectangle="[(8,410)],787×62" LineColor="#000000" Radius="10" LineWidth="2" FillEnable="true" FillColor="#ffffff"/>
+        <Text AlignV="2" TextRegAddress="0" geometry="[(18,10)],350×50" TextFont="2" Id="2005" TextMaxLen="0" TextDotLen="0" BkColor="#00f0f0f0" TextType="0" TextTotLen="0" TextColor="#000000" AlignH="0">
+            <LAN0>
+                <String value="供气加载压力(BAR):"/>
+            </LAN0>
+            <LAN1>
+                <String value=""/>
+            </LAN1>
+        </Text>
+        <Text AlignV="2" TextRegAddress="0" geometry="[(18,60)],350×50" TextFont="2" Id="2006" TextMaxLen="0" TextDotLen="0" BkColor="#00f0f0f0" TextType="0" TextTotLen="0" TextColor="#000000" AlignH="0">
+            <LAN0>
+                <String value="供气卸载压力(BAR):"/>
+            </LAN0>
+            <LAN1>
+                <String value=""/>
+            </LAN1>
+        </Text>
+        <Text AlignV="2" TextRegAddress="0" geometry="[(18,110)],350×50" TextFont="2" Id="2007" TextMaxLen="0" TextDotLen="0" BkColor="#00f0f0f0" TextType="0" TextTotLen="0" TextColor="#000000" AlignH="0">
+            <LAN0>
+                <String value="风机启温度(℃):"/>
+            </LAN0>
+            <LAN1>
+                <String value=""/>
+            </LAN1>
+        </Text>
+        <Text AlignV="2" TextRegAddress="0" geometry="[(18,160)],350×50" TextFont="2" Id="2008" TextMaxLen="0" TextDotLen="0" BkColor="#00f0f0f0" TextType="0" TextTotLen="0" TextColor="#000000" AlignH="0">
+            <LAN0>
+                <String value="风机停温度(℃):"/>
+            </LAN0>
+            <LAN1>
+                <String value=""/>
+            </LAN1>
+        </Text>
+        <Text AlignV="2" TextRegAddress="0" geometry="[(18,210)],350×50" TextFont="2" Id="2009" TextMaxLen="0" TextDotLen="0" BkColor="#00f0f0f0" TextType="0" TextTotLen="0" TextColor="#000000" AlignH="0">
+            <LAN0>
+                <String value="主机启动延时(秒):"/>
+            </LAN0>
+            <LAN1>
+                <String value=""/>
+            </LAN1>
+        </Text>
+        <Text AlignV="2" TextRegAddress="0" geometry="[(18,260)],350×50" TextFont="2" Id="2010" TextMaxLen="0" TextDotLen="0" BkColor="#00f0f0f0" TextType="0" TextTotLen="0" TextColor="#000000" AlignH="0">
+            <LAN0>
+                <String value="风机启动延时(秒):"/>
+            </LAN0>
+            <LAN1>
+                <String value=""/>
+            </LAN1>
+        </Text>
+        <Text AlignV="2" TextRegAddress="0" geometry="[(18,310)],350×50" TextFont="2" Id="2011" TextMaxLen="0" TextDotLen="0" BkColor="#00f0f0f0" TextType="0" TextTotLen="0" TextColor="#000000" AlignH="0">
+            <LAN0>
+                <String value="星角延时(秒):"/>
+            </LAN0>
+            <LAN1>
+                <String value=""/>
+            </LAN1>
+        </Text>
+        <Text AlignV="2" TextRegAddress="0" geometry="[(18,360)],350×50" TextFont="2" Id="2012" TextMaxLen="0" TextDotLen="0" BkColor="#00f0f0f0" TextType="0" TextTotLen="0" TextColor="#000000" AlignH="0">
+            <LAN0>
+                <String value="加载延时(秒):"/>
+            </LAN0>
+            <LAN1>
+                <String value=""/>
+            </LAN1>
+        </Text>
+        <Edit AlignV="2" BkDisableColor="#000000" TextRegAddress="0" geometry="[(400,60)],120×35" TextFont="2" Id="3000" TextMaxLen="0" TextDotLen="0" BkColor="#f0f0f0" TextType="0" TextTotLen="0" TextColor="#000000" AlignH="2">
+            <LAN0>
+                <String value="0.500"/>
+            </LAN0>
+            <LAN1>
+                <String value=""/>
+            </LAN1>
+        </Edit>
+        <Edit AlignV="2" BkDisableColor="#000000" TextRegAddress="10" geometry="[(400,110)],120×35" TextFont="2" Id="3001" TextMaxLen="0" TextDotLen="0" BkColor="#f0f0f0" TextType="1" TextTotLen="0" TextColor="#5500ff" AlignH="2">
+            <LAN0>
+                <String value="0000"/>
+            </LAN0>
+            <LAN1>
+                <String value=""/>
+            </LAN1>
+        </Edit>
+        <Edit AlignV="2" BkDisableColor="#000000" TextRegAddress="0" geometry="[(400,210)],120×35" TextFont="2" Id="3002" TextMaxLen="0" TextDotLen="0" BkColor="#f0f0f0" TextType="0" TextTotLen="0" TextColor="#000000" AlignH="2">
+            <LAN0>
+                <String value="0010"/>
+            </LAN0>
+            <LAN1>
+                <String value=""/>
+            </LAN1>
+        </Edit>
+        <Edit AlignV="2" BkDisableColor="#000000" TextRegAddress="0" geometry="[(400,360)],120×35" TextFont="2" Id="3003" TextMaxLen="0" TextDotLen="0" BkColor="#f0f0f0" TextType="0" TextTotLen="0" TextColor="#000000" AlignH="2">
+            <LAN0>
+                <String value="0010"/>
+            </LAN0>
+            <LAN1>
+                <String value=""/>
+            </LAN1>
+        </Edit>
+        <Edit AlignV="2" BkDisableColor="#000000" TextRegAddress="0" geometry="[(400,310)],120×35" TextFont="2" Id="3004" TextMaxLen="0" TextDotLen="0" BkColor="#f0f0f0" TextType="0" TextTotLen="0" TextColor="#000000" AlignH="2">
+            <LAN0>
+                <String value="0006"/>
+            </LAN0>
+            <LAN1>
+                <String value=""/>
+            </LAN1>
+        </Edit>
+        <Edit AlignV="2" BkDisableColor="#000000" TextRegAddress="0" geometry="[(400,160)],120×35" TextFont="2" Id="3005" TextMaxLen="0" TextDotLen="0" BkColor="#f0f0f0" TextType="0" TextTotLen="0" TextColor="#000000" AlignH="2">
+            <LAN0>
+                <String value="0070"/>
+            </LAN0>
+            <LAN1>
+                <String value=""/>
+            </LAN1>
+        </Edit>
+        <Edit AlignV="2" BkDisableColor="#000000" TextRegAddress="0" geometry="[(400,260)],120×35" TextFont="2" Id="3006" TextMaxLen="0" TextDotLen="0" BkColor="#f0f0f0" TextType="0" TextTotLen="0" TextColor="#000000" AlignH="2">
+            <LAN0>
+                <String value="0008"/>
+            </LAN0>
+            <LAN1>
+                <String value=""/>
+            </LAN1>
+        </Edit>
+        <Edit AlignV="2" BkDisableColor="#000000" TextRegAddress="0" geometry="[(400,10)],120×35" TextFont="2" Id="3007" TextMaxLen="0" TextDotLen="0" BkColor="#f0f0f0" TextType="0" TextTotLen="0" TextColor="#000000" AlignH="2">
+            <LAN0>
+                <String value="0499"/>
+            </LAN0>
+            <LAN1>
+                <String value=""/>
+            </LAN1>
+        </Edit>
+        <Button AlignV="2" BkDisableColor="#f0f0f0" TextRegAddress="0" geometry="[(50,415)],150×50" TextFont="2" Id="1005" LuaCmd="a=getData(10)&#xa;a=a-1&#xa;setData(10,a)" TextMaxLen="0" BkPressColor="#f0f0f0" TextDotLen="0" BkColor="#f0f0f0" TextType="0" TextTotLen="0" TextColor="#000000" AlignH="2">
+            <LAN0>
+                <String value="上一页"/>
+            </LAN0>
+            <LAN1>
+                <String value=""/>
+            </LAN1>
+        </Button>
+        <Button AlignV="2" BkDisableColor="#f0f0f0" TextRegAddress="0" geometry="[(325,415)],150×50" TextFont="2" Id="1006" LuaCmd="a=getData(10)&#xa;a=a+1&#xa;setData(10,a)&#xa;" TextMaxLen="0" BkPressColor="#f0f0f0" TextDotLen="0" BkColor="#f0f0f0" TextType="0" TextTotLen="0" TextColor="#000000" AlignH="2">
+            <LAN0>
+                <String value="下一页"/>
+            </LAN0>
+            <LAN1>
+                <String value=""/>
+            </LAN1>
+        </Button>
+        <Button AlignV="2" BkDisableColor="#f0f0f0" TextRegAddress="0" geometry="[(600,415)],150×50" TextFont="2" Id="1007" LuaCmd="switchWindow(0)" TextMaxLen="0" BkPressColor="#f0f0f0" TextDotLen="0" BkColor="#f0f0f0" TextType="0" TextTotLen="0" TextColor="#000000" AlignH="2">
+            <LAN0>
+                <String value="返回"/>
+            </LAN0>
+            <LAN1>
+                <String value=""/>
+            </LAN1>
+        </Button>
+    </Window>
+</PLT>

@@ -9,7 +9,9 @@ QEditor::QEditor(QWidget *parent) :
     ui->setupUi(this);
     //setWindowModality(Qt::ApplicationModal);
 
-    ui->tableWidget->setSelectionMode (QAbstractItemView::SingleSelection); //设置选择模式，选择单行
+    ui->tableWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
+    ui->tableWidget->setSelectionMode(QAbstractItemView::SingleSelection); //设置选择模式，选择单行
+    ui->tableWidget->setColumnWidth(0, 120);
     ui->output->setColumnWidth(0, 40);
     ui->output->verticalHeader()->setDefaultSectionSize(20);
     ui->output->setShowGrid(false);
@@ -26,11 +28,11 @@ QEditor::QEditor(QWidget *parent) :
 
     L = openLua();
 
-    addUserKeyWords();
+    //addUserKeyWords();
     ui->codeEditor->initLexer();
 
-    ui->regType->addItems(PV->getEnumProperty("WriteRegType"));
     ui->triggerType->addItems(PV->getEnumProperty("TriggerType"));
+    ui->regAddress->setRange(0, VAR_BUF_LEN);
 }
 
 QEditor::~QEditor()
@@ -46,17 +48,20 @@ QList<QEditor::Macro> *QEditor::getMacroList()
 
 void QEditor::showEditor()
 {
-    if (ui->tableWidget->rowCount() != m_macroList.count()){
-        ui->tableWidget->setRowCount(m_macroList.count());
-        for(int i=0;i<m_macroList.count();i++){
-            QTableWidgetItem *item = new QTableWidgetItem(m_macroList[i].name);
-            item->setCheckState((m_macroList[i].isUsed==0?(Qt::Unchecked):(Qt::Checked)));
-            ui->tableWidget->setItem(i, 0, item);
-            ui->tableWidget->setCurrentCell(0,0);
+    if (0 != m_macroList.count()){
+        if (ui->tableWidget->rowCount() != m_macroList.count()){
+            ui->tableWidget->setRowCount(m_macroList.count());
+            for(int i=0;i<m_macroList.count();i++){
+                QTableWidgetItem *item = new QTableWidgetItem(m_macroList[i].name);
+                item->setCheckState((m_macroList[i].isUsed==0?(Qt::Unchecked):(Qt::Checked)));
+                ui->tableWidget->setItem(i, 0, item);
+                ui->tableWidget->setCurrentCell(0,0);
+            }
         }
+        openItem(ui->tableWidget->currentRow());
     }
-    openItem(ui->tableWidget->currentRow());
     show();
+    raise();
 }
 
 void QEditor::currentChanged(int currentRow, int currentColumn, int previousRow, int previousColumn)
@@ -73,9 +78,13 @@ void QEditor::currentChanged(int currentRow, int currentColumn, int previousRow,
 
 void QEditor::itemChanged(QTableWidgetItem *item)
 {
-    int row = item->row();
-    m_macroList[row].isUsed = item->checkState();
-    m_macroList[row].name = item->text();
+    if (item->column() == 0){
+        int row = item->row();
+        m_macroList[row].isUsed = item->checkState();
+        m_macroList[row].name = item->text();
+    }else{
+
+    }
 
 }
 
@@ -88,6 +97,7 @@ void QEditor::outputCellClicked(int row, int col)
 
 void QEditor::saveItem(int row)
 {
+    if (0 == m_macroList.count()) return;
     if (row >= m_macroList.count()) return;
     QTableWidgetItem *item = ui->tableWidget->item(row, 0);
     m_macroList[row].isUsed = item->checkState();
@@ -96,7 +106,7 @@ void QEditor::saveItem(int row)
     m_macroList[row].mark = "";
     m_macroList[row].regAddress = ui->regAddress->value();
     m_macroList[row].bitAddress = ui->bitAddress->value();
-    m_macroList[row].regType = ui->regType->currentIndex();
+    m_macroList[row].regType = ui->bitCheck->isChecked();
     m_macroList[row].tirggerType = ui->triggerType->currentIndex();
 }
 
@@ -106,10 +116,11 @@ void QEditor::openItem(int row)
     ui->codeEditor->setText(m_macroList[row].content);
     ui->regAddress->setValue(m_macroList[row].regAddress);
     ui->bitAddress->setValue(m_macroList[row].bitAddress);
-    ui->regType->setCurrentIndex(m_macroList[row].regType);
+    ui->bitCheck->setChecked(m_macroList[row].regType);
     ui->triggerType->setCurrentIndex(m_macroList[row].tirggerType);
     ui->tableWidget->item(row, 0)->setCheckState((m_macroList[row].isUsed==0?(Qt::Unchecked):(Qt::Checked)));
     ui->tableWidget->item(row, 0)->setText(m_macroList[row].name);
+    ui->tableWidget->item(row, 1)->setText(triggerString(m_macroList[row]));
 }
 
 void QEditor::addUserKeyWords()
@@ -152,27 +163,30 @@ void QEditor::on_action_New_triggered()
     newMacro.bitAddress = 0;
     newMacro.regType = 0;
     newMacro.tirggerType = 0;
-    newMacro.name = "new macro";
-    newMacro.isUsed = true;
+    newMacro.name = QString("macro%1").arg(index);
+    newMacro.isUsed = false;
     newMacro.mark = "";
     m_macroList.append(newMacro);
 
-    QTableWidgetItem *item = new QTableWidgetItem(newMacro.name);
+
+    QTableWidgetItem * item = new QTableWidgetItem(triggerString(newMacro));
+    item->setFlags(item->flags() & (~Qt::ItemIsEditable));
+    ui->tableWidget->setItem(index, 1, item);
+
+    item = new QTableWidgetItem(newMacro.name);
     item->setCheckState(Qt::Checked);
     item->setFlags(item->flags() | Qt::ItemIsUserCheckable);
     ui->tableWidget->setItem(index, 0, item);
-    ui->tableWidget->setCurrentCell(index, 0);
-}
+    ui->tableWidget->setCurrentItem(item);
 
-void QEditor::on_regType_currentIndexChanged(int index)
+    on_bitCheck_clicked(false);
+}
+void QEditor::on_action_Delete_triggered()
 {
-    if (index == 0){
-        ui->bitAddress->setEnabled(false);
-    }else{
-        ui->bitAddress->setEnabled(true);
-    }
+    int index = ui->tableWidget->currentRow();
+    ui->tableWidget->removeRow(index);
+    m_macroList.removeAt(index);
 }
-
 void QEditor::closeEvent(QCloseEvent *event)
 {
     saveItem(ui->tableWidget->currentRow());
@@ -264,7 +278,58 @@ int QEditor::syntaxCheck(QString &in, QString &out, bool execute)
     return line;
 }
 
+QString QEditor::triggerString(const QEditor::Macro &macro)
+{
+    QString str;
+    if (macro.regType == 0){
+        str = QString("Reg %1 == %2")
+                .arg(macro.regAddress)
+                .arg(macro.tirggerType);
+    }else{
+        str = QString("Reg %1_%2 == %3")
+                .arg(macro.regAddress)
+                .arg(macro.bitAddress)
+                .arg(macro.tirggerType);
+    }
+    return str;
+}
+
 void QEditor::on_action_Clear_triggered()
 {
     ui->output->clearContents();
 }
+
+void QEditor::on_bitCheck_clicked(bool checked)
+{
+    if (checked){
+        ui->bitAddress->setEnabled(true);
+    }else{
+        ui->bitAddress->setEnabled(false);
+    }
+    int idx = ui->tableWidget->currentRow();
+    m_macroList[idx].regType = checked;
+    openItem(idx);
+}
+
+void QEditor::on_regAddress_editingFinished()
+{
+    int idx = ui->tableWidget->currentRow();
+    m_macroList[idx].regAddress = ui->regAddress->value();
+    openItem(idx);
+}
+
+void QEditor::on_bitAddress_editingFinished()
+{
+    int idx = ui->tableWidget->currentRow();
+    m_macroList[idx].bitAddress = ui->bitAddress->value();
+    openItem(idx);
+}
+
+void QEditor::on_triggerType_currentIndexChanged(int index)
+{
+    int idx = ui->tableWidget->currentRow();
+    m_macroList[idx].tirggerType = index;
+    openItem(idx);
+}
+
+

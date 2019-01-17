@@ -30,7 +30,7 @@
       </font>
      </property>
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="tabBase">
       <attribute name="title">
@@ -48,7 +48,7 @@
           <number>0</number>
          </property>
          <widget class="QWidget" name="pWidget">
-          <layout class="QVBoxLayout" name="verticalLayout_4" stretch="1,3,6">
+          <layout class="QVBoxLayout" name="verticalLayout_4">
            <item>
             <layout class="QHBoxLayout" name="IdLayout">
              <item>
@@ -137,18 +137,13 @@
             </widget>
            </item>
            <item>
-            <widget class="QGroupBox" name="boxWrite">
-             <property name="font">
-              <font>
-               <pointsize>12</pointsize>
-              </font>
-             </property>
+            <widget class="QGroupBox" name="boxPage">
              <property name="title">
-              <string>写入寄存器</string>
+              <string>页面属性</string>
              </property>
-             <layout class="QGridLayout" name="gridLayout_6">
-              <item row="6" column="1">
-               <widget class="QSpinBox" name="writeValue">
+             <layout class="QGridLayout" name="gridLayout_7">
+              <item row="0" column="1">
+               <widget class="QSpinBox" name="pageTimer">
                 <property name="minimumSize">
                  <size>
                   <width>0</width>
@@ -161,109 +156,34 @@
                  </font>
                 </property>
                 <property name="minimum">
-                 <number>-100</number>
+                 <number>100</number>
                 </property>
-               </widget>
-              </item>
-              <item row="6" column="0">
-               <widget class="QComboBox" name="writeValueType">
-                <property name="minimumSize">
-                 <size>
-                  <width>0</width>
-                  <height>30</height>
-                 </size>
-                </property>
-                <property name="font">
-                 <font>
-                  <pointsize>12</pointsize>
-                 </font>
+                <property name="maximum">
+                 <number>1000000000</number>
                 </property>
                </widget>
               </item>
               <item row="2" column="0">
-               <widget class="QLabel" name="label_7">
+               <widget class="QCheckBox" name="checkPermanent">
                 <property name="font">
                  <font>
                   <pointsize>12</pointsize>
                  </font>
                 </property>
                 <property name="text">
-                 <string>位地址     00-15</string>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="0">
-               <widget class="QLabel" name="label_6">
-                <property name="font">
-                 <font>
-                  <pointsize>12</pointsize>
-                 </font>
-                </property>
-                <property name="text">
-                 <string>寄存器地址 0000-FFFF</string>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="1">
-               <widget class="QSpinBox" name="writeRegAddress">
-                <property name="minimumSize">
-                 <size>
-                  <width>0</width>
-                  <height>30</height>
-                 </size>
-                </property>
-                <property name="font">
-                 <font>
-                  <pointsize>12</pointsize>
-                 </font>
-                </property>
-                <property name="maximum">
-                 <number>65535</number>
-                </property>
-               </widget>
-              </item>
-              <item row="2" column="1">
-               <widget class="QSpinBox" name="writeBitAddress">
-                <property name="minimumSize">
-                 <size>
-                  <width>0</width>
-                  <height>30</height>
-                 </size>
-                </property>
-                <property name="font">
-                 <font>
-                  <pointsize>12</pointsize>
-                 </font>
-                </property>
-                <property name="maximum">
-                 <number>15</number>
+                 <string>是否常驻内存</string>
                 </property>
                </widget>
               </item>
               <item row="0" column="0">
-               <widget class="QLabel" name="label_8">
+               <widget class="QCheckBox" name="pageTimerCk">
                 <property name="font">
                  <font>
                   <pointsize>12</pointsize>
                  </font>
                 </property>
                 <property name="text">
-                 <string>操作寄存器类型</string>
-                </property>
-               </widget>
-              </item>
-              <item row="0" column="1">
-               <widget class="QComboBox" name="writeRegType">
-                <property name="minimumSize">
-                 <size>
-                  <width>0</width>
-                  <height>30</height>
-                 </size>
-                </property>
-                <property name="font">
-                 <font>
-                  <pointsize>12</pointsize>
-                 </font>
+                 <string>页面刷新周期</string>
                 </property>
                </widget>
               </item>
@@ -299,12 +219,12 @@
             <rect>
              <x>140</x>
              <y>160</y>
-             <width>54</width>
-             <height>12</height>
+             <width>141</width>
+             <height>16</height>
             </rect>
            </property>
            <property name="text">
-            <string>TextLabel</string>
+            <string>line</string>
            </property>
           </widget>
          </widget>
@@ -625,11 +545,577 @@
        </item>
       </layout>
      </widget>
+     <widget class="QWidget" name="tabSecurity">
+      <attribute name="title">
+       <string>安全属性</string>
+      </attribute>
+      <layout class="QGridLayout" name="gridLayout_10">
+       <property name="verticalSpacing">
+        <number>20</number>
+       </property>
+       <item row="0" column="0">
+        <widget class="QCheckBox" name="keyBoardCk">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>30</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="font">
+          <font>
+           <pointsize>12</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>启用键盘</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <widget class="QComboBox" name="keyBoard">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>30</height>
+          </size>
+         </property>
+         <property name="font">
+          <font>
+           <pointsize>12</pointsize>
+          </font>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0" colspan="2">
+        <widget class="QToolBox" name="toolBox">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="font">
+          <font>
+           <pointsize>12</pointsize>
+          </font>
+         </property>
+         <property name="currentIndex">
+          <number>0</number>
+         </property>
+         <widget class="QWidget" name="safePageRead">
+          <property name="geometry">
+           <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>486</width>
+            <height>259</height>
+           </rect>
+          </property>
+          <attribute name="label">
+           <string>查看权限</string>
+          </attribute>
+          <layout class="QHBoxLayout" name="horizontalLayout" stretch="4,1">
+           <item>
+            <widget class="QGroupBox" name="groupBox_2">
+             <property name="title">
+              <string/>
+             </property>
+             <layout class="QGridLayout" name="gridLayout_8">
+              <item row="1" column="0">
+               <widget class="QCheckBox" name="readCk4">
+                <property name="text">
+                 <string>密码4</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="2">
+               <widget class="QCheckBox" name="readCk3">
+                <property name="text">
+                 <string>密码3</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="0">
+               <widget class="QCheckBox" name="readCk1">
+                <property name="text">
+                 <string>密码1</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="1">
+               <widget class="QCheckBox" name="readCk2">
+                <property name="text">
+                 <string>密码2</string>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="2">
+               <widget class="QCheckBox" name="readCk9">
+                <property name="text">
+                 <string>密码9</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="2">
+               <widget class="QCheckBox" name="readCk6">
+                <property name="text">
+                 <string>密码6</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="1">
+               <widget class="QCheckBox" name="readCk5">
+                <property name="text">
+                 <string>密码5</string>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="0">
+               <widget class="QCheckBox" name="readCk7">
+                <property name="text">
+                 <string>密码7</string>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="1">
+               <widget class="QCheckBox" name="readCk8">
+                <property name="text">
+                 <string>密码8</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item>
+            <layout class="QVBoxLayout" name="verticalLayout_6" stretch="0,0,0">
+             <item>
+              <widget class="QLabel" name="label_6">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="text">
+                <string>无权限时显示</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLineEdit" name="lineEdit">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="text">
+                <string>******</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignCenter</set>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QPushButton" name="readAllBtn">
+               <property name="text">
+                <string>全部勾选</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+          </layout>
+         </widget>
+         <widget class="QWidget" name="safePageWirte">
+          <property name="geometry">
+           <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>486</width>
+            <height>259</height>
+           </rect>
+          </property>
+          <attribute name="label">
+           <string>修改权限</string>
+          </attribute>
+          <layout class="QHBoxLayout" name="horizontalLayout_9" stretch="4,1">
+           <item>
+            <widget class="QGroupBox" name="groupBox_3">
+             <property name="title">
+              <string/>
+             </property>
+             <layout class="QGridLayout" name="gridLayout_9">
+              <item row="0" column="0">
+               <widget class="QCheckBox" name="writeCk1">
+                <property name="text">
+                 <string>密码1</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="1">
+               <widget class="QCheckBox" name="writeCk2">
+                <property name="text">
+                 <string>密码2</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="2">
+               <widget class="QCheckBox" name="writeCk3">
+                <property name="text">
+                 <string>密码3</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="0">
+               <widget class="QCheckBox" name="writeCk4">
+                <property name="text">
+                 <string>密码4</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="1">
+               <widget class="QCheckBox" name="writeCk5">
+                <property name="text">
+                 <string>密码5</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="2">
+               <widget class="QCheckBox" name="writeCk6">
+                <property name="text">
+                 <string>密码6</string>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="0">
+               <widget class="QCheckBox" name="writeCk7">
+                <property name="text">
+                 <string>密码7</string>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="1">
+               <widget class="QCheckBox" name="writeCk8">
+                <property name="text">
+                 <string>密码8</string>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="2">
+               <widget class="QCheckBox" name="writeCk9">
+                <property name="text">
+                 <string>密码9</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item>
+            <layout class="QVBoxLayout" name="verticalLayout_7" stretch="0,0,1">
+             <item>
+              <widget class="QLabel" name="label_7">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="text">
+                <string/>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="label_9">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="text">
+                <string/>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QPushButton" name="writeAllBtn">
+               <property name="text">
+                <string>全部勾选</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+          </layout>
+         </widget>
+        </widget>
+       </item>
+      </layout>
+     </widget>
      <widget class="QWidget" name="tabAction">
       <attribute name="title">
        <string>动作属性</string>
       </attribute>
-      <layout class="QHBoxLayout" name="horizontalLayout"/>
+      <layout class="QGridLayout" name="gridLayout_11" rowstretch="1,3">
+       <item row="0" column="0">
+        <widget class="QCheckBox" name="actionEnableCk">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="text">
+          <string> 使能</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QGroupBox" name="boxWrite">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="font">
+          <font>
+           <pointsize>12</pointsize>
+          </font>
+         </property>
+         <property name="title">
+          <string>写入寄存器</string>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_6" rowstretch="0,0,0,0,0,0" rowminimumheight="0,0,0,0,0,0" columnminimumwidth="1,1">
+          <item row="4" column="1">
+           <widget class="QSpinBox" name="writeBitAddress">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>30</height>
+             </size>
+            </property>
+            <property name="font">
+             <font>
+              <pointsize>12</pointsize>
+             </font>
+            </property>
+            <property name="maximum">
+             <number>15</number>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="1">
+           <widget class="QSpinBox" name="writeValue">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>30</height>
+             </size>
+            </property>
+            <property name="font">
+             <font>
+              <pointsize>12</pointsize>
+             </font>
+            </property>
+            <property name="minimum">
+             <number>0</number>
+            </property>
+            <property name="maximum">
+             <number>65535</number>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="writeRegAddressLab">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="font">
+             <font>
+              <pointsize>12</pointsize>
+             </font>
+            </property>
+            <property name="text">
+             <string>寄存器地址 0000-FFFF</string>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="0">
+           <widget class="QComboBox" name="writeValueType">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>30</height>
+             </size>
+            </property>
+            <property name="font">
+             <font>
+              <pointsize>12</pointsize>
+             </font>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QComboBox" name="writeRegType">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>30</height>
+             </size>
+            </property>
+            <property name="font">
+             <font>
+              <pointsize>12</pointsize>
+             </font>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="0">
+           <widget class="QCheckBox" name="writeCheckBit">
+            <property name="text">
+             <string>位地址     00-15</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0">
+           <widget class="QLabel" name="label_8">
+            <property name="font">
+             <font>
+              <pointsize>12</pointsize>
+             </font>
+            </property>
+            <property name="text">
+             <string>操作寄存器类型</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QStackedWidget" name="writeStack">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="currentIndex">
+             <number>1</number>
+            </property>
+            <widget class="QWidget" name="pageWriteRegAddress">
+             <layout class="QHBoxLayout" name="horizontalLayout_7">
+              <property name="spacing">
+               <number>0</number>
+              </property>
+              <property name="leftMargin">
+               <number>0</number>
+              </property>
+              <property name="topMargin">
+               <number>0</number>
+              </property>
+              <property name="rightMargin">
+               <number>0</number>
+              </property>
+              <property name="bottomMargin">
+               <number>0</number>
+              </property>
+              <item>
+               <widget class="QSpinBox" name="writeRegAddress">
+                <property name="minimumSize">
+                 <size>
+                  <width>0</width>
+                  <height>30</height>
+                 </size>
+                </property>
+                <property name="font">
+                 <font>
+                  <pointsize>12</pointsize>
+                 </font>
+                </property>
+                <property name="maximum">
+                 <number>15</number>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+            <widget class="QWidget" name="pageWriteRegInternal">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
+             <layout class="QHBoxLayout" name="horizontalLayout_6">
+              <property name="spacing">
+               <number>0</number>
+              </property>
+              <property name="leftMargin">
+               <number>0</number>
+              </property>
+              <property name="topMargin">
+               <number>0</number>
+              </property>
+              <property name="rightMargin">
+               <number>0</number>
+              </property>
+              <property name="bottomMargin">
+               <number>0</number>
+              </property>
+              <item>
+               <widget class="QComboBox" name="writeRegInternal">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
+                <property name="minimumSize">
+                 <size>
+                  <width>0</width>
+                  <height>30</height>
+                 </size>
+                </property>
+                <property name="font">
+                 <font>
+                  <pointsize>12</pointsize>
+                 </font>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+      </layout>
      </widget>
     </widget>
    </item>

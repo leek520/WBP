@@ -112,6 +112,12 @@ typedef enum _eRegType
     F32,
     D64,
 }RegType;
+typedef enum _eInterReg
+{
+    PageReg=0,
+
+    InterRegEnd=10,
+}InterReg;
 typedef struct {
   uchar XSize;
   uchar XDist;
@@ -178,10 +184,11 @@ typedef struct _tTextPara
 }TextPara;
 typedef struct _tOptRegPara
 {
+    uchar enable;
+    uchar regType;
     ushort regAddress;
     uchar bitAddress;
-    uchar regType;
-    ushort valueType;
+    uchar valueType;
     ushort value;
 }OptRegPara;    //2bytes
 typedef struct {
@@ -221,8 +228,8 @@ typedef struct {
 }GraphInfo;
 typedef struct _tTimerPara
 {
-        ushort Id;
-        ushort time;	//ms
+    ushort Id;
+    ushort time;	//ms
 }TimerPara;
 /*********´°ÌåÐÅÏ¢½á¹¹************/
 typedef struct _tWindowInfo
@@ -264,7 +271,8 @@ typedef struct _tMacroInfo
 {
     struct list_head list;
     OptRegPara optReg;
-    char *content;
+    char *name;
+    char *content;  
 }MacroInfo;
 
 /************双向循环链表*************/

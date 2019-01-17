@@ -39,15 +39,24 @@ private slots:
     void addUserKeyWords();
     void insertRecordToOutput(int row, QString key, QString value);
     int syntaxCheck(QString &in, QString &out, bool execute);
-
+    QString triggerString(const Macro &macro);
     void on_action_Font_triggered();
 
     void on_action_New_triggered();
 
-    void on_regType_currentIndexChanged(int index);
     void on_action_Build_triggered();
 
     void on_action_Clear_triggered();
+
+    void on_bitCheck_clicked(bool checked);
+
+    void on_regAddress_editingFinished();
+
+    void on_bitAddress_editingFinished();
+
+    void on_triggerType_currentIndexChanged(int index);
+
+    void on_action_Delete_triggered();
 
 protected:
     void closeEvent(QCloseEvent *event);

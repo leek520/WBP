@@ -43,6 +43,7 @@ private:
     WindowInfo *setWidgetInfo(Widget *w, struct list_head *head, int *pos, int start);
     void setBaseInfo(Widget *w, BasePara *base);
     void setTextInfo(Widget *w, TextPara *text);
+    void setOptRegInfo(Widget *w, OptRegPara *optReg);
     void recordUsedChar();
     void modifyAddressInfo(struct list_head *head, int offset);
 private slots:

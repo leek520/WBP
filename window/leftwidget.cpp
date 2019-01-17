@@ -3,6 +3,7 @@
 LeftWidget::LeftWidget(QWidget *parent) :
     QWidget(parent)
 {
+
     QSplitter *splitter = new QSplitter(Qt::Vertical, this); //新建主分割窗口，水平分割
     QVBoxLayout *layout = new QVBoxLayout(this);
     layout->addWidget(splitter);
@@ -33,6 +34,7 @@ void LeftWidget::setInit()
 void LeftWidget::addWidget(Widget *w)
 {
     //添加
+    QFont font("Times", 10, QFont::Normal);
     int type = w->getType();
     QString name = QString("%1").arg(EnumToStr(type));
     QString id = QString("%1").arg(w->getId());
@@ -41,6 +43,8 @@ void LeftWidget::addWidget(Widget *w)
     case Window:
     {
         QTreeWidgetItem *win = new QTreeWidgetItem(m_objectTree, QStringList(name)); //添加子节点
+        win->setFont(0, font);
+        win->setFont(1, font);
         win->setIcon(0, QIcon(QString(":/%1").arg(name.toLower())));
         win->setText(1, id);
         win->setData(0, Qt::UserRole, value);
@@ -56,6 +60,8 @@ void LeftWidget::addWidget(Widget *w)
     case Circle:
     {
         QTreeWidgetItem *child = new QTreeWidgetItem(m_curWinItem, QStringList(name)); //添加子节点
+        child->setFont(0, font);
+        child->setFont(1, font);
         child->setIcon(0, QIcon(QString(":/%1").arg(name.toLower())));
         child->setText(1, id);
         child->setData(0, Qt::UserRole, value);

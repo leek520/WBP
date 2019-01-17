@@ -5,7 +5,6 @@
 #-------------------------------------------------
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-
 INCLUDEPATH += $$PWD
 DEPENDPATH += $$PWD
 
@@ -16,19 +15,17 @@ SOURCES += \
         $$PWD/scilexerlua.cpp \
         $$PWD/sciapislua.cpp \
         $$PWD/qeditor.cpp \
-    $$PWD/luafun.cpp
+        $$PWD/luafun.cpp
 
 HEADERS  += \
         $$PWD/codeeidtor.h \
         $$PWD/scilexerlua.h \
         $$PWD/sciapislua.h \
         $$PWD/qeditor.h \
-    $$PWD/luafun.h
+        $$PWD/luafun.h
 
 FORMS   += \
         $$PWD/qeditor.ui
-
-RESOURCES += $$PWD/resources.qrc
 
 win32:CONFIG(release, debug|release): LIBS += -lqscintilla2
 else:win32:CONFIG(debug, debug|release): LIBS += -lqscintilla2d
@@ -37,5 +34,7 @@ else:unix: LIBS += -lqscintilla2
 win32:CONFIG(release, debug|release): LIBS += -lqscintilla2
 else:win32:CONFIG(debug, debug|release): LIBS +=  -lqscintilla2d
 else:unix: LIBS += -lqscintilla2
+
+RESOURCES += $$PWD/resources.qrc
 
 
