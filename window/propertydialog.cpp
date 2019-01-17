@@ -236,7 +236,7 @@ void PropertyDialog::getProperty()
     ui->baseId->setValue(m_widget->getId());
     ui->baseBkColor->setStyleSheet(QString("background-color: #%1;")
                                    .arg(QString::number(m_widget->getBkColor().rgba(), 16)));
-
+    ui->PermanentCk->setChecked(m_widget->getPermanent());
     /*text*/
     ui->textColor->setStyleSheet(QString("background-color: #%1;")
                                 .arg(QString::number(m_widget->getTextColor().rgba(), 16)));
@@ -278,6 +278,7 @@ void PropertyDialog::setProperty()
     m_widget->setWriteValueType(ui->writeValueType->currentIndex());
     m_widget->setWriteValue(ui->writeValue->value());
 
+    m_widget->setPermanent(ui->PermanentCk->isChecked());
     /*text*/
     m_widget->setTextFont(ui->textFont->currentIndex());
     m_widget->setTextRegAddress(ui->textRegAddress->value());

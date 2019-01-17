@@ -91,6 +91,7 @@ class Widget : public QWidget
     Q_PROPERTY(ushort WriteValueType READ getWriteValueType WRITE setWriteValueType)
     Q_PROPERTY(int WriteValue READ getWriteValue WRITE setWriteValue)
 
+    Q_PROPERTY(bool   Permanent READ getPermanent WRITE setPermanent)
     Q_PROPERTY(QVariant BkColor1 READ getBkColor1 WRITE setBkColor1)
 public:
     explicit Widget(QWidget *parent = 0);
@@ -237,6 +238,12 @@ public:
     int getWriteValue();
     void setWriteValue(int value);
 
+
+    bool getPermanent();
+    void setPermanent(bool value);
+
+
+
     QVariant getBkColor1();
     void virtual setBkColor1(QVariant bkColor);
 protected:
@@ -284,6 +291,8 @@ protected:
     int m_WriteValue;
     bool m_IsBitReg;
     bool m_WriteEnable;
+
+    bool m_Permanent;
 };
 
 #endif // WIDGET_H

@@ -237,6 +237,8 @@ typedef struct _tWindowInfo
     BasePara base;
     int BkColor[1];
     TimerPara timer;
+    uchar permanent;
+    uchar resv[3];
     struct list_head childList;
     struct list_head imageList;
     struct list_head graphList;

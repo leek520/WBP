@@ -26,6 +26,8 @@ void WindowWidget::initPropertyTable()
     m_propTable << qMakePair(QVariant::Int, QString("Id"));
     m_propTable << qMakePair(QVariant::Rect, QString("geometry"));
     m_propTable << qMakePair(QVariant::Color, QString("BkColor"));
+    m_propTable << qMakePair(QVariant::Color, QString("Permanent"));
+
 }
 
 void WindowWidget::initParament()
@@ -33,6 +35,12 @@ void WindowWidget::initParament()
     m_Type = Window;
     Widget::initParament();
     m_Id = m_windowList.count();
+    if (m_Id == 1){
+        m_Permanent = true;
+    }else
+    {
+        m_Permanent = false;
+    }
 }
 
 void WindowWidget::addWidget(QWidget *w)

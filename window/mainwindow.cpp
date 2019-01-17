@@ -849,6 +849,7 @@ WindowInfo *MainWindow::setWidgetInfo(Widget *w, struct list_head *head, int *po
         winInfo->BkColor[0] = m_buildInfo->QColorToEColor(w->getBkColor());
         winInfo->timer.Id = w->getId()<<8;
         winInfo->timer.time = 100;
+        winInfo->permanent = w->getPermanent();
         base = &winInfo->base;
         *pos = curPos + sizeof(WindowInfo);
 
@@ -862,7 +863,6 @@ WindowInfo *MainWindow::setWidgetInfo(Widget *w, struct list_head *head, int *po
         btnInfo->BkColor[0] = m_buildInfo->QColorToEColor(w->getBkColor());
         btnInfo->BkColor[1] = m_buildInfo->QColorToEColor(w->getBkPressColor());
         btnInfo->BkColor[2] = m_buildInfo->QColorToEColor(w->getBkDisableColor());
-        //btnInfo->cmd = m_buildInfo->QStringToLuaChar(w->getLuaCmd());
         setTextInfo(w, &btnInfo->text);
         setOptRegInfo(w, &btnInfo->optReg);
 
@@ -888,8 +888,8 @@ WindowInfo *MainWindow::setWidgetInfo(Widget *w, struct list_head *head, int *po
     case Edit:
     {
         EditInfo *editInfo = (EditInfo*)(start + curPos);
-        editInfo->BkColor[0] = m_buildInfo->QColorToEColor(w->getBkColor());
-        editInfo->BkColor[1] = m_buildInfo->QColorToEColor(w->getBkDisableColor());
+        editInfo->BkColor[0] = m_buildInfo->QColorToEColor(w->getBkDisableColor());
+        editInfo->BkColor[1] = m_buildInfo->QColorToEColor(w->getBkColor());
         editInfo->maxLen = 100;
         setTextInfo(w, &editInfo->text);
         base = &editInfo->base;

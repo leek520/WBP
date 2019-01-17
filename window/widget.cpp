@@ -669,6 +669,16 @@ void Widget::setWriteValue(int value)
     m_WriteValue = value;
 }
 
+bool Widget::getPermanent()
+{
+    return m_Permanent;
+}
+
+void Widget::setPermanent(bool value)
+{
+    m_Permanent = value;
+}
+
 QVariant Widget::getBkColor1()
 {
     return QVariant::fromValue<QList<QColor> >(m_BkColor1);

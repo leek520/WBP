@@ -11,12 +11,13 @@
 int getData(lua_State *L);
 int setData(lua_State *L);
 int switchWindow(lua_State *L);
-int printl(lua_State *L);
+int setWidgetColor(lua_State *L);
 static const struct luaL_Reg luaLib[] =
 {
     {"getData", getData},
     {"setData", setData},
     {"switchWindow", switchWindow},
+    {"setWidgetColor", setWidgetColor},
     {NULL, NULL},
 };
 

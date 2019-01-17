@@ -1,4 +1,4 @@
-#include "luafun.h"
+﻿#include "luafun.h"
 
 
 int getData(lua_State *L)
@@ -14,7 +14,7 @@ int switchWindow(lua_State *L)
 {
     return 0;
 }
-int printl(lua_State *L)
+int setWidgetColor(lua_State *L)
 {
     return 0;
 }
@@ -29,3 +29,5 @@ void closeLua(lua_State *L)
 {
     lua_close(L);
 }
+
+
