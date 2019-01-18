@@ -33,7 +33,8 @@ SOURCES += \
     $$PWD/bottomwidget.cpp \
     $$PWD/buildinfo.cpp \
     $$PWD/publicvar.cpp \
-    $$PWD/baseComponent.cpp
+    $$PWD/baseComponent.cpp \
+    $$PWD/iconviewwidget.cpp
 
 HEADERS  += \
     ../common.h \
@@ -54,7 +55,8 @@ HEADERS  += \
     $$PWD/bottomwidget.h \
     $$PWD/buildinfo.h \
     $$PWD/publicvar.h \
-    $$PWD/baseComponent.h
+    $$PWD/baseComponent.h \
+    $$PWD/iconviewwidget.h
 
 
 FORMS += \

@@ -49,6 +49,7 @@ void PropertyDialog::showDialog(Widget *w)
         ui->boxPage->setVisible(true);
         break;
     case Button:
+    case Iconview:
         ui->baseStack->setCurrentIndex(0);
         ui->tabwidget->addTab(ui->tabText, "文本属性");
         ui->tabwidget->addTab(ui->tabSecurity, "安全属性");

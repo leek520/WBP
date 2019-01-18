@@ -82,6 +82,7 @@ typedef enum _eWidgetType
     Button,
     Text,
     Edit,
+    Iconview,
 
     Image = 10,
     Line,
@@ -268,7 +269,17 @@ typedef struct _tEditInfo
     uchar maxLen;
     char resv[3];
 }EditInfo;      //11*4byte
-
+/*********图标信息结构************/
+typedef struct _tIconviewInfo
+{
+    BasePara base;
+    int BkColor[2];
+    TextPara text;
+    OptRegPara optReg;
+    ushort xSizeItem;
+    ushort ySizeItem;
+    GUI_BITMAP *GUI_Image;
+}IconviewInfo;
 typedef struct _tMacroInfo
 {
     struct list_head list;

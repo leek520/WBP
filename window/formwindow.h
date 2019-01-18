@@ -6,6 +6,7 @@
 #include "buttonwidget.h"
 #include "editwidget.h"
 #include "textwidget.h"
+#include "iconviewwidget.h"
 #include "imagewidget.h"
 #include "scrollarea.h"
 class WindowWidget : public Widget

@@ -38,5 +38,6 @@
         <file alias="editor">resources/images/tools/editor.png</file>
         <file alias="down">resources/images/dialog/down.png</file>
         <file alias="up">resources/images/dialog/up.png</file>
+        <file alias="iconview">resources/images/widget/iconview.PNG</file>
     </qresource>
 </RCC>

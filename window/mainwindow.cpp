@@ -163,6 +163,11 @@ void MainWindow::createActions()
     connect(act, SIGNAL(triggered()), this, SLOT(addWidget()));
     m_widgetActList.append(act);
 
+    act = new QAction(QIcon(":/iconview"), tr("iconview"), this);
+    act->setShortcut(Qt::Key_F6);
+    connect(act, SIGNAL(triggered()), this, SLOT(addWidget()));
+
+    m_widgetActList.append(act);
     /****graph****/
     act = new QAction(QIcon(":/image"), tr("image"), this);
     connect(act, SIGNAL(triggered()), this, SLOT(addWidget()));
@@ -899,6 +904,8 @@ WindowInfo *MainWindow::setWidgetInfo(Widget *w, struct list_head *head, int *po
         list_add_tail(&base->list, head);
         break;
     }
+    case Iconview:
+        break;
     case Image:
     {
         ImageInfo *imageInfo = (ImageInfo*)(start + curPos);
@@ -1304,7 +1311,10 @@ Widget* MainWindow::addWidget(WidgetType type)
         create = new EditWidget(WindowWidget::m_curWin);
         create->resize(DefaultWidgetWidth, DefaultWidgetHeight);
         break;
-
+    case Iconview:
+        create = new IconviewWidget(WindowWidget::m_curWin);
+        create->resize(DefaultWidgetWidth, DefaultWidgetHeight);
+        break;
     case Image:
         create = new ImageWidget(WindowWidget::m_curWin);
         create->resize(DefaultWidgetWidth, DefaultWidgetHeight);

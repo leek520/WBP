@@ -54,6 +54,7 @@ void LeftWidget::addWidget(Widget *w)
     case Button:
     case Text:
     case Edit:
+    case Iconview:
     case Image:
     case Line:
     case Rect:

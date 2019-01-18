@@ -26,7 +26,7 @@ void WindowWidget::initPropertyTable()
     m_propTable << qMakePair(QVariant::Int, QString("Id"));
     m_propTable << qMakePair(QVariant::Rect, QString("geometry"));
     m_propTable << qMakePair(QVariant::Color, QString("BkColor"));
-    m_propTable << qMakePair(QVariant::Color, QString("Permanent"));
+    m_propTable << qMakePair(QVariant::Bool, QString("Permanent"));
 
 }
 
@@ -53,6 +53,7 @@ void WindowWidget::addWidget(QWidget *w)
         case Button:
         case Text:
         case Edit:
+        case Iconview:
             m_childList.append(w);
             break;
         case Image:
@@ -92,6 +93,7 @@ void WindowWidget::removeWidget(QWidget *w)
         case Button:
         case Text:
         case Edit:
+        case Iconview:
             m_childList.removeOne(w);
             break;
         case Image:
